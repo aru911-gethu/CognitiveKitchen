@@ -1,8 +1,9 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from backend.crawler import stream_smart_ingest
-from backend.pdf_ingest import save_and_parse_pdf
+
+from .crawler import stream_smart_ingest
+from .pdf_ingest import save_and_parse_pdf
 
 app = FastAPI(title="Cognitive Kitchen API", version="0.0.1")
 

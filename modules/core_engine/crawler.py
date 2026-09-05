@@ -2,7 +2,7 @@ import json
 import time
 from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
-from backend.ingest import scrape_and_store_recipe
+from .ingest import scrape_and_store_recipe
 
 def stream_smart_ingest(url: str):
     """
