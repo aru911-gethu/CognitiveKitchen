@@ -1,64 +1,113 @@
-# CognitiveKitchen
+<div align="center">
+
+# 🍳 CognitiveKitchen
 
 An advanced, production-grade RAG recipe assistant engineered iteratively from a core MVP into an intelligent, multi-modal culinary system featuring semantic retrieval, HyDE query expansion, fridge-vision inventory, and cloud deployment.
 
----
+[![Python](https://img.shields.io/badge/Python-3.12%2B-blue.svg)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688.svg)](https://fastapi.tiangolo.com/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Frontend-FF4B4B.svg)](https://streamlit.io/)
+[![FAISS](https://img.shields.io/badge/FAISS-VectorDB-orange.svg)](https://github.com/facebookresearch/faiss)
 
-## Tech Stack
-
-- **Orchestration:** LangChain, Python
-- **API Framework:** FastAPI, Uvicorn
-- **Vector Database:** FAISS (Local)
-- **Embeddings:** HuggingFace (all-MiniLM-L6-v2)
-- **Web Scraping:** Playwright, BeautifulSoup
-- **Frontend / UI:** Streamlit
-- **Containerization & Cloud:** Docker, AWS
+</div>
 
 ---
 
-## Project Structure & Module Breakdown
+## 🛠️ Tech Stack
 
-CognitiveKitchen uses a modular, scalable architecture separating core ingestion/retrieval engines from advanced enhancements and production configs:
-
-- **`app.py` (Root):** The primary Streamlit frontend entry point providing an interactive chat interface and ingestion dashboards.
-- **`data/`:** Centralized storage for raw JSON recipe vaults (`raw_recipes/`) and unstructured document assets (`raw_pdfs/`).
-- **`modules/core_engine/`:** Houses the foundational pipelines—FastAPI server (`main.py`), automated web scrapers (`crawler.py`, `ingest.py`), PDF text extractors (`pdf_ingest.py`), and baseline vector store vectorization/retrieval logic.
-- **`modules/enhancements/`:** Reserved for advanced retrieval upgrades (semantic chunking, Maximal Marginal Relevance) and query engineering (HyDE, query expansion, and multi-modal vision).
-- **`modules/production/`:** Houses containerization scripts (Dockerfile) and cloud deployment configurations for AWS.
-
----
-
-## Architectural Evolution & Development Roadmap
-
-- **[x] Phase 1: Core Data Ingestion & API Architecture**
-  - **Multi-Source Ingestion Pipeline:** Built robust parsers to ingest user-shared URLs and raw PDFs, normalizing unstructured culinary data into clean JSON schemas.
-  - **Intelligent Playwright Routing:** Leveraged Playwright to auto-recognize page structures, dynamically diverting execution between bulk category index pages and live single-recipe pages.
-  - **FastAPI Live Streaming:** Engineered a high-performance FastAPI backend featuring NDJSON streaming endpoints to deliver real-time progress updates and recipe fetch stats directly to the UI.
-- **[ ] Phase 2: Core Naive RAG & Chat UI**
-  - Implementing local vector storage (FAISS) powered by lightweight HuggingFace embeddings (`all-MiniLM-L6-v2`).
-  - Expanding the Streamlit interface into a real-time conversational assistant connected to the recipe vault.
-- **[ ] Phase 3: Advanced Retrieval & Query Engineering**
-  - Upgrading semantic search diversity using Maximal Marginal Relevance (MMR) scoring and optimized chunking.
-  - Introducing Hypothetical Document Embeddings (HyDE) to bridge casual human cravings with structured recipe schemas.
-- **[ ] Phase 4: Multi-Modal Vision & Constraints**
-  - Integrating computer vision to parse fridge-inventory photo uploads and recommend recipes based on available ingredients.
-  - Implementing deterministic dietary preference and allergen filtering.
-- **[ ] Phase 5: Production Hardening & Cloud Deployment**
-  - Containerizing the full stack via Docker and deploying to AWS for production-grade scalability.
+- **Orchestration & Frameworks:** Python, LangChain
+- **Backend API:** FastAPI, Uvicorn, NDJSON Streaming
+- **Vector Database:** FAISS (Local Vector Index)
+- **Embeddings Model:** HuggingFace (`all-MiniLM-L6-v2`)
+- **Web Automation & Scraping:** Playwright, BeautifulSoup
+- **Frontend UI:** Streamlit
+- **Infrastructure & Cloud:** Docker, AWS
 
 ---
 
-## Quick Start
+## 📁 Project Structure & Module Breakdown
 
-1. **Clone repository:** `git clone https://github.com/aru911-gethu/CognitiveKitchen.git`
-2. **Navigate to folder:** `cd CognitiveKitchen`
-3. **Create virtual environment:** `python -m venv .venv`
-4. **Activate environment on Windows:** `.venv\Scripts\Activate`
-5. **Install dependencies:** `pip install -r requirements.txt`
-6. **Run FastAPI backend:** `uvicorn modules.core_engine.main:app --reload`
-7. **Run Streamlit app (in a separate terminal):** `streamlit run app.py`
+CognitiveKitchen implements a clean, modular architecture separating core data ingestion and retrieval engines from advanced enhancements and production configurations:
 
----
+```text
+CognitiveKitchen/
+├── app.py                      # Streamlit frontend entry point (Chat UI & Dashboards)
+├── data/                       # Centralized local storage
+│   ├── raw_recipes/            # Structured JSON recipe vault
+│   └── raw_pdfs/               # Unstructured document assets & PDF books
+└── modules/
+    ├── core_engine/            # Foundational pipelines (FastAPI, Scrapers, FAISS)
+    │   ├── main.py             # FastAPI server & streaming endpoints
+    │   ├── crawler.py          # Playwright intelligent routing scraper
+    │   ├── ingest.py           # Recipe normalization & schema mapping
+    │   └── pdf_ingest.py       # PyMuPDF text extraction pipeline
+    ├── enhancements/           # Advanced retrieval (Semantic chunking, MMR) & Query engineering (HyDE)
+    └── production/             # Docker containerization & AWS deployment configs
 
-## Author
-Built by [Arun](https://github.com/aru911-gethu) as an exploration into production-ready RAG architectures.
+
+    🚀 Architectural Evolution & Development Roadmap
+
+    [x] Phase 1: Core Data Ingestion & API Architecture
+
+        Multi-Source Ingestion Pipeline: Built robust parsers to ingest user-shared URLs and raw PDF document uploads, normalizing unstructured culinary text into clean, structured JSON schemas.
+
+        Intelligent Playwright Routing: Leveraged Playwright to auto-recognize page layouts, dynamically diverting execution between bulk category index listings and live single-recipe pages.
+
+        FastAPI Live Streaming: Engineered a high-performance FastAPI backend featuring NDJSON streaming endpoints to deliver real-time progress updates, live log streaming, and fetched recipe stats directly to the UI.
+
+    [ ] Phase 2: Core Naive RAG & Chat UI
+
+        Vector Database Indexing: Implementing local FAISS vector indexing powered by lightweight HuggingFace embeddings (all-MiniLM-L6-v2).
+
+        Conversational Assistant: Expanding the Streamlit frontend into a real-time chat interface connected securely to the local recipe vault retrieval engine.
+
+    [ ] Phase 3: Advanced Retrieval & Query Engineering
+
+        Maximal Marginal Relevance (MMR): Upgrading semantic search diversity to prevent redundant recipe results.
+
+        Hypothetical Document Embeddings (HyDE): Introducing query expansion to bridge casual human cravings with technical recipe schemas.
+
+    [ ] Phase 4: Multi-Modal Vision & Constraints
+
+        Fridge-Vision Inventory: Integrating computer vision to parse uploaded fridge-inventory photos and recommend recipes based on available ingredients.
+
+        Dietary Guardrails: Implementing deterministic dietary preference and allergen filtering.
+
+    [ ] Phase 5: Production Hardening & Cloud Deployment
+
+        Containerization: Packaging the entire multi-container stack using Docker.
+
+        Cloud Orchestration: Deploying the application pipeline onto AWS for production-grade scalability.
+
+⚡ Quick Start Guide
+
+    Clone the repository:
+    Bash
+
+git clone [https://github.com/aru911-gethu/CognitiveKitchen.git](https://github.com/aru911-gethu/CognitiveKitchen.git)
+cd CognitiveKitchen
+
+Create and activate a virtual environment:
+Bash
+
+python -m venv .venv
+.venv\Scripts\Activate  # On Windows PowerShell
+
+Install dependencies:
+Bash
+
+pip install -r requirements.txt
+
+Launch the FastAPI backend:
+Bash
+
+uvicorn modules.core_engine.main:app --reload
+
+Launch the Streamlit frontend (in a separate terminal tab):
+Bash
+
+    streamlit run app.py
+
+👤 Author
+
+Built with precision by Arun (@aru911-gethu) as an exploration into production-ready, modular RAG architectures.
