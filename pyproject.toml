@@ -1,0 +1,29 @@
+[project]
+name = "cognitive-kitchen"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Narun" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "bs4>=0.0.2",
+    "fastapi>=0.141.1",
+    "langchain>=1.4.0",
+    "langsmith>=0.12.1",
+    "playwright>=1.62.0",
+    "pydantic>=2.13.5",
+    "pymupdf>=1.28.2",
+    "python-dotenv>=1.2.3",
+    "requests>=2.34.2",
+    "streamlit>=1.63.0",
+    "uvicorn>=0.52.4",
+]
+
+[project.scripts]
+cognitive-kitchen = "cognitive_kitchen:main"
+
+[build-system]
+requires = ["uv_build>=0.12.10,<0.13.0"]
+build-backend = "uv_build"

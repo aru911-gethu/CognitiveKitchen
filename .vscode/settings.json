@@ -1,0 +1,14 @@
+{
+  "files.exclude": {
+    "**/.env": true,
+    "**/.env.*": true
+  },
+  "search.exclude": {
+    "**/.env": true,
+    "**/.env.*": true
+  },
+  "github.copilot.enable": {
+    "*": true,
+    "dotenv": false
+  }
+}
