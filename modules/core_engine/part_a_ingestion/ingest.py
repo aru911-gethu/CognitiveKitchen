@@ -1,10 +1,12 @@
+import os
 import json
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 
-# Define our local storage vault directory
-STORAGE_DIR = Path("data/raw_recipes")
+# Robust path resolution: go up 3 levels to the CognitiveKitchen root
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
+STORAGE_DIR = Path(ROOT_DIR) / "data" / "raw_recipes"
 STORAGE_DIR.mkdir(parents=True, exist_ok=True)
 
 def scrape_and_store_recipe(url: str) -> dict:

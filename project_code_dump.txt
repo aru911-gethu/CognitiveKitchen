@@ -1,0 +1,357 @@
+﻿=====================================================================
+FILE: app.py
+=====================================================================
+import streamlit as st
+import requests
+import json
+import pandas as pd
+
+st.set_page_config(page_title="Cognitive Kitchen", page_icon="ðŸ³", layout="centered")
+
+st.title("ðŸ³ Cognitive Kitchen")
+st.markdown("Your AI-powered multi-modal recipe vault. Ingest recipes via **Smart Web Crawler** or **PDF Document Upload**.")
+
+# Create clean tabs for multiple ingestion channels
+tab1, tab2 = st.tabs(["ðŸŒ Web Ingest (URL)", "ðŸ“„ PDF Document Ingest"])
+
+with tab1:
+    st.subheader("Smart Web Crawler (Live Streaming)")
+    target_url = st.text_input("Recipe or Category Webpage URL", placeholder="https://chitrasfoodbook.com/... or category link")
+
+    if st.button("Process Web URL Live"):
+        if not target_url:
+            st.warning("Please enter a URL first!")
+        else:
+            status_box = st.status("Initializing crawler...", expanded=True)
+            progress_bar = st.progress(0)
+            scraped_recipes = []
+            table_placeholder = st.empty()
+            
+            try:
+                response = requests.post(
+                    "http://127.0.0.1:8000/api/v1/stream-ingest",
+                    json={"url": target_url},
+                    stream=True
+                )
+                
+                for line in response.iter_lines():
+                    if line:
+                        data = json.loads(line.decode("utf-8"))
+                        msg_status = data.get("status")
+                        
+                        if msg_status == "info":
+                            status_box.write(data.get("message"))
+                        elif msg_status == "progress":
+                            current = data.get("current")
+                            total = data.get("total")
+                            recipe = data.get("recipe")
+                            scraped_recipes.append(recipe)
+                            
+                            progress_bar.progress(current / total)
+                            status_box.update(label=f"Scraping [{current}/{total}]: {recipe.get('title')}", state="running")
+                            
+                            df = pd.DataFrame(scraped_recipes)
+                            table_placeholder.dataframe(df[["title", "saved_path"]], use_container_width=True)
+                            
+                        elif msg_status == "complete":
+                            status_box.update(label="Vault Ingestion Complete! âœ…", state="complete")
+                            progress_bar.progress(1.0)
+            except Exception as e:
+                st.error(f"Connection error: {e}")
+
+with tab2:
+    st.subheader("Upload Recipe PDF")
+    uploaded_file = st.file_uploader("Choose a recipe PDF file", type=["pdf"])
+
+    if uploaded_file is not None:
+        if st.button("Upload & Parse PDF"):
+            with st.spinner("Uploading PDF, extracting text with PyMuPDF, and saving to vault..."):
+                try:
+                    files = {"file": (uploaded_file.name, uploaded_file.getvalue(), "application/pdf")}
+                    response = requests.post(
+                        "http://127.0.0.1:8000/api/v1/ingest-pdf",
+                        files=files
+                    )
+                    
+                    if response.status_code == 200:
+                        res_data = response.json()
+                        st.success(f"Successfully ingested PDF: **{res_data.get('title')}**")
+                        st.json(res_data)
+                    else:
+                        st.error(f"Server error: {response.text}")
+                except Exception as e:
+                    st.error(f"Failed to connect to backend: {e}")
+
+
+=====================================================================
+FILE: modules\core_engine\main.py
+=====================================================================
+import os
+import tempfile
+from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
+
+# Corrected absolute imports routing perfectly to Part A
+from modules.core_engine.part_a_ingestion.crawler import stream_smart_ingest
+from modules.core_engine.part_a_ingestion.pdf_ingest import extract_text_from_pdf, save_extracted_pdf_to_vault
+
+app = FastAPI(title="Cognitive Kitchen API", version="0.0.1")
+
+# Request schema for the web crawler endpoint
+class URLRequest(BaseModel):
+    url: str
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy", "service": "kitchen_engine"}
+
+@app.post("/api/v1/stream-ingest")
+def stream_ingest(request: URLRequest):
+    """
+    Streams live progress updates while crawling and batch-scraping a web index or single recipe.
+    """
+    return StreamingResponse(stream_smart_ingest(request.url), media_type="application/x-ndjson")
+
+@app.post("/api/v1/ingest-pdf")
+async def ingest_pdf(file: UploadFile = File(...)):
+    """
+    Receives an uploaded PDF file, temporarily saves it, extracts text using PyMuPDF, 
+    and stores it in the local structured JSON vault.
+    """
+    if not file.filename.endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF files are supported.")
+    
+    try:
+        # 1. Save uploaded bytes to a temporary file so PyMuPDF can open it
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+            tmp.write(await file.read())
+            tmp_path = tmp.name
+        
+        # 2. Extract text using our Part A pipeline
+        extracted_pages = extract_text_from_pdf(tmp_path)
+        
+        # 3. Save the extracted content into the JSON vault
+        output_path = save_extracted_pdf_to_vault(extracted_pages, file.filename)
+        
+        # 4. Clean up the temporary file
+        os.remove(tmp_path)
+        
+        return {
+            "status": "success", 
+            "title": file.filename, 
+            "saved_path": output_path, 
+            "total_pages": len(extracted_pages)
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+=====================================================================
+FILE: modules\core_engine\part_a_ingestion\crawler.py
+=====================================================================
+import json
+import time
+from playwright.sync_api import sync_playwright
+from bs4 import BeautifulSoup
+from .ingest import scrape_and_store_recipe
+
+def stream_smart_ingest(url: str):
+    """
+    Generator that yields live progress updates for FastAPI streaming.
+    """
+    yield json.dumps({"status": "info", "message": f"Analyzing URL: {url}"}) + "\n"
+    
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page()
+        page.goto(url, wait_until="domcontentloaded")
+        html_content = page.content()
+        browser.close()
+        
+    soup = BeautifulSoup(html_content, 'html.parser')
+    
+    recipe_links = set()
+    for a in soup.find_all('a', href=True):
+        href = a['href']
+        if "/chitrasfoodbook.com/" in href:
+            unwanted_patterns = [
+                "/recipes", "/category/", "/tag/", "/page/", "wp-content", "#", 
+                "/about-me", "/contact", "/recipe-index", "/privacy-policy", 
+                "/terms", "/sitemap", "feed/"
+            ]
+            if not any(pattern in href for pattern in unwanted_patterns) and href != url and href != "https://chitrasfoodbook.com/":
+                recipe_links.add(href)
+                
+    target_urls = list(recipe_links)
+    
+    if len(target_urls) > 1:
+        yield json.dumps({"status": "info", "message": f"Found {len(target_urls)} pure recipe links. Scraping live..."}) + "\n"
+        
+        for idx, recipe_url in enumerate(target_urls, 1):
+            try:
+                res = scrape_and_store_recipe(recipe_url)
+                yield json.dumps({
+                    "status": "progress",
+                    "current": idx,
+                    "total": len(target_urls),
+                    "recipe": res
+                }) + "\n"
+                time.sleep(1)
+            except Exception as e:
+                yield json.dumps({"status": "error", "message": f"Failed {recipe_url}: {str(e)}"}) + "\n"
+        
+        yield json.dumps({"status": "complete", "total_scraped": len(target_urls)}) + "\n"
+    else:
+        res = scrape_and_store_recipe(url)
+        yield json.dumps({
+            "status": "complete",
+            "total_scraped": 1,
+            "recipe": res
+        }) + "\n"
+
+
+=====================================================================
+FILE: modules\core_engine\part_a_ingestion\ingest.py
+=====================================================================
+import os
+import json
+from pathlib import Path
+from playwright.sync_api import sync_playwright
+from bs4 import BeautifulSoup
+
+# Robust path resolution: go up 3 levels to the CognitiveKitchen root
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
+STORAGE_DIR = Path(ROOT_DIR) / "data" / "raw_recipes"
+STORAGE_DIR.mkdir(parents=True, exist_ok=True)
+
+def scrape_and_store_recipe(url: str) -> dict:
+    """
+    Scrapes a recipe URL, strips website clutter, extracts clean markdown-like text for RAG,
+    and saves it locally as a JSON document in our raw vault.
+    """
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page()
+        page.goto(url, wait_until="domcontentloaded")
+        html_content = page.content()
+        page_title = page.title()
+        browser.close()
+        
+    soup = BeautifulSoup(html_content, 'html.parser')
+    
+    # Strip away website clutter (ads, sidebars, navigation, footers)
+    for element in soup(["script", "style", "nav", "footer", "header", "aside"]):
+        element.decompose()
+        
+    # Extract clean, human-readable text body
+    clean_text = soup.get_text(separator="\n", strip=True)
+    
+    recipe_document = {
+        "url": url,
+        "title": page_title,
+        "raw_text": clean_text
+    }
+    
+    # Generate a safe local filename from the page title
+    safe_filename = "".join(c if c.isalnum() else "_" for c in page_title)[:50] + ".json"
+    file_path = STORAGE_DIR / safe_filename
+    
+    # Save locally to our Raw Vault
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(recipe_document, f, indent=4, ensure_ascii=False)
+        
+    return {
+        "status": "success", 
+        "saved_path": str(file_path), 
+        "title": page_title
+    }
+
+
+=====================================================================
+FILE: modules\core_engine\part_a_ingestion\pdf_ingest.py
+=====================================================================
+import os
+import json
+import fitz  # PyMuPDF
+from typing import List, Dict, Any
+
+# Note the path change here: we now go up THREE levels (../../../) because we are in part_a_ingestion
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
+RAW_PDFS_DIR = os.path.join(ROOT_DIR, "data", "raw_pdfs")
+RAW_RECIPES_DIR = os.path.join(ROOT_DIR, "data", "raw_recipes")
+
+def extract_text_from_pdf(pdf_path: str) -> List[Dict[str, Any]]:
+    """Extracts text page-by-page from a PDF using PyMuPDF (fitz)."""
+    if not os.path.exists(pdf_path):
+        raise FileNotFoundError(f"PDF file not found at: {pdf_path}")
+
+    extracted_pages = []
+    doc = fitz.open(pdf_path)
+    filename = os.path.basename(pdf_path)
+
+    for page_num in range(len(doc)):
+        page = doc[page_num]
+        text = page.get_text("text").strip()
+        if text:
+            extracted_pages.append({
+                "source_file": filename,
+                "page_number": page_num + 1,
+                "content": text
+            })
+    doc.close()
+    return extracted_pages
+
+def save_extracted_pdf_to_vault(extracted_pages: List[Dict[str, Any]], base_filename: str) -> str:
+    """Saves extracted PDF content as a normalized JSON inside data/raw_recipes/."""
+    os.makedirs(RAW_RECIPES_DIR, exist_ok=True)
+    output_filename = f"pdf_{os.path.splitext(base_filename)[0]}.json"
+    output_path = os.path.join(RAW_RECIPES_DIR, output_filename)
+    
+    payload = {
+        "source": base_filename,
+        "type": "pdf_document",
+        "total_pages": len(extracted_pages),
+        "pages": extracted_pages
+    }
+    
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2, ensure_ascii=False)
+        
+    return output_path
+
+
+=====================================================================
+FILE: modules\core_engine\part_a_ingestion\schemas.py
+=====================================================================
+from pydantic import BaseModel, Field
+from typing import List, Optional
+
+class Ingredient(BaseModel):
+    name: str = Field(..., description="Normalized ingredient name (e.g., 'chicken breast')")
+    quantity: Optional[float] = Field(None, description="Numeric quantity, optional if missing on site")
+    unit: Optional[str] = Field(None, description="Unit of measurement (e.g., 'grams', 'cups')")
+
+class Recipe(BaseModel):
+    id: str = Field(..., description="Unique hash or identifier for the recipe")
+    title: str = Field(..., description="Name of the recipe")
+    prep_time_minutes: Optional[int] = Field(None, description="Preparation time in minutes")
+    dietary_tags: List[str] = Field(default_factory=list, description="e.g., ['vegan', 'gluten-free']")
+    ingredients: List[Ingredient] = Field(..., description="Structured list of ingredients")
+    instructions: List[str] = Field(..., description="Step-by-step cooking instructions")
+    
+    class Config:
+        frozen = True
+
+
+=====================================================================
+FILE: modules\core_engine\part_a_ingestion\__init__.py
+=====================================================================
+
+
+=====================================================================
+FILE: modules\core_engine\part_b_rag\__init__.py
+=====================================================================
+
+
