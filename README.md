@@ -1,16 +1,21 @@
+Here is a polished, professional-grade version of your README.
+
+I have added modern repository badges, improved the typography (using italics and bolding for emphasis), fixed the code block syntax highlighting, and cleaned up the roadmap using native Markdown task lists.
+
+Copy the code block below and replace your current README.md contents:
 Markdown
 
 <div align="center">
 
 # 🍳 CognitiveKitchen
 
-An advanced, production-grade RAG recipe assistant engineered iteratively from a core MVP into an intelligent, multi-modal culinary system featuring semantic retrieval, HyDE query expansion, fridge-vision inventory, and cloud deployment.
+*An advanced, production-grade RAG recipe assistant engineered iteratively from a core MVP into an intelligent, multi-modal culinary system.*
 
-[![Python](https://img.shields.io/badge/Python-3.12%2B-blue.svg)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688.svg)](https://fastapi.tiangolo.com/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-Frontend-FF4B4B.svg)](https://streamlit.io/)
-[![LangChain](https://img.shields.io/badge/LangChain-LCEL-green.svg)](https://www.langchain.com/)
-[![FAISS](https://img.shields.io/badge/FAISS-VectorDB-orange.svg)](https://github.com/facebookresearch/faiss)
+[![Python](https://img.shields.io/badge/Python-3.12%2B-blue?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![LangChain](https://img.shields.io/badge/LangChain-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white)](https://www.langchain.com/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
 </div>
 
@@ -19,9 +24,9 @@ An advanced, production-grade RAG recipe assistant engineered iteratively from a
 ## 🛠️ Tech Stack
 
 - **Orchestration & Frameworks:** Python, LangChain, LCEL
-- **Observability:** LangSmith (Tracing, latency, and token monitoring)
+- **Observability:** LangSmith *(Tracing, latency, and token monitoring)*
 - **Backend API:** FastAPI, Uvicorn, NDJSON Streaming
-- **Vector Database:** FAISS (Local Vector Index)
+- **Vector Database:** FAISS *(Local Vector Index)*
 - **Embeddings Model:** HuggingFace (`all-MiniLM-L6-v2`)
 - **LLM Engine:** OpenAI (`gpt-4o-mini`)
 - **Web Automation & Scraping:** Playwright, BeautifulSoup
@@ -32,7 +37,7 @@ An advanced, production-grade RAG recipe assistant engineered iteratively from a
 
 ## 📁 Project Structure & Module Breakdown
 
-CognitiveKitchen implements a clean, modular architecture separating core data ingestion and UI controls (Part A) from semantic RAG intelligence and chat execution (Part B):
+**CognitiveKitchen** implements a clean, modular architecture separating core data ingestion and UI controls (**Part A**) from semantic RAG intelligence and chat execution (**Part B**):
 
 ```text
 CognitiveKitchen/
@@ -91,32 +96,37 @@ CognitiveKitchen/
 
 ⚡ Quick Start Guide
 
-    Clone the repository:
-    Bash
+1. Clone the repository:
+Bash
 
 git clone [https://github.com/aru911-gethu/CognitiveKitchen.git](https://github.com/aru911-gethu/CognitiveKitchen.git)
 cd CognitiveKitchen
 
-Create and activate a virtual environment:
+2. Create and activate a virtual environment:
 Bash
 
 python -m venv .venv
-.venv\Scripts\Activate  # On Windows PowerShell
 
-Install dependencies:
+# On Windows PowerShell:
+.venv\Scripts\Activate  
+
+# On macOS/Linux:
+# source .venv/bin/activate
+
+3. Install dependencies:
 Bash
 
 pip install -r requirements.txt
 
-Launch the FastAPI backend:
+4. Launch the FastAPI backend:
 Bash
 
 uvicorn modules.core_engine.main:app --reload
 
-Launch the Streamlit frontend (in a separate terminal tab):
+5. Launch the Streamlit frontend (in a separate terminal tab):
 Bash
 
-    streamlit run app.py
+streamlit run app.py
 
 👤 Author
 
