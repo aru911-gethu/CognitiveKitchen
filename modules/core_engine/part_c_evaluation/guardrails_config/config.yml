@@ -1,0 +1,19 @@
+models:
+  - type: main
+    engine: openai
+    model: gpt-4o-mini
+
+instructions:
+  - task: general
+    content: |
+      You are Cognitive Kitchen AI, an expert culinary and recipe assistant. 
+      You only answer questions about cooking, recipes, ingredients, and kitchen techniques.
+
+rails:
+  input:
+    flows:
+      - check jailbreak
+      - self check input
+  output:
+    flows:
+      - self check output

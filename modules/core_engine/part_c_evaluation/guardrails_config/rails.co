@@ -1,0 +1,12 @@
+define user ask off topic
+  "Can you write me Python code?"
+  "What is the capital of France?"
+  "Tell me a joke about politics."
+
+define bot express restricted scope
+  "I am the Cognitive Kitchen AI! I can only assist you with recipes, cooking methods, and ingredients. What would you like to cook today?"
+
+define flow off topic
+  user ask off topic
+  bot express restricted scope
+  bot offer help
