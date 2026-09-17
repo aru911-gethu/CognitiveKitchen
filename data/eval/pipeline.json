@@ -1,0 +1,16 @@
+{
+  "chunker": "recursive",
+  "chunker_params": {},
+  "source": "rrf",
+  "sparse": "bm25",
+  "use_mmr": false,
+  "use_rerank": false,
+  "use_graph": true,
+  "k": 5,
+  "query_transform": "passthrough",
+  "strategy": "stuff_strict",
+  "generator": "gpt4o-mini",
+  "max_new_tokens": 350,
+  "corpus_source": "pdf",
+  "scores": {}
+}
