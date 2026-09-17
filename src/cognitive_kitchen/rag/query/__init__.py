@@ -1,0 +1,1 @@
+"""Query transforms. Each module registers itself under kind "query"."""
