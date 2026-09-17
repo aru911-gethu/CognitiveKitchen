@@ -1,0 +1,4325 @@
+{
+  "add flavor to curries rice": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "add milk stir continuously": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "all-purpose flour": {
+    "canonical": "all-purpose flour",
+    "category": "gluten",
+    "split": null
+  },
+  "almond": {
+    "canonical": "almond",
+    "category": "nut",
+    "split": null
+  },
+  "almonds": {
+    "canonical": "almond",
+    "category": "nut",
+    "split": null
+  },
+  "almonds cashews fried": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "almond",
+      "cashew"
+    ]
+  },
+  "amchoor powder": {
+    "canonical": "amchur",
+    "category": "none",
+    "split": null
+  },
+  "amchoor powder/mango powder": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "amchur"
+    ]
+  },
+  "amchur": {
+    "canonical": "amchur",
+    "category": "none",
+    "split": null
+  },
+  "another term green vegetables": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "apple pear nectarine plums guava mango": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "apple",
+      "pear",
+      "nectarine",
+      "plum",
+      "guava",
+      "mango"
+    ]
+  },
+  "arhar": {
+    "canonical": "toor dal",
+    "category": "none",
+    "split": null
+  },
+  "arhar/toor daal": {
+    "canonical": "toor dal",
+    "category": "none",
+    "split": null
+  },
+  "arrarot": {
+    "canonical": "arrowroot",
+    "category": "none",
+    "split": null
+  },
+  "arrowroot": {
+    "canonical": "arrowroot",
+    "category": "none",
+    "split": null
+  },
+  "as garnish": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "as much fat as possible": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "asafoetida": {
+    "canonical": "asafoetida",
+    "category": "none",
+    "split": null
+  },
+  "asafoetida powder": {
+    "canonical": "asafoetida",
+    "category": "none",
+    "split": null
+  },
+  "availability": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "available at any indian grocery store": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "baby potatoes": {
+    "canonical": "potato",
+    "category": "none",
+    "split": null
+  },
+  "baking potato": {
+    "canonical": "potato",
+    "category": "none",
+    "split": null
+  },
+  "baking powder": {
+    "canonical": "baking powder",
+    "category": "none",
+    "split": null
+  },
+  "baking powder cardamom water making dough": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "baking powder",
+      "cardamom",
+      "water"
+    ]
+  },
+  "baking soda": {
+    "canonical": "baking soda",
+    "category": "none",
+    "split": null
+  },
+  "banana": {
+    "canonical": "banana",
+    "category": "none",
+    "split": null
+  },
+  "banana oranges are must": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "bananas": {
+    "canonical": "banana",
+    "category": "none",
+    "split": null
+  },
+  "bananas lemon juice": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "banana",
+      "lemon juice"
+    ]
+  },
+  "basmati other long grain rice": {
+    "canonical": "rice",
+    "category": "none",
+    "split": null
+  },
+  "basmati rice": {
+    "canonical": "rice",
+    "category": "none",
+    "split": null
+  },
+  "bay leaf": {
+    "canonical": "bay leaf",
+    "category": "none",
+    "split": null
+  },
+  "bay leaves": {
+    "canonical": "bay leaf",
+    "category": "none",
+    "split": null
+  },
+  "bell peppers": {
+    "canonical": "capsicum",
+    "category": "none",
+    "split": null
+  },
+  "besan": {
+    "canonical": "besan",
+    "category": "none",
+    "split": null
+  },
+  "besan -chickpea flour": {
+    "canonical": "besan",
+    "category": "none",
+    "split": null
+  },
+  "besan flour": {
+    "canonical": "besan",
+    "category": "none",
+    "split": null
+  },
+  "besan gram flour": {
+    "canonical": "besan",
+    "category": "none",
+    "split": null
+  },
+  "bhujia /sev / omapodi": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "bisquick sour cream sugar water": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "sour cream",
+      "sugar",
+      "water"
+    ]
+  },
+  "bitter gourd": {
+    "canonical": "bitter gourd",
+    "category": "none",
+    "split": null
+  },
+  "black cumin seeds": {
+    "canonical": "cumin seeds",
+    "category": "none",
+    "split": null
+  },
+  "black dal picked over": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "urad dal"
+    ]
+  },
+  "black gram": {
+    "canonical": "urad dal",
+    "category": "none",
+    "split": null
+  },
+  "black gram dal": {
+    "canonical": "urad dal",
+    "category": "none",
+    "split": null
+  },
+  "black gram dal picked over": {
+    "canonical": "urad dal",
+    "category": "none",
+    "split": null
+  },
+  "black mustard seed": {
+    "canonical": "mustard seeds",
+    "category": "none",
+    "split": null
+  },
+  "black mustard seeds": {
+    "canonical": "mustard seeds",
+    "category": "none",
+    "split": null
+  },
+  "black pepper": {
+    "canonical": "black pepper",
+    "category": "none",
+    "split": null
+  },
+  "black peppercorns": {
+    "canonical": "black pepper",
+    "category": "none",
+    "split": null
+  },
+  "black peppercorns cinnamon": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "black pepper",
+      "cinnamon"
+    ]
+  },
+  "blanch almonds remove skin": {
+    "canonical": "almond",
+    "category": "nut",
+    "split": null
+  },
+  "blanched almonds": {
+    "canonical": "almond",
+    "category": "nut",
+    "split": null
+  },
+  "blanched pistachio": {
+    "canonical": "pistachio",
+    "category": "nut",
+    "split": null
+  },
+  "blanched pistachios": {
+    "canonical": "pistachio",
+    "category": "nut",
+    "split": null
+  },
+  "boiling water": {
+    "canonical": "water",
+    "category": "none",
+    "split": null
+  },
+  "boiling water yogurt salt": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "water",
+      "yogurt",
+      "salt"
+    ]
+  },
+  "brinjal": {
+    "canonical": "brinjal",
+    "category": "none",
+    "split": null
+  },
+  "broccoli": {
+    "canonical": "broccoli",
+    "category": "none",
+    "split": null
+  },
+  "broccoli florets": {
+    "canonical": "broccoli",
+    "category": "none",
+    "split": null
+  },
+  "brown mustard seeds": {
+    "canonical": "mustard seeds",
+    "category": "none",
+    "split": null
+  },
+  "brown sugar": {
+    "canonical": "sugar",
+    "category": "none",
+    "split": null
+  },
+  "butter": {
+    "canonical": "butter",
+    "category": "dairy",
+    "split": null
+  },
+  "butter vegetable oil": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "butter",
+      "oil"
+    ]
+  },
+  "buttermilk": {
+    "canonical": "buttermilk",
+    "category": "dairy",
+    "split": null
+  },
+  "byadagi red chilli": {
+    "canonical": "dried red chilli",
+    "category": "none",
+    "split": null
+  },
+  "byadgi red chilli": {
+    "canonical": "dried red chilli",
+    "category": "none",
+    "split": null
+  },
+  "cabbage": {
+    "canonical": "cabbage",
+    "category": "none",
+    "split": null
+  },
+  "cabbage size": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "called differently": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "camphor": {
+    "canonical": "edible camphor",
+    "category": "none",
+    "split": null
+  },
+  "canned chickpeas": {
+    "canonical": "chickpeas",
+    "category": "none",
+    "split": null
+  },
+  "capsicum": {
+    "canonical": "capsicum",
+    "category": "none",
+    "split": null
+  },
+  "capsicum eggplant choko cucumber etc": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "capsicum",
+      "brinjal",
+      "cucumber"
+    ]
+  },
+  "caraway seeds": {
+    "canonical": "cumin seeds",
+    "category": "none",
+    "split": null
+  },
+  "cardamom": {
+    "canonical": "cardamom",
+    "category": "none",
+    "split": null
+  },
+  "cardamom fat": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "cardamom"
+    ]
+  },
+  "cardamom pods": {
+    "canonical": "cardamom",
+    "category": "none",
+    "split": null
+  },
+  "cardamom pods cracked": {
+    "canonical": "cardamom",
+    "category": "none",
+    "split": null
+  },
+  "cardamom pods ground": {
+    "canonical": "cardamom powder",
+    "category": "none",
+    "split": null
+  },
+  "cardamom powder": {
+    "canonical": "cardamom powder",
+    "category": "none",
+    "split": null
+  },
+  "cardamom powder nuts raisins": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "cardamom powder",
+      "raisins"
+    ]
+  },
+  "cardamom powder vanilla": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "cardamom powder",
+      "vanilla"
+    ]
+  },
+  "cardamom seeds": {
+    "canonical": "cardamom",
+    "category": "none",
+    "split": null
+  },
+  "cardamoms": {
+    "canonical": "cardamom",
+    "category": "none",
+    "split": null
+  },
+  "carrot": {
+    "canonical": "carrot",
+    "category": "none",
+    "split": null
+  },
+  "carrots": {
+    "canonical": "carrot",
+    "category": "none",
+    "split": null
+  },
+  "carrots saut ed ghee": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "carrot",
+      "ghee"
+    ]
+  },
+  "cashew": {
+    "canonical": "cashew",
+    "category": "nut",
+    "split": null
+  },
+  "cashew nut": {
+    "canonical": "cashew",
+    "category": "nut",
+    "split": null
+  },
+  "cashew nut pistachio oil": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "cashew",
+      "pistachio",
+      "oil"
+    ]
+  },
+  "cashew nuts": {
+    "canonical": "cashew",
+    "category": "nut",
+    "split": null
+  },
+  "cashews": {
+    "canonical": "cashew",
+    "category": "nut",
+    "split": null
+  },
+  "cashews bits halves": {
+    "canonical": "cashew",
+    "category": "nut",
+    "split": null
+  },
+  "cashews some": {
+    "canonical": "cashew",
+    "category": "nut",
+    "split": null
+  },
+  "cauliflower": {
+    "canonical": "cauliflower",
+    "category": "none",
+    "split": null
+  },
+  "cauliflower flowerets into cubes": {
+    "canonical": "cauliflower",
+    "category": "none",
+    "split": null
+  },
+  "cauliflower green beans etc": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "cauliflower",
+      "green beans"
+    ]
+  },
+  "cayenne": {
+    "canonical": "chilli powder",
+    "category": "none",
+    "split": null
+  },
+  "cayenne pepper": {
+    "canonical": "chilli powder",
+    "category": "none",
+    "split": null
+  },
+  "chaat masala": {
+    "canonical": "chaat masala",
+    "category": "none",
+    "split": null
+  },
+  "chana": {
+    "canonical": "chickpeas",
+    "category": "none",
+    "split": null
+  },
+  "chana daal": {
+    "canonical": "chana dal",
+    "category": "none",
+    "split": null
+  },
+  "chana daal ginger": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "chana dal",
+      "ginger"
+    ]
+  },
+  "chana daal seeds": {
+    "canonical": "chana dal",
+    "category": "none",
+    "split": null
+  },
+  "chana dal": {
+    "canonical": "chana dal",
+    "category": "none",
+    "split": null
+  },
+  "channa dal dry": {
+    "canonical": "chana dal",
+    "category": "none",
+    "split": null
+  },
+  "chapatti flour": {
+    "canonical": "chapatti flour",
+    "category": "gluten",
+    "split": null
+  },
+  "chick peas": {
+    "canonical": "chickpeas",
+    "category": "none",
+    "split": null
+  },
+  "chicken": {
+    "canonical": "chicken",
+    "category": "meat",
+    "split": null
+  },
+  "chicken breast": {
+    "canonical": "chicken",
+    "category": "meat",
+    "split": null
+  },
+  "chicken breast halves": {
+    "canonical": "chicken",
+    "category": "meat",
+    "split": null
+  },
+  "chicken drumsticks": {
+    "canonical": "chicken",
+    "category": "meat",
+    "split": null
+  },
+  "chicken drumsticks/ thighs/ breast": {
+    "canonical": "chicken",
+    "category": "meat",
+    "split": null
+  },
+  "chicken skin removed into": {
+    "canonical": "chicken",
+    "category": "meat",
+    "split": null
+  },
+  "chickpea flour": {
+    "canonical": "besan",
+    "category": "none",
+    "split": null
+  },
+  "chickpeas": {
+    "canonical": "chickpeas",
+    "category": "none",
+    "split": null
+  },
+  "chile powder": {
+    "canonical": "chilli powder",
+    "category": "none",
+    "split": null
+  },
+  "chilli powder": {
+    "canonical": "chilli powder",
+    "category": "none",
+    "split": null
+  },
+  "chilli powder yogurt": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "chilli powder",
+      "yogurt"
+    ]
+  },
+  "chilly powder ginger": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "chilli powder",
+      "ginger"
+    ]
+  },
+  "chirongi": {
+    "canonical": "chironji",
+    "category": "nut",
+    "split": null
+  },
+  "chironji": {
+    "canonical": "chironji",
+    "category": "nut",
+    "split": null
+  },
+  "chironji seeds": {
+    "canonical": "chironji",
+    "category": "nut",
+    "split": null
+  },
+  "chironji seeds pistachios": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "chironji",
+      "pistachio"
+    ]
+  },
+  "chumchum chuka": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "cilantro": {
+    "canonical": "coriander leaves",
+    "category": "none",
+    "split": null
+  },
+  "cilantro coriander leaves": {
+    "canonical": "coriander leaves",
+    "category": "none",
+    "split": null
+  },
+  "cilantro fresh": {
+    "canonical": "coriander leaves",
+    "category": "none",
+    "split": null
+  },
+  "cilantro leaves": {
+    "canonical": "coriander leaves",
+    "category": "none",
+    "split": null
+  },
+  "cilantro stems root removed": {
+    "canonical": "coriander leaves",
+    "category": "none",
+    "split": null
+  },
+  "cilantro/coriander leaves": {
+    "canonical": "coriander leaves",
+    "category": "none",
+    "split": null
+  },
+  "cinnamon": {
+    "canonical": "cinnamon",
+    "category": "none",
+    "split": null
+  },
+  "cinnamon tspn turmeric": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "cinnamon",
+      "turmeric"
+    ]
+  },
+  "clarified butter": {
+    "canonical": "ghee",
+    "category": "dairy",
+    "split": null
+  },
+  "clarified butter sugar": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "ghee",
+      "sugar"
+    ]
+  },
+  "coconut": {
+    "canonical": "coconut",
+    "category": "none",
+    "split": null
+  },
+  "coconut coriander leaves garnishing": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "coconut",
+      "coriander leaves"
+    ]
+  },
+  "coconut desiccated coconut water": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "coconut",
+      "water"
+    ]
+  },
+  "coconut flakes": {
+    "canonical": "coconut",
+    "category": "none",
+    "split": null
+  },
+  "coconut fried dal chutney pottukadalai chutney": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "coconut milk": {
+    "canonical": "coconut milk",
+    "category": "none",
+    "split": null
+  },
+  "coffee": {
+    "canonical": "coffee",
+    "category": "none",
+    "split": null
+  },
+  "colander": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "cold milk preferably": {
+    "canonical": "milk",
+    "category": "dairy",
+    "split": null
+  },
+  "cooking oil": {
+    "canonical": "oil",
+    "category": "none",
+    "split": null
+  },
+  "cooking oil ghee": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "oil",
+      "ghee"
+    ]
+  },
+  "coriander": {
+    "canonical": "coriander leaves",
+    "category": "none",
+    "split": null
+  },
+  "coriander / cilantro leaves": {
+    "canonical": "coriander leaves",
+    "category": "none",
+    "split": null
+  },
+  "coriander fresh mint": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "coriander leaves",
+      "mint leaves"
+    ]
+  },
+  "coriander leaves": {
+    "canonical": "coriander leaves",
+    "category": "none",
+    "split": null
+  },
+  "coriander leaves to garish": {
+    "canonical": "coriander leaves",
+    "category": "none",
+    "split": null
+  },
+  "coriander paste powder": {
+    "canonical": "coriander powder",
+    "category": "none",
+    "split": null
+  },
+  "coriander powder": {
+    "canonical": "coriander powder",
+    "category": "none",
+    "split": null
+  },
+  "coriander powder potatoes": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "coriander powder",
+      "potato"
+    ]
+  },
+  "coriander seeds": {
+    "canonical": "coriander seeds",
+    "category": "none",
+    "split": null
+  },
+  "coriander seeds ground": {
+    "canonical": "coriander seeds",
+    "category": "none",
+    "split": null
+  },
+  "coriander seeds roasted & powdered": {
+    "canonical": "coriander powder",
+    "category": "none",
+    "split": null
+  },
+  "corn recipe": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "cottage cheese": {
+    "canonical": "cottage cheese",
+    "category": "dairy",
+    "split": null
+  },
+  "cover dough damp cloth": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "cream": {
+    "canonical": "cream",
+    "category": "dairy",
+    "split": null
+  },
+  "cucumber": {
+    "canonical": "cucumber",
+    "category": "none",
+    "split": null
+  },
+  "cucumbers": {
+    "canonical": "cucumber",
+    "category": "none",
+    "split": null
+  },
+  "cumin": {
+    "canonical": "cumin seeds",
+    "category": "none",
+    "split": null
+  },
+  "cumin coriander turmeric chilli powders": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "cumin powder",
+      "coriander powder",
+      "turmeric",
+      "chilli powder"
+    ]
+  },
+  "cumin mustard seeds": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "cumin seeds",
+      "mustard seeds"
+    ]
+  },
+  "cumin powder": {
+    "canonical": "cumin powder",
+    "category": "none",
+    "split": null
+  },
+  "cumin seed": {
+    "canonical": "cumin seeds",
+    "category": "none",
+    "split": null
+  },
+  "cumin seeds": {
+    "canonical": "cumin seeds",
+    "category": "none",
+    "split": null
+  },
+  "cumin seeds peppercorns roasted & powdered": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "cumin seeds",
+      "black pepper"
+    ]
+  },
+  "cumin seeds roasted ground": {
+    "canonical": "cumin powder",
+    "category": "none",
+    "split": null
+  },
+  "cumin seeds roasted into powder": {
+    "canonical": "cumin powder",
+    "category": "none",
+    "split": null
+  },
+  "cup butter": {
+    "canonical": "butter",
+    "category": "dairy",
+    "split": null
+  },
+  "cup mango": {
+    "canonical": "mango",
+    "category": "none",
+    "split": null
+  },
+  "cups shelled green peas carrots": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "green peas",
+      "carrot"
+    ]
+  },
+  "curd": {
+    "canonical": "yogurt",
+    "category": "dairy",
+    "split": null
+  },
+  "curry leaves": {
+    "canonical": "curry leaves",
+    "category": "none",
+    "split": null
+  },
+  "curry leaves salt": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "curry leaves",
+      "salt"
+    ]
+  },
+  "curry powder": {
+    "canonical": "curry powder",
+    "category": "none",
+    "split": null
+  },
+  "curry powder curd": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "curry powder",
+      "yogurt"
+    ]
+  },
+  "daal": {
+    "canonical": "toor dal",
+    "category": "none",
+    "split": null
+  },
+  "dal": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "dal variety": {
+    "canonical": "toor dal",
+    "category": "none",
+    "split": null
+  },
+  "daliya": {
+    "canonical": "roasted gram",
+    "category": "none",
+    "split": null
+  },
+  "dash lemon salt": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "lemon juice",
+      "salt"
+    ]
+  },
+  "dates": {
+    "canonical": "dates",
+    "category": "none",
+    "split": null
+  },
+  "de- cm cubes": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "decorating almond colour cardamom cashew nuts": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "almond",
+      "food colour",
+      "cardamom",
+      "cashew"
+    ]
+  },
+  "decoration given to food item": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "deep fry": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "description": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "desiccated coconut": {
+    "canonical": "coconut",
+    "category": "none",
+    "split": null
+  },
+  "dhal": {
+    "canonical": "toor dal",
+    "category": "none",
+    "split": null
+  },
+  "dhokla": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "dhum": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "directions fried bread puffs recipe": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "directions naan recipe": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "dissolve saffron milk boil milk handy": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "dosa": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "double acting baking powder": {
+    "canonical": "baking powder",
+    "category": "none",
+    "split": null
+  },
+  "dozen curry leaves": {
+    "canonical": "curry leaves",
+    "category": "none",
+    "split": null
+  },
+  "dried green peas": {
+    "canonical": "green peas",
+    "category": "none",
+    "split": null
+  },
+  "dried red chilli": {
+    "canonical": "dried red chilli",
+    "category": "none",
+    "split": null
+  },
+  "dried red chilli pods": {
+    "canonical": "dried red chilli",
+    "category": "none",
+    "split": null
+  },
+  "dried red chillies": {
+    "canonical": "dried red chilli",
+    "category": "none",
+    "split": null
+  },
+  "dried red pepper flakes": {
+    "canonical": "chilli powder",
+    "category": "none",
+    "split": null
+  },
+  "drops": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "dry coconut": {
+    "canonical": "coconut",
+    "category": "none",
+    "split": null
+  },
+  "dry coconut little water": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "coconut",
+      "water"
+    ]
+  },
+  "dry dates": {
+    "canonical": "dates",
+    "category": "none",
+    "split": null
+  },
+  "dry fruits": {
+    "canonical": "dry fruits",
+    "category": "none",
+    "split": null
+  },
+  "dry masala ingredients": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "garam masala"
+    ]
+  },
+  "dry mint": {
+    "canonical": "mint leaves",
+    "category": "none",
+    "split": null
+  },
+  "dry red chillies": {
+    "canonical": "dried red chilli",
+    "category": "none",
+    "split": null
+  },
+  "edible camphor": {
+    "canonical": "edible camphor",
+    "category": "none",
+    "split": null
+  },
+  "egg": {
+    "canonical": "egg",
+    "category": "egg",
+    "split": null
+  },
+  "egg plant": {
+    "canonical": "brinjal",
+    "category": "none",
+    "split": null
+  },
+  "eggplant": {
+    "canonical": "brinjal",
+    "category": "none",
+    "split": null
+  },
+  "eggs": {
+    "canonical": "egg",
+    "category": "egg",
+    "split": null
+  },
+  "f fresh ginger": {
+    "canonical": "ginger",
+    "category": "none",
+    "split": null
+  },
+  "fat": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "fennel seeds": {
+    "canonical": "fennel seeds",
+    "category": "none",
+    "split": null
+  },
+  "fenugreek leaves": {
+    "canonical": "fenugreek leaves",
+    "category": "none",
+    "split": null
+  },
+  "fenugreek seeds": {
+    "canonical": "fenugreek seeds",
+    "category": "none",
+    "split": null
+  },
+  "filling": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "filling mawa": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "fish": {
+    "canonical": "fish",
+    "category": "fish",
+    "split": null
+  },
+  "fish into": {
+    "canonical": "fish",
+    "category": "fish",
+    "split": null
+  },
+  "flat metal plate similar to skillet": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "flattened rice": {
+    "canonical": "poha",
+    "category": "none",
+    "split": null
+  },
+  "flour": {
+    "canonical": "all-purpose flour",
+    "category": "gluten",
+    "split": null
+  },
+  "food colour": {
+    "canonical": "food colour",
+    "category": "none",
+    "split": null
+  },
+  "fresh chenna cows milk": {
+    "canonical": "milk",
+    "category": "dairy",
+    "split": null
+  },
+  "fresh chillies": {
+    "canonical": "green chilli",
+    "category": "none",
+    "split": null
+  },
+  "fresh cilantro": {
+    "canonical": "coriander leaves",
+    "category": "none",
+    "split": null
+  },
+  "fresh cilantro coriander": {
+    "canonical": "coriander leaves",
+    "category": "none",
+    "split": null
+  },
+  "fresh cilantro/coriander leaves": {
+    "canonical": "coriander leaves",
+    "category": "none",
+    "split": null
+  },
+  "fresh coconut": {
+    "canonical": "coconut",
+    "category": "none",
+    "split": null
+  },
+  "fresh coconut coconut flakes": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "coconut"
+    ]
+  },
+  "fresh coriander": {
+    "canonical": "coriander leaves",
+    "category": "none",
+    "split": null
+  },
+  "fresh coriander leaves": {
+    "canonical": "coriander leaves",
+    "category": "none",
+    "split": null
+  },
+  "fresh coriander mint": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "coriander leaves",
+      "mint leaves"
+    ]
+  },
+  "fresh coriander mint leaves": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "coriander leaves",
+      "mint leaves"
+    ]
+  },
+  "fresh curry leaves": {
+    "canonical": "curry leaves",
+    "category": "none",
+    "split": null
+  },
+  "fresh curry leaves dried curry leaves": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "curry leaves"
+    ]
+  },
+  "fresh fenugreek/methi leaves dried": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "fenugreek leaves"
+    ]
+  },
+  "fresh ginger": {
+    "canonical": "ginger",
+    "category": "none",
+    "split": null
+  },
+  "fresh ginger root": {
+    "canonical": "ginger",
+    "category": "none",
+    "split": null
+  },
+  "fresh green beans": {
+    "canonical": "green beans",
+    "category": "none",
+    "split": null
+  },
+  "fresh green chilli": {
+    "canonical": "green chilli",
+    "category": "none",
+    "split": null
+  },
+  "fresh green chillies": {
+    "canonical": "green chilli",
+    "category": "none",
+    "split": null
+  },
+  "fresh green peas": {
+    "canonical": "green peas",
+    "category": "none",
+    "split": null
+  },
+  "fresh green peas / pacha pattani": {
+    "canonical": "green peas",
+    "category": "none",
+    "split": null
+  },
+  "fresh hot green chilli": {
+    "canonical": "green chilli",
+    "category": "none",
+    "split": null
+  },
+  "fresh lemon juice": {
+    "canonical": "lemon juice",
+    "category": "none",
+    "split": null
+  },
+  "fresh mild chillies seeds removed": {
+    "canonical": "green chilli",
+    "category": "none",
+    "split": null
+  },
+  "fresh mint": {
+    "canonical": "mint leaves",
+    "category": "none",
+    "split": null
+  },
+  "fresh red green chillies": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "green chilli",
+      "dried red chilli"
+    ]
+  },
+  "fresh tomatoes": {
+    "canonical": "tomato",
+    "category": "none",
+    "split": null
+  },
+  "fried cashew nuts": {
+    "canonical": "cashew",
+    "category": "nut",
+    "split": null
+  },
+  "frozen peas": {
+    "canonical": "green peas",
+    "category": "none",
+    "split": null
+  },
+  "full fat milk": {
+    "canonical": "milk",
+    "category": "dairy",
+    "split": null
+  },
+  "g lamb": {
+    "canonical": "lamb",
+    "category": "meat",
+    "split": null
+  },
+  "garam masala": {
+    "canonical": "garam masala",
+    "category": "none",
+    "split": null
+  },
+  "garam masala eatable": {
+    "canonical": "garam masala",
+    "category": "none",
+    "split": null
+  },
+  "garam masala powder": {
+    "canonical": "garam masala",
+    "category": "none",
+    "split": null
+  },
+  "garbanzo": {
+    "canonical": "chickpeas",
+    "category": "none",
+    "split": null
+  },
+  "garbanzo beans tin": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "chickpeas"
+    ]
+  },
+  "garlic": {
+    "canonical": "garlic",
+    "category": "none",
+    "split": null
+  },
+  "garlic fine": {
+    "canonical": "garlic",
+    "category": "none",
+    "split": null
+  },
+  "garlic green chillies": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "garlic",
+      "green chilli"
+    ]
+  },
+  "garlic ground": {
+    "canonical": "garlic",
+    "category": "none",
+    "split": null
+  },
+  "garlic halves": {
+    "canonical": "garlic",
+    "category": "none",
+    "split": null
+  },
+  "garlic paste": {
+    "canonical": "garlic paste",
+    "category": "none",
+    "split": null
+  },
+  "garlic paste powder": {
+    "canonical": "ginger garlic paste",
+    "category": "none",
+    "split": null
+  },
+  "garnish": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "garnish tomato wedges": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "tomato"
+    ]
+  },
+  "ghee": {
+    "canonical": "ghee",
+    "category": "dairy",
+    "split": null
+  },
+  "ghee / butter": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "ghee",
+      "butter"
+    ]
+  },
+  "ghee brushing bread": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "ghee"
+    ]
+  },
+  "ghee butter": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "ghee",
+      "butter"
+    ]
+  },
+  "ghee oil": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "ghee",
+      "oil"
+    ]
+  },
+  "ghee oil eggs": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "ghee",
+      "oil",
+      "egg"
+    ]
+  },
+  "ghee oil shallow frying": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "ghee",
+      "oil"
+    ]
+  },
+  "ghee vegetable oil": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "ghee",
+      "oil"
+    ]
+  },
+  "ginger": {
+    "canonical": "ginger",
+    "category": "none",
+    "split": null
+  },
+  "ginger & garlic": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "ginger",
+      "garlic"
+    ]
+  },
+  "ginger fine": {
+    "canonical": "ginger",
+    "category": "none",
+    "split": null
+  },
+  "ginger garlic paste": {
+    "canonical": "ginger garlic paste",
+    "category": "none",
+    "split": null
+  },
+  "ginger into strips": {
+    "canonical": "ginger",
+    "category": "none",
+    "split": null
+  },
+  "ginger paste": {
+    "canonical": "ginger paste",
+    "category": "none",
+    "split": null
+  },
+  "ginger paste powder": {
+    "canonical": "ginger garlic paste",
+    "category": "none",
+    "split": null
+  },
+  "ginger salt": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "ginger",
+      "salt"
+    ]
+  },
+  "good asafoetida": {
+    "canonical": "asafoetida",
+    "category": "none",
+    "split": null
+  },
+  "gram flour": {
+    "canonical": "besan",
+    "category": "none",
+    "split": null
+  },
+  "granulated sugar": {
+    "canonical": "sugar",
+    "category": "none",
+    "split": null
+  },
+  "grating garnish halwa idli": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "green beans": {
+    "canonical": "green beans",
+    "category": "none",
+    "split": null
+  },
+  "green cardamom kishmish": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "cardamom",
+      "raisins"
+    ]
+  },
+  "green cardamom pods ground": {
+    "canonical": "cardamom",
+    "category": "none",
+    "split": null
+  },
+  "green chilli": {
+    "canonical": "green chilli",
+    "category": "none",
+    "split": null
+  },
+  "green chillies": {
+    "canonical": "green chilli",
+    "category": "none",
+    "split": null
+  },
+  "green chillies red chilli": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "green chilli",
+      "dried red chilli"
+    ]
+  },
+  "green chillies slit": {
+    "canonical": "green chilli",
+    "category": "none",
+    "split": null
+  },
+  "green chillies slit into two": {
+    "canonical": "green chilli",
+    "category": "none",
+    "split": null
+  },
+  "green chills": {
+    "canonical": "green chilli",
+    "category": "none",
+    "split": null
+  },
+  "green cucumbers": {
+    "canonical": "cucumber",
+    "category": "none",
+    "split": null
+  },
+  "green gram": {
+    "canonical": "moong dal",
+    "category": "none",
+    "split": null
+  },
+  "green gram rice upma": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "green moong dhal": {
+    "canonical": "moong dal",
+    "category": "none",
+    "split": null
+  },
+  "green peas": {
+    "canonical": "green peas",
+    "category": "none",
+    "split": null
+  },
+  "green pepper": {
+    "canonical": "black pepper",
+    "category": "none",
+    "split": null
+  },
+  "green peppers": {
+    "canonical": "capsicum",
+    "category": "none",
+    "split": null
+  },
+  "green rice upma": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "green sundal sweet n spice versions": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "green/red chillies": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "green chilli",
+      "dried red chilli"
+    ]
+  },
+  "griddle gravy": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "grind to paste": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "ground almonds": {
+    "canonical": "almond",
+    "category": "nut",
+    "split": null
+  },
+  "ground black pepper": {
+    "canonical": "black pepper",
+    "category": "none",
+    "split": null
+  },
+  "ground cardamom": {
+    "canonical": "cardamom powder",
+    "category": "none",
+    "split": null
+  },
+  "ground cardamom cinnamon": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "cardamom powder",
+      "cinnamon"
+    ]
+  },
+  "ground cinnamon": {
+    "canonical": "cinnamon",
+    "category": "none",
+    "split": null
+  },
+  "ground coriander": {
+    "canonical": "coriander powder",
+    "category": "none",
+    "split": null
+  },
+  "ground coriander seeds": {
+    "canonical": "coriander powder",
+    "category": "none",
+    "split": null
+  },
+  "ground cumin": {
+    "canonical": "cumin powder",
+    "category": "none",
+    "split": null
+  },
+  "ground fennel": {
+    "canonical": "fennel seeds",
+    "category": "none",
+    "split": null
+  },
+  "ground nutmeg": {
+    "canonical": "nutmeg",
+    "category": "none",
+    "split": null
+  },
+  "ground pepper": {
+    "canonical": "black pepper",
+    "category": "none",
+    "split": null
+  },
+  "ground roasted cumin seeds": {
+    "canonical": "cumin powder",
+    "category": "none",
+    "split": null
+  },
+  "ground s": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "ground turmeric": {
+    "canonical": "turmeric",
+    "category": "none",
+    "split": null
+  },
+  "groundnut oil": {
+    "canonical": "oil",
+    "category": "none",
+    "split": null
+  },
+  "groundnuts": {
+    "canonical": "peanut",
+    "category": "nut",
+    "split": null
+  },
+  "gtm": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "gulab jamun": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "h long grain rice": {
+    "canonical": "rice",
+    "category": "none",
+    "split": null
+  },
+  "hard eggs": {
+    "canonical": "egg",
+    "category": "egg",
+    "split": null
+  },
+  "head cabbage fine": {
+    "canonical": "cabbage",
+    "category": "none",
+    "split": null
+  },
+  "heaped tspn sambar powder": {
+    "canonical": "sambar powder",
+    "category": "none",
+    "split": null
+  },
+  "heat fat fry rice": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "heavy cream": {
+    "canonical": "cream",
+    "category": "dairy",
+    "split": null
+  },
+  "help vegetable grater": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "hing": {
+    "canonical": "asafoetida",
+    "category": "none",
+    "split": null
+  },
+  "hing / asafetida": {
+    "canonical": "asafoetida",
+    "category": "none",
+    "split": null
+  },
+  "honey": {
+    "canonical": "honey",
+    "category": "none",
+    "split": null
+  },
+  "honey & ginger marinade": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "honey",
+      "ginger"
+    ]
+  },
+  "honey sugar": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "honey",
+      "sugar"
+    ]
+  },
+  "hot green chillies": {
+    "canonical": "green chilli",
+    "category": "none",
+    "split": null
+  },
+  "hot green chills slit into": {
+    "canonical": "green chilli",
+    "category": "none",
+    "split": null
+  },
+  "hot red dried chilli": {
+    "canonical": "dried red chilli",
+    "category": "none",
+    "split": null
+  },
+  "hot stock water": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "water"
+    ]
+  },
+  "hot water": {
+    "canonical": "water",
+    "category": "none",
+    "split": null
+  },
+  "hours": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "i fresh green chilli": {
+    "canonical": "green chilli",
+    "category": "none",
+    "split": null
+  },
+  "i ground coriander": {
+    "canonical": "coriander powder",
+    "category": "none",
+    "split": null
+  },
+  "i spring onion including green leaves": {
+    "canonical": "spring onion",
+    "category": "none",
+    "split": null
+  },
+  "ice cubes": {
+    "canonical": "ice cubes",
+    "category": "none",
+    "split": null
+  },
+  "ice-cubes": {
+    "canonical": "ice cubes",
+    "category": "none",
+    "split": null
+  },
+  "idli rice dosa rice": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "rice"
+    ]
+  },
+  "ingredients": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "ingredients chicken": {
+    "canonical": "chicken",
+    "category": "meat",
+    "split": null
+  },
+  "ingredients rice flour": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "rice flour"
+    ]
+  },
+  "instant coffee powder": {
+    "canonical": "coffee",
+    "category": "none",
+    "split": null
+  },
+  "into": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "into cubes": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "ivy gourd": {
+    "canonical": "ivy gourd",
+    "category": "none",
+    "split": null
+  },
+  "ivy gourd jaggery jilebi": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "jaggery": {
+    "canonical": "jaggery",
+    "category": "none",
+    "split": null
+  },
+  "jaggery brown sugar": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "jaggery",
+      "sugar"
+    ]
+  },
+  "jalapeno serrano pepper": {
+    "canonical": "green chilli",
+    "category": "none",
+    "split": null
+  },
+  "jhangri kaja flat": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "juice lemon": {
+    "canonical": "lemon juice",
+    "category": "none",
+    "split": null
+  },
+  "juice one lime": {
+    "canonical": "lime juice",
+    "category": "none",
+    "split": null
+  },
+  "kaja round": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "kaju": {
+    "canonical": "cashew",
+    "category": "nut",
+    "split": null
+  },
+  "kalpasi": {
+    "canonical": "kalpasi",
+    "category": "none",
+    "split": null
+  },
+  "kalpasi / black stone flower": {
+    "canonical": "kalpasi",
+    "category": "none",
+    "split": null
+  },
+  "kesari khara kheer khoa": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "khas-khas": {
+    "canonical": "poppy seeds",
+    "category": "none",
+    "split": null
+  },
+  "khoa": {
+    "canonical": "mawa",
+    "category": "dairy",
+    "split": null
+  },
+  "kishmish": {
+    "canonical": "raisins",
+    "category": "none",
+    "split": null
+  },
+  "koottu kurma khofta": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "korma cooking sauce jar": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "l cumin seeds": {
+    "canonical": "cumin seeds",
+    "category": "none",
+    "split": null
+  },
+  "laddu lassi": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "lamb": {
+    "canonical": "lamb",
+    "category": "meat",
+    "split": null
+  },
+  "lamb goat shoulder": {
+    "canonical": "lamb",
+    "category": "meat",
+    "split": null
+  },
+  "lean lamb into": {
+    "canonical": "lamb",
+    "category": "meat",
+    "split": null
+  },
+  "leftover rice poha": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "rice",
+      "poha"
+    ]
+  },
+  "leg lamb boned": {
+    "canonical": "lamb",
+    "category": "meat",
+    "split": null
+  },
+  "lemon": {
+    "canonical": "lemon",
+    "category": "none",
+    "split": null
+  },
+  "lemon juice": {
+    "canonical": "lemon juice",
+    "category": "none",
+    "split": null
+  },
+  "lemon size tamarind about water": {
+    "canonical": "tamarind",
+    "category": "none",
+    "split": null
+  },
+  "lemon/lime juice": {
+    "canonical": "lemon juice",
+    "category": "none",
+    "split": null
+  },
+  "lemons": {
+    "canonical": "lemon",
+    "category": "none",
+    "split": null
+  },
+  "lettuce": {
+    "canonical": "lettuce",
+    "category": "none",
+    "split": null
+  },
+  "lettuce leaves fine": {
+    "canonical": "lettuce",
+    "category": "none",
+    "split": null
+  },
+  "light sesame oil": {
+    "canonical": "sesame oil",
+    "category": "none",
+    "split": null
+  },
+  "lime": {
+    "canonical": "lime",
+    "category": "none",
+    "split": null
+  },
+  "lime juice": {
+    "canonical": "lime juice",
+    "category": "none",
+    "split": null
+  },
+  "lime juice salt": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "lime juice",
+      "salt"
+    ]
+  },
+  "lime/lemon juice": {
+    "canonical": "lemon juice",
+    "category": "none",
+    "split": null
+  },
+  "little ginger": {
+    "canonical": "ginger",
+    "category": "none",
+    "split": null
+  },
+  "little jaggery sugar": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "jaggery",
+      "sugar"
+    ]
+  },
+  "little oil roasting seasoning salt": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "oil",
+      "salt"
+    ]
+  },
+  "long grain rice": {
+    "canonical": "rice",
+    "category": "none",
+    "split": null
+  },
+  "long grain rice ghee": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "rice",
+      "ghee"
+    ]
+  },
+  "long grain rice preferably basmati": {
+    "canonical": "rice",
+    "category": "none",
+    "split": null
+  },
+  "loose black tea": {
+    "canonical": "tea",
+    "category": "none",
+    "split": null
+  },
+  "maida": {
+    "canonical": "all-purpose flour",
+    "category": "gluten",
+    "split": null
+  },
+  "maida fat": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "all-purpose flour"
+    ]
+  },
+  "make soft clough without reading": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "make stiff but pliable dough": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "mangalore cucumber": {
+    "canonical": "cucumber",
+    "category": "none",
+    "split": null
+  },
+  "mango": {
+    "canonical": "mango",
+    "category": "none",
+    "split": null
+  },
+  "mango powder called amchur": {
+    "canonical": "amchur",
+    "category": "none",
+    "split": null
+  },
+  "mango pulp": {
+    "canonical": "mango pulp",
+    "category": "none",
+    "split": null
+  },
+  "mango pulp from flesh mangoes": {
+    "canonical": "mango pulp",
+    "category": "none",
+    "split": null
+  },
+  "masala": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "masala ingredients": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "masala preparation": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "masoor dal": {
+    "canonical": "masoor dal",
+    "category": "none",
+    "split": null
+  },
+  "masoor dhal": {
+    "canonical": "masoor dal",
+    "category": "none",
+    "split": null
+  },
+  "masur daal": {
+    "canonical": "masoor dal",
+    "category": "none",
+    "split": null
+  },
+  "mawa": {
+    "canonical": "mawa",
+    "category": "dairy",
+    "split": null
+  },
+  "measure urad flour": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "urad flour"
+    ]
+  },
+  "measures rice flour": {
+    "canonical": "rice flour",
+    "category": "none",
+    "split": null
+  },
+  "med bitter gourds": {
+    "canonical": "bitter gourd",
+    "category": "none",
+    "split": null
+  },
+  "med tomatoes cardamoms": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "tomato",
+      "cardamom"
+    ]
+  },
+  "med- onions fine": {
+    "canonical": "onion",
+    "category": "none",
+    "split": null
+  },
+  "methi": {
+    "canonical": "fenugreek seeds",
+    "category": "none",
+    "split": null
+  },
+  "methi leaves": {
+    "canonical": "fenugreek leaves",
+    "category": "none",
+    "split": null
+  },
+  "methi seeds": {
+    "canonical": "fenugreek seeds",
+    "category": "none",
+    "split": null
+  },
+  "method": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "method qty ingredients": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "method to roll out dough": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "mild curry paste": {
+    "canonical": "mild curry paste",
+    "category": "none",
+    "split": null
+  },
+  "mild dal variety choice vegetables": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "milk": {
+    "canonical": "milk",
+    "category": "dairy",
+    "split": null
+  },
+  "milk kesar rice": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "milk",
+      "saffron",
+      "rice"
+    ]
+  },
+  "milk yogurt": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "milk",
+      "yogurt"
+    ]
+  },
+  "mint": {
+    "canonical": "mint leaves",
+    "category": "none",
+    "split": null
+  },
+  "mint leaves": {
+    "canonical": "mint leaves",
+    "category": "none",
+    "split": null
+  },
+  "mix together": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "mixed": {
+    "canonical": "mixed vegetables",
+    "category": "none",
+    "split": null
+  },
+  "mixed fruit season": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "mixed spices": {
+    "canonical": "garam masala",
+    "category": "none",
+    "split": null
+  },
+  "mixed vegetables": {
+    "canonical": "mixed vegetables",
+    "category": "none",
+    "split": null
+  },
+  "mixed vets": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "moong daal": {
+    "canonical": "moong dal",
+    "category": "none",
+    "split": null
+  },
+  "moong dal": {
+    "canonical": "moong dal",
+    "category": "none",
+    "split": null
+  },
+  "more kozhambhu powder": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "mozzarella cheese": {
+    "canonical": "mozzarella cheese",
+    "category": "dairy",
+    "split": null
+  },
+  "mung dal": {
+    "canonical": "moong dal",
+    "category": "none",
+    "split": null
+  },
+  "mustard": {
+    "canonical": "mustard seeds",
+    "category": "none",
+    "split": null
+  },
+  "mustard chana dal curry leaves seasoning": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "mustard seeds",
+      "chana dal",
+      "curry leaves"
+    ]
+  },
+  "mustard cumin seeds": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "mustard seeds",
+      "cumin seeds"
+    ]
+  },
+  "mustard powder": {
+    "canonical": "mustard powder",
+    "category": "none",
+    "split": null
+  },
+  "mustard seeds": {
+    "canonical": "mustard seeds",
+    "category": "none",
+    "split": null
+  },
+  "mustard seeds curry leaves oil seasoning": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "mustard seeds",
+      "curry leaves",
+      "oil"
+    ]
+  },
+  "mutton": {
+    "canonical": "mutton",
+    "category": "meat",
+    "split": null
+  },
+  "mutton tomatoes coriander fat": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "mutton",
+      "tomato",
+      "coriander leaves"
+    ]
+  },
+  "namkeen nan": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "nutmeg": {
+    "canonical": "nutmeg",
+    "category": "none",
+    "split": null
+  },
+  "oil": {
+    "canonical": "oil",
+    "category": "none",
+    "split": null
+  },
+  "oil - use wok": {
+    "canonical": "oil",
+    "category": "none",
+    "split": null
+  },
+  "oil making dosas": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "oil"
+    ]
+  },
+  "oil to make dosas": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "oil"
+    ]
+  },
+  "oiled potatoes": {
+    "canonical": "potato",
+    "category": "none",
+    "split": null
+  },
+  "okra": {
+    "canonical": "okra",
+    "category": "none",
+    "split": null
+  },
+  "okra lengthwise into": {
+    "canonical": "okra",
+    "category": "none",
+    "split": null
+  },
+  "one bhima eggplant": {
+    "canonical": "brinjal",
+    "category": "none",
+    "split": null
+  },
+  "one maida": {
+    "canonical": "all-purpose flour",
+    "category": "gluten",
+    "split": null
+  },
+  "one semolina/rava": {
+    "canonical": "semolina",
+    "category": "gluten",
+    "split": null
+  },
+  "one to eggplant": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "onion": {
+    "canonical": "onion",
+    "category": "none",
+    "split": null
+  },
+  "onion fine": {
+    "canonical": "onion",
+    "category": "none",
+    "split": null
+  },
+  "onion puree": {
+    "canonical": "onion puree",
+    "category": "none",
+    "split": null
+  },
+  "onion pureed": {
+    "canonical": "onion puree",
+    "category": "none",
+    "split": null
+  },
+  "onions": {
+    "canonical": "onion",
+    "category": "none",
+    "split": null
+  },
+  "onions coriander": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "onion",
+      "coriander leaves"
+    ]
+  },
+  "onions curry leaves": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "onion",
+      "curry leaves"
+    ]
+  },
+  "onions preferably red onions": {
+    "canonical": "onion",
+    "category": "none",
+    "split": null
+  },
+  "onions pureed": {
+    "canonical": "onion puree",
+    "category": "none",
+    "split": null
+  },
+  "onions ratan jot": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "onion",
+      "ratan jot"
+    ]
+  },
+  "onions tamarind juice": {
+    "canonical": "tamarind pulp",
+    "category": "none",
+    "split": null
+  },
+  "orange food color": {
+    "canonical": "food colour",
+    "category": "none",
+    "split": null
+  },
+  "pakora/pakoda": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "pan": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "paneer": {
+    "canonical": "paneer",
+    "category": "dairy",
+    "split": null
+  },
+  "pannir": {
+    "canonical": "paneer",
+    "category": "dairy",
+    "split": null
+  },
+  "papad": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "papaya ginger": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "papaya",
+      "ginger"
+    ]
+  },
+  "paprika": {
+    "canonical": "chilli powder",
+    "category": "none",
+    "split": null
+  },
+  "paratha": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "pastry": {
+    "canonical": "samosa pastry",
+    "category": "gluten",
+    "split": null
+  },
+  "payasam pulao": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "peaches syrup": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "peach",
+      "sugar syrup"
+    ]
+  },
+  "peanut": {
+    "canonical": "peanut",
+    "category": "nut",
+    "split": null
+  },
+  "peanut bits": {
+    "canonical": "peanut",
+    "category": "nut",
+    "split": null
+  },
+  "peanuts": {
+    "canonical": "peanut",
+    "category": "nut",
+    "split": null
+  },
+  "peanuts/cashew nuts split halves": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "peanut",
+      "cashew"
+    ]
+  },
+  "pearl onions/shallots": {
+    "canonical": "onion",
+    "category": "none",
+    "split": null
+  },
+  "peas": {
+    "canonical": "green peas",
+    "category": "none",
+    "split": null
+  },
+  "pepper corns": {
+    "canonical": "black pepper",
+    "category": "none",
+    "split": null
+  },
+  "peppercorns": {
+    "canonical": "black pepper",
+    "category": "none",
+    "split": null
+  },
+  "pista": {
+    "canonical": "pistachio",
+    "category": "nut",
+    "split": null
+  },
+  "pista & almond": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "pistachio",
+      "almond"
+    ]
+  },
+  "pistachio": {
+    "canonical": "pistachio",
+    "category": "nut",
+    "split": null
+  },
+  "pistachio milk": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "pistachio",
+      "milk"
+    ]
+  },
+  "pistachio nuts cardamom qty": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "pistachio",
+      "cardamom"
+    ]
+  },
+  "pistachios": {
+    "canonical": "pistachio",
+    "category": "nut",
+    "split": null
+  },
+  "pitted cherries pineapple kiwi seedless grapes": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "cherry",
+      "pineapple",
+      "kiwi",
+      "grapes"
+    ]
+  },
+  "pizza crust": {
+    "canonical": "pizza crust",
+    "category": "gluten",
+    "split": null
+  },
+  "plain yogurt": {
+    "canonical": "yogurt",
+    "category": "dairy",
+    "split": null
+  },
+  "plum tomatoes": {
+    "canonical": "tomato",
+    "category": "none",
+    "split": null
+  },
+  "plum tomatoes water": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "tomato",
+      "water"
+    ]
+  },
+  "poha": {
+    "canonical": "poha",
+    "category": "none",
+    "split": null
+  },
+  "poha / aval / pressed rice": {
+    "canonical": "poha",
+    "category": "none",
+    "split": null
+  },
+  "pohe": {
+    "canonical": "poha",
+    "category": "none",
+    "split": null
+  },
+  "poppy seeds": {
+    "canonical": "poppy seeds",
+    "category": "none",
+    "split": null
+  },
+  "potato": {
+    "canonical": "potato",
+    "category": "none",
+    "split": null
+  },
+  "potato chips": {
+    "canonical": "potato chips",
+    "category": "none",
+    "split": null
+  },
+  "potatoes": {
+    "canonical": "potato",
+    "category": "none",
+    "split": null
+  },
+  "potatoes coriander powder": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "potato",
+      "coriander powder"
+    ]
+  },
+  "potatoes onions": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "potato",
+      "onion"
+    ]
+  },
+  "potatoes their jackets allowed to cool": {
+    "canonical": "potato",
+    "category": "none",
+    "split": null
+  },
+  "pottukadalai": {
+    "canonical": "roasted gram",
+    "category": "none",
+    "split": null
+  },
+  "powdered cardamom": {
+    "canonical": "cardamom powder",
+    "category": "none",
+    "split": null
+  },
+  "powdered cardamom cinnamon nutmeg": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "cardamom powder",
+      "cinnamon",
+      "nutmeg"
+    ]
+  },
+  "powdered ginger": {
+    "canonical": "ginger",
+    "category": "none",
+    "split": null
+  },
+  "powdered saffron": {
+    "canonical": "saffron",
+    "category": "none",
+    "split": null
+  },
+  "powdered sugar": {
+    "canonical": "sugar",
+    "category": "none",
+    "split": null
+  },
+  "prawn": {
+    "canonical": "prawn",
+    "category": "fish",
+    "split": null
+  },
+  "prawns": {
+    "canonical": "prawn",
+    "category": "fish",
+    "split": null
+  },
+  "pre baked pizza crust": {
+    "canonical": "pizza crust",
+    "category": "gluten",
+    "split": null
+  },
+  "preparation": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "puffed rice": {
+    "canonical": "puffed rice",
+    "category": "none",
+    "split": null
+  },
+  "pulusu": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "puri": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "qty": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "qty ingredients": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "raisins": {
+    "canonical": "raisins",
+    "category": "none",
+    "split": null
+  },
+  "raisins almonds pistachio like": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "raisins",
+      "almond",
+      "pistachio"
+    ]
+  },
+  "raisins some": {
+    "canonical": "raisins",
+    "category": "none",
+    "split": null
+  },
+  "rajma": {
+    "canonical": "red kidney bean",
+    "category": "none",
+    "split": null
+  },
+  "random spices": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "random vegetables": {
+    "canonical": "mixed vegetables",
+    "category": "none",
+    "split": null
+  },
+  "random vegetables butter": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "mixed vegetables",
+      "butter"
+    ]
+  },
+  "rasam": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "rasgolla rawa": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "ratan jot": {
+    "canonical": "ratan jot",
+    "category": "none",
+    "split": null
+  },
+  "rava": {
+    "canonical": "semolina",
+    "category": "gluten",
+    "split": null
+  },
+  "readymade puri": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "red chile": {
+    "canonical": "dried red chilli",
+    "category": "none",
+    "split": null
+  },
+  "red chilli": {
+    "canonical": "dried red chilli",
+    "category": "none",
+    "split": null
+  },
+  "red chilli into two": {
+    "canonical": "dried red chilli",
+    "category": "none",
+    "split": null
+  },
+  "red chilli powder": {
+    "canonical": "chilli powder",
+    "category": "none",
+    "split": null
+  },
+  "red chillies": {
+    "canonical": "dried red chilli",
+    "category": "none",
+    "split": null
+  },
+  "red chillies up to": {
+    "canonical": "dried red chilli",
+    "category": "none",
+    "split": null
+  },
+  "red dry chillies": {
+    "canonical": "dried red chilli",
+    "category": "none",
+    "split": null
+  },
+  "red kidney bean": {
+    "canonical": "red kidney bean",
+    "category": "none",
+    "split": null
+  },
+  "red lentils": {
+    "canonical": "masoor dal",
+    "category": "none",
+    "split": null
+  },
+  "red pepper": {
+    "canonical": "black pepper",
+    "category": "none",
+    "split": null
+  },
+  "refined oil": {
+    "canonical": "oil",
+    "category": "none",
+    "split": null
+  },
+  "riata": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "rice": {
+    "canonical": "rice",
+    "category": "none",
+    "split": null
+  },
+  "rice all purpose flour": {
+    "canonical": "all-purpose flour",
+    "category": "gluten",
+    "split": null
+  },
+  "rice flour": {
+    "canonical": "rice flour",
+    "category": "none",
+    "split": null
+  },
+  "rice mung dal": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "rice",
+      "moong dal"
+    ]
+  },
+  "rice powder": {
+    "canonical": "rice flour",
+    "category": "none",
+    "split": null
+  },
+  "rice rice powder coconut salt": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "rice",
+      "rice flour",
+      "coconut",
+      "salt"
+    ]
+  },
+  "ricotta cheese": {
+    "canonical": "ricotta cheese",
+    "category": "dairy",
+    "split": null
+  },
+  "roast methi chana daal asafoetida": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "fenugreek seeds",
+      "chana dal",
+      "asafoetida"
+    ]
+  },
+  "roasted chick peas ground besan": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "chickpeas",
+      "besan"
+    ]
+  },
+  "roasted chicken breast": {
+    "canonical": "chicken",
+    "category": "meat",
+    "split": null
+  },
+  "roasted cumin seeds": {
+    "canonical": "cumin seeds",
+    "category": "none",
+    "split": null
+  },
+  "roasted dal / daliya / pottukadalai": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "roasted gram": {
+    "canonical": "roasted gram",
+    "category": "none",
+    "split": null
+  },
+  "roasted ground cumin as garnish": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "roasted jeera powder": {
+    "canonical": "cumin powder",
+    "category": "none",
+    "split": null
+  },
+  "roasted peanuts": {
+    "canonical": "peanut",
+    "category": "nut",
+    "split": null
+  },
+  "roasting chicken": {
+    "canonical": "chicken",
+    "category": "meat",
+    "split": null
+  },
+  "roasting chicken into bite size": {
+    "canonical": "chicken",
+    "category": "meat",
+    "split": null
+  },
+  "rose water": {
+    "canonical": "rose water",
+    "category": "none",
+    "split": null
+  },
+  "rose water cashew nut": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "rose water",
+      "cashew"
+    ]
+  },
+  "rose water drops": {
+    "canonical": "rose water",
+    "category": "none",
+    "split": null
+  },
+  "rose water ghee": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "rose water",
+      "ghee"
+    ]
+  },
+  "round brinjals": {
+    "canonical": "brinjal",
+    "category": "none",
+    "split": null
+  },
+  "round potatoes": {
+    "canonical": "potato",
+    "category": "none",
+    "split": null
+  },
+  "s salt": {
+    "canonical": "salt",
+    "category": "none",
+    "split": null
+  },
+  "s sugar": {
+    "canonical": "sugar",
+    "category": "none",
+    "split": null
+  },
+  "saffron": {
+    "canonical": "saffron",
+    "category": "none",
+    "split": null
+  },
+  "saffron/turmeric": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "saffron",
+      "turmeric"
+    ]
+  },
+  "sago": {
+    "canonical": "sago",
+    "category": "none",
+    "split": null
+  },
+  "sago tapioca": {
+    "canonical": "sago",
+    "category": "none",
+    "split": null
+  },
+  "salad dressing": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "salt": {
+    "canonical": "salt",
+    "category": "none",
+    "split": null
+  },
+  "salt &amp water": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "salt",
+      "water"
+    ]
+  },
+  "salt black pepper": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "salt",
+      "black pepper"
+    ]
+  },
+  "salt chilli powder": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "salt",
+      "chilli powder"
+    ]
+  },
+  "salt cilantro/coriander leaves": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "salt",
+      "coriander leaves"
+    ]
+  },
+  "salt free butter": {
+    "canonical": "butter",
+    "category": "dairy",
+    "split": null
+  },
+  "salt free butter ghee": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "butter",
+      "ghee"
+    ]
+  },
+  "salt good curry leaves": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "salt",
+      "curry leaves"
+    ]
+  },
+  "salt gr chillies": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "salt",
+      "green chilli"
+    ]
+  },
+  "salt ground pepper": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "salt",
+      "black pepper"
+    ]
+  },
+  "salt lime juice": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "salt",
+      "lime juice"
+    ]
+  },
+  "salt pepper": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "salt",
+      "black pepper"
+    ]
+  },
+  "salted peanuts": {
+    "canonical": "peanut",
+    "category": "nut",
+    "split": null
+  },
+  "sambar powder": {
+    "canonical": "sambar powder",
+    "category": "none",
+    "split": null
+  },
+  "sambar samosa": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "samosa pastry": {
+    "canonical": "samosa pastry",
+    "category": "gluten",
+    "split": null
+  },
+  "samosa sheets / samosa patti": {
+    "canonical": "samosa pastry",
+    "category": "gluten",
+    "split": null
+  },
+  "scrapped coconut": {
+    "canonical": "coconut",
+    "category": "none",
+    "split": null
+  },
+  "seasoning": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "seedless green chilli fresh": {
+    "canonical": "green chilli",
+    "category": "none",
+    "split": null
+  },
+  "seedless raisins": {
+    "canonical": "raisins",
+    "category": "none",
+    "split": null
+  },
+  "semiya": {
+    "canonical": "vermicelli",
+    "category": "gluten",
+    "split": null
+  },
+  "semolina": {
+    "canonical": "semolina",
+    "category": "gluten",
+    "split": null
+  },
+  "semolina sugar fat cardamom - water": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "semolina",
+      "sugar",
+      "cardamom",
+      "water"
+    ]
+  },
+  "serving": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "sesame oil": {
+    "canonical": "sesame oil",
+    "category": "none",
+    "split": null
+  },
+  "sesame seeds": {
+    "canonical": "sesame seeds",
+    "category": "none",
+    "split": null
+  },
+  "sesame seeds lemon juice": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "sesame seeds",
+      "lemon juice"
+    ]
+  },
+  "set aside minutes": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "seven burfi": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "seven burfi coconut burfi halkova": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "shelled green peas": {
+    "canonical": "green peas",
+    "category": "none",
+    "split": null
+  },
+  "shelled peas": {
+    "canonical": "green peas",
+    "category": "none",
+    "split": null
+  },
+  "shrikand semiya sandesh sesame sev": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "shrimp": {
+    "canonical": "prawn",
+    "category": "fish",
+    "split": null
+  },
+  "shrimps de-veined": {
+    "canonical": "prawn",
+    "category": "fish",
+    "split": null
+  },
+  "silver leaf": {
+    "canonical": "silver leaf",
+    "category": "none",
+    "split": null
+  },
+  "sized eggplant": {
+    "canonical": "brinjal",
+    "category": "none",
+    "split": null
+  },
+  "slivered blanched almonds": {
+    "canonical": "almond",
+    "category": "nut",
+    "split": null
+  },
+  "sodium bicarbonate": {
+    "canonical": "baking soda",
+    "category": "none",
+    "split": null
+  },
+  "sona masoori rice basmati rice": {
+    "canonical": "rice",
+    "category": "none",
+    "split": null
+  },
+  "sooji": {
+    "canonical": "semolina",
+    "category": "gluten",
+    "split": null
+  },
+  "sour cream": {
+    "canonical": "sour cream",
+    "category": "dairy",
+    "split": null
+  },
+  "sour curd": {
+    "canonical": "yogurt",
+    "category": "dairy",
+    "split": null
+  },
+  "spices": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "spicy curry made gravy variety vegetables": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "spinach": {
+    "canonical": "spinach",
+    "category": "none",
+    "split": null
+  },
+  "spinach ghee oil": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "spinach",
+      "ghee",
+      "oil"
+    ]
+  },
+  "spinach leaves": {
+    "canonical": "spinach",
+    "category": "none",
+    "split": null
+  },
+  "spring onion": {
+    "canonical": "spring onion",
+    "category": "none",
+    "split": null
+  },
+  "spring onions": {
+    "canonical": "spring onion",
+    "category": "none",
+    "split": null
+  },
+  "sprouted green gram moong dal": {
+    "canonical": "moong dal",
+    "category": "none",
+    "split": null
+  },
+  "sprouted green moong dal": {
+    "canonical": "moong dal",
+    "category": "none",
+    "split": null
+  },
+  "stuffing": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "subzi": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "sugar": {
+    "canonical": "sugar",
+    "category": "none",
+    "split": null
+  },
+  "sugar chirongi": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "sugar",
+      "chironji"
+    ]
+  },
+  "sugar cup": {
+    "canonical": "sugar",
+    "category": "none",
+    "split": null
+  },
+  "sugar ice": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "sugar",
+      "ice cubes"
+    ]
+  },
+  "sugar sugar": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "sugar"
+    ]
+  },
+  "sugar syrup": {
+    "canonical": "sugar syrup",
+    "category": "none",
+    "split": null
+  },
+  "sultanas": {
+    "canonical": "raisins",
+    "category": "none",
+    "split": null
+  },
+  "sultanas raisins": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "raisins"
+    ]
+  },
+  "sunflower seeds": {
+    "canonical": "sunflower seeds",
+    "category": "none",
+    "split": null
+  },
+  "sweet chutney": {
+    "canonical": "sweet chutney",
+    "category": "none",
+    "split": null
+  },
+  "sweet mango chutney": {
+    "canonical": "sweet chutney",
+    "category": "none",
+    "split": null
+  },
+  "syrup": {
+    "canonical": "sugar syrup",
+    "category": "none",
+    "split": null
+  },
+  "tamarind": {
+    "canonical": "tamarind",
+    "category": "none",
+    "split": null
+  },
+  "tamarind - gooseberry size": {
+    "canonical": "tamarind",
+    "category": "none",
+    "split": null
+  },
+  "tamarind about size lemon": {
+    "canonical": "tamarind",
+    "category": "none",
+    "split": null
+  },
+  "tamarind concentrate": {
+    "canonical": "tamarind paste",
+    "category": "none",
+    "split": null
+  },
+  "tamarind paste": {
+    "canonical": "tamarind paste",
+    "category": "none",
+    "split": null
+  },
+  "tamarind pulp": {
+    "canonical": "tamarind pulp",
+    "category": "none",
+    "split": null
+  },
+  "tamarind pulp instant tamarind": {
+    "canonical": "tamarind pulp",
+    "category": "none",
+    "split": null
+  },
+  "tamcom": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "tamcon": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "tamcon flat": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "tamcon paste": {
+    "canonical": "tamarind paste",
+    "category": "none",
+    "split": null
+  },
+  "tbs rose water": {
+    "canonical": "rose water",
+    "category": "none",
+    "split": null
+  },
+  "tbspn ghee/ butter turned brown": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "ghee",
+      "butter"
+    ]
+  },
+  "tbspn ghee/melted butter turned brown": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "ghee",
+      "butter"
+    ]
+  },
+  "tbspn jaggery": {
+    "canonical": "jaggery",
+    "category": "none",
+    "split": null
+  },
+  "tbspn oil": {
+    "canonical": "oil",
+    "category": "none",
+    "split": null
+  },
+  "tbspn oil preferably sesame": {
+    "canonical": "sesame oil",
+    "category": "none",
+    "split": null
+  },
+  "tbspn sesame seeds roasted dry": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "sesame seeds"
+    ]
+  },
+  "tbspoon oil": {
+    "canonical": "oil",
+    "category": "none",
+    "split": null
+  },
+  "tea": {
+    "canonical": "tea",
+    "category": "none",
+    "split": null
+  },
+  "th cardamom powder": {
+    "canonical": "cardamom powder",
+    "category": "none",
+    "split": null
+  },
+  "th onions": {
+    "canonical": "onion",
+    "category": "none",
+    "split": null
+  },
+  "thcup onion": {
+    "canonical": "onion",
+    "category": "none",
+    "split": null
+  },
+  "thteaspoon salt": {
+    "canonical": "salt",
+    "category": "none",
+    "split": null
+  },
+  "til": {
+    "canonical": "sesame seeds",
+    "category": "none",
+    "split": null
+  },
+  "to cabbage leaves": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "cabbage"
+    ]
+  },
+  "to cardamom pods": {
+    "canonical": "cardamom",
+    "category": "none",
+    "split": null
+  },
+  "to fresh peaches": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "peach"
+    ]
+  },
+  "to ghee butter": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "ghee",
+      "butter"
+    ]
+  },
+  "to ghee melted butter": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "ghee",
+      "butter"
+    ]
+  },
+  "to potatoes": {
+    "canonical": "potato",
+    "category": "none",
+    "split": null
+  },
+  "to sugar": {
+    "canonical": "sugar",
+    "category": "none",
+    "split": null
+  },
+  "to sugar combination sugar honey": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "sugar",
+      "honey"
+    ]
+  },
+  "to tomatoes": {
+    "canonical": "tomato",
+    "category": "none",
+    "split": null
+  },
+  "tomato": {
+    "canonical": "tomato",
+    "category": "none",
+    "split": null
+  },
+  "tomato cucumber": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "tomato",
+      "cucumber"
+    ]
+  },
+  "tomato fine": {
+    "canonical": "tomato",
+    "category": "none",
+    "split": null
+  },
+  "tomato paste": {
+    "canonical": "tomato paste",
+    "category": "none",
+    "split": null
+  },
+  "tomato puree": {
+    "canonical": "tomato puree",
+    "category": "none",
+    "split": null
+  },
+  "tomato pureed": {
+    "canonical": "tomato puree",
+    "category": "none",
+    "split": null
+  },
+  "tomato sauce": {
+    "canonical": "tomato sauce",
+    "category": "none",
+    "split": null
+  },
+  "tomatoes": {
+    "canonical": "tomato",
+    "category": "none",
+    "split": null
+  },
+  "tomatoes into": {
+    "canonical": "tomato",
+    "category": "none",
+    "split": null
+  },
+  "tomatoes juice": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "tomato"
+    ]
+  },
+  "tomatoes pureed": {
+    "canonical": "tomato puree",
+    "category": "none",
+    "split": null
+  },
+  "toor daal": {
+    "canonical": "toor dal",
+    "category": "none",
+    "split": null
+  },
+  "toor dal": {
+    "canonical": "toor dal",
+    "category": "none",
+    "split": null
+  },
+  "toor dal dry": {
+    "canonical": "toor dal",
+    "category": "none",
+    "split": null
+  },
+  "toovar dal": {
+    "canonical": "toor dal",
+    "category": "none",
+    "split": null
+  },
+  "tspn black mustard seeds": {
+    "canonical": "mustard seeds",
+    "category": "none",
+    "split": null
+  },
+  "tspn chana dal": {
+    "canonical": "chana dal",
+    "category": "none",
+    "split": null
+  },
+  "tspn coriander seeds": {
+    "canonical": "coriander seeds",
+    "category": "none",
+    "split": null
+  },
+  "tspn cumin": {
+    "canonical": "cumin seeds",
+    "category": "none",
+    "split": null
+  },
+  "tspn cumin turmeric": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "cumin seeds",
+      "turmeric"
+    ]
+  },
+  "tspn dhania powder": {
+    "canonical": "coriander powder",
+    "category": "none",
+    "split": null
+  },
+  "tspn fenugreek": {
+    "canonical": "fenugreek seeds",
+    "category": "none",
+    "split": null
+  },
+  "tspn garam masala": {
+    "canonical": "garam masala",
+    "category": "none",
+    "split": null
+  },
+  "tspn jeera": {
+    "canonical": "cumin seeds",
+    "category": "none",
+    "split": null
+  },
+  "tspn mustard": {
+    "canonical": "mustard seeds",
+    "category": "none",
+    "split": null
+  },
+  "tspn mustard seeds": {
+    "canonical": "mustard seeds",
+    "category": "none",
+    "split": null
+  },
+  "tspn red chilli powder": {
+    "canonical": "chilli powder",
+    "category": "none",
+    "split": null
+  },
+  "tspn sambar powder": {
+    "canonical": "sambar powder",
+    "category": "none",
+    "split": null
+  },
+  "tspn tamarind paste": {
+    "canonical": "tamarind paste",
+    "category": "none",
+    "split": null
+  },
+  "tspn turmeric": {
+    "canonical": "turmeric",
+    "category": "none",
+    "split": null
+  },
+  "tspn urad dal": {
+    "canonical": "urad dal",
+    "category": "none",
+    "split": null
+  },
+  "tspn white urad dal": {
+    "canonical": "urad dal",
+    "category": "none",
+    "split": null
+  },
+  "turmeric": {
+    "canonical": "turmeric",
+    "category": "none",
+    "split": null
+  },
+  "turmeric powder": {
+    "canonical": "turmeric",
+    "category": "none",
+    "split": null
+  },
+  "turmeric salt": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "turmeric",
+      "salt"
+    ]
+  },
+  "uncooked rice": {
+    "canonical": "rice",
+    "category": "none",
+    "split": null
+  },
+  "unsalted peanuts": {
+    "canonical": "peanut",
+    "category": "nut",
+    "split": null
+  },
+  "unsalted pistachios": {
+    "canonical": "pistachio",
+    "category": "nut",
+    "split": null
+  },
+  "up to water": {
+    "canonical": "water",
+    "category": "none",
+    "split": null
+  },
+  "urad daal": {
+    "canonical": "urad dal",
+    "category": "none",
+    "split": null
+  },
+  "urad dal": {
+    "canonical": "urad dal",
+    "category": "none",
+    "split": null
+  },
+  "urad dal dry": {
+    "canonical": "urad dal",
+    "category": "none",
+    "split": null
+  },
+  "urad dal turmeric": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "urad dal",
+      "turmeric"
+    ]
+  },
+  "urad dhal": {
+    "canonical": "urad dal",
+    "category": "none",
+    "split": null
+  },
+  "urad flour": {
+    "canonical": "urad flour",
+    "category": "none",
+    "split": null
+  },
+  "using little ones bag about five": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "vanilla": {
+    "canonical": "vanilla",
+    "category": "none",
+    "split": null
+  },
+  "veg": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "vegetable": {
+    "canonical": "mixed vegetables",
+    "category": "none",
+    "split": null
+  },
+  "vegetable oil": {
+    "canonical": "oil",
+    "category": "none",
+    "split": null
+  },
+  "vegetables": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "vegetables etc": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "vegetables mixed": {
+    "canonical": "mixed vegetables",
+    "category": "none",
+    "split": null
+  },
+  "vermicelli": {
+    "canonical": "vermicelli",
+    "category": "gluten",
+    "split": null
+  },
+  "very fresh green coriander": {
+    "canonical": "coriander leaves",
+    "category": "none",
+    "split": null
+  },
+  "view complete seven burfi recipe": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "vinegar": {
+    "canonical": "vinegar",
+    "category": "none",
+    "split": null
+  },
+  "wash soak rice four hours": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "water": {
+    "canonical": "water",
+    "category": "none",
+    "split": null
+  },
+  "water at room temperature": {
+    "canonical": "water",
+    "category": "none",
+    "split": null
+  },
+  "water if you like": {
+    "canonical": "water",
+    "category": "none",
+    "split": null
+  },
+  "water salt": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "water",
+      "salt"
+    ]
+  },
+  "wheat flour": {
+    "canonical": "wheat flour",
+    "category": "gluten",
+    "split": null
+  },
+  "white onions": {
+    "canonical": "onion",
+    "category": "none",
+    "split": null
+  },
+  "white pepper": {
+    "canonical": "black pepper",
+    "category": "none",
+    "split": null
+  },
+  "white poppy seeds": {
+    "canonical": "poppy seeds",
+    "category": "none",
+    "split": null
+  },
+  "white poppy seeds dry roasted pan": {
+    "canonical": "poppy seeds",
+    "category": "none",
+    "split": null
+  },
+  "white rice": {
+    "canonical": "rice",
+    "category": "none",
+    "split": null
+  },
+  "white vinegar": {
+    "canonical": "vinegar",
+    "category": "none",
+    "split": null
+  },
+  "wooden skewers": {
+    "canonical": null,
+    "category": "none",
+    "split": null
+  },
+  "yellow split peas": {
+    "canonical": "yellow split peas",
+    "category": "none",
+    "split": null
+  },
+  "yellow split peas chilli powder turmeric": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "yellow split peas",
+      "chilli powder",
+      "turmeric"
+    ]
+  },
+  "yellow split peas red lentils": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "yellow split peas",
+      "masoor dal"
+    ]
+  },
+  "yoghurt": {
+    "canonical": "yogurt",
+    "category": "dairy",
+    "split": null
+  },
+  "yoghurt cream": {
+    "canonical": "cream",
+    "category": "dairy",
+    "split": null
+  },
+  "yogurt": {
+    "canonical": "yogurt",
+    "category": "dairy",
+    "split": null
+  },
+  "yogurt buttermilk": {
+    "canonical": null,
+    "category": "none",
+    "split": [
+      "yogurt",
+      "buttermilk"
+    ]
+  },
+  "yogurt/curds": {
+    "canonical": "yogurt",
+    "category": "dairy",
+    "split": null
+  },
+  "zucchini": {
+    "canonical": "zucchini",
+    "category": "none",
+    "split": null
+  }
+}
