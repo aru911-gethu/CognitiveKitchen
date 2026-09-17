@@ -1,0 +1,1 @@
+"""Text generation. Registers under kind "generator"."""
