@@ -1,5 +1,5 @@
 {
-  "chunker": "recursive",
+  "chunker": "recipe",
   "chunker_params": {},
   "source": "rrf",
   "sparse": "bm25",
