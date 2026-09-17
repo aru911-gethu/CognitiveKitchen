@@ -1,0 +1,1 @@
+"""Retrieval strategies. Each module registers itself under kind "retriever"."""

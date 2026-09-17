@@ -1,0 +1,1 @@
+"""Embedding models. Imported lazily so chunkers that need no vectors stay fast."""
