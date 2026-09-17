@@ -1,0 +1,47 @@
+[project]
+name = "cognitive-kitchen"
+version = "0.1.0"
+description = "RAG-based cooking assistant grounded in recipes you own"
+readme = "README.md"
+authors = [
+    { name = "aru911-gethu", email = "aru91190@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "beautifulsoup4>=4.15.0",
+    "deepeval>=4.2.3",
+    "faiss-cpu>=1.15.0",
+    "fastapi>=0.141.1",
+    "httpx>=0.28.1",
+    "langchain-core>=1.6.3",
+    "langchain-text-splitters>=1.1.2",
+    "lxml>=6.1.3",
+    "neo4j>=6.3.0",
+    "numpy>=2.5.3",
+    "openai>=3.14.0",
+    "playwright>=1.62.0",
+    "pydantic-settings>=2.15.0",
+    "pymupdf>=1.28.2",
+    "pypdf>=6.18.1",
+    "python-multipart>=0.0.32",
+    "rank-bm25>=0.2.2",
+    "scikit-learn>=1.9.1",
+    "sentence-transformers>=6.0.1",
+    "sse-starlette>=3.4.11",
+    "streamlit>=1.63.0",
+    "uvicorn[standard]>=0.53.0",
+]
+
+[project.scripts]
+ck-api = "cognitive_kitchen:serve_api"
+ck-ui = "cognitive_kitchen:serve_ui"
+ck-vocab = "cognitive_kitchen:build_vocabulary"
+ck-graph = "cognitive_kitchen:build_graph"
+
+[build-system]
+requires = ["uv_build>=0.12.10,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --no-header -p no:cacheprovider"

@@ -1,0 +1,77 @@
+# ---- Environment / secrets ----
+.env
+.env.*
+!.env.example
+
+# ---- Virtual environments ----
+.venv/
+venv/
+env/
+
+# ---- Third-party copyrighted source material ----
+# The source cookbook is not redistributed with this repository.
+# Anywhere under data/, not just the top level: an uploaded copy lands in
+# data/uploads/ and the old rule did not reach it.
+data/**/*.pdf
+data/*.pdf
+
+# ---- Ingestion output: TRACKED ----
+# These are the pipeline inputs for every later phase, so they are committed
+# rather than treated as scratch. Only the source PDF stays out.
+!data/ingested/
+!data/ingested/*.json
+
+# The curated benchmark is committed. It is the evaluation ground truth.
+!data/golden_dataset.json
+
+# ---- Derived caches: not tracked ----
+# Embedding vectors and chunked corpora are reproducible from the ingested JSON.
+# The ingredient vocabulary IS tracked: it is hand-curated, not derived.
+data/eval/emb-*.npy
+data/eval/corpus-*.json
+data/eval/judged.json
+data/chat/
+data/eval/constraints.json
+
+# Tracked: hand-curated or paid-for once, and cheap to keep.
+!data/eval/ingredient_map.json
+!data/eval/recipe_course.json
+!data/eval/pipeline.json
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ---- Testing / coverage ----
+.pytest_cache/
+.hypothesis/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# ---- Type checkers / linters ----
+.mypy_cache/
+.ruff_cache/
+.pyright/
+
+# ---- Editors / OS ----
+.idea/
+.vscode/*
+!.vscode/settings.json
+*.swp
+.DS_Store
+Thumbs.db
+
+# ---- Personal career content ----
+# Positioning drafts, not project documentation. Kept in the working tree so it
+# travels with the project, out of git so it does not ship if the repo goes
+# public.
+docs/linkedin-series.md
