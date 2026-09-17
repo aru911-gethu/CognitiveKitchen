@@ -75,3 +75,11 @@ Thumbs.db
 # travels with the project, out of git so it does not ship if the repo goes
 # public.
 docs/linkedin-series.md
+
+# ---- Scratch ----
+# Throwaway scripts and run logs from development. Named so they cannot be
+# committed by accident: a sweeping `git add -A` picked several up once.
+_*.py
+*.log
+*.raw
+res.txt
