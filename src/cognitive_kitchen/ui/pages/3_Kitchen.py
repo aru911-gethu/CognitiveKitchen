@@ -176,6 +176,14 @@ if question:
             except Exception:
                 pass
 
+            # The graph key of every cited recipe, kept for the pantry check
+            # below. Streamlit reruns the script on a button press, so this has
+            # to outlive the turn that produced it.
+            st.session_state["last_keys"] = [
+                f"{passage.meta.get('source')}:{(passage.meta.get('recipe_ids') or [''])[0]}"
+                for passage in contexts
+                if passage.meta.get("source") and passage.meta.get("recipe_ids")]
+
             meta = " · ".join(badges)
             with st.expander("Sources"):
                 for index, passage in enumerate(contexts, start=1):
@@ -186,3 +194,55 @@ if question:
         st.caption(meta)
         conversation.add("assistant", text, meta=meta)
         M.save(conversation)
+
+
+# ------------------------------------------------- can I actually make it?
+# The generator answers from retrieved text. This asks the graph whether the
+# cook can act on that answer, which retrieval structurally cannot: "missing"
+# appears in no document. The recipe is identified by the answer's cited source,
+# never by parsing the answer text.
+keys = st.session_state.get("last_keys") or []
+if keys:
+    st.divider()
+    st.subheader("Can I actually make it?")
+    st.caption("Checks the recipe this answer came from against your pantry. "
+               "Answered by the graph — retrieval has no notion of what you lack.")
+
+    if st.button("Check against my pantry", width="stretch"):
+        with st.spinner("Resolving your pantry, then asking the graph..."):
+            try:
+                from cognitive_kitchen.rag.graph import pantry as PN
+
+                resolution = PN.resolve_pantry(pantry)
+                st.session_state["pantry_check"] = {
+                    "resolution": resolution,
+                    "checks": [PN.can_i_make(key, resolution.canonical)
+                               for key in keys[:3]]}
+            except Exception as exc:
+                st.session_state["pantry_check"] = {"error": str(exc)}
+
+    check = st.session_state.get("pantry_check") or {}
+    if check.get("error"):
+        st.error(f"Graph unavailable: {check['error']}")
+    elif check.get("checks"):
+        resolution = check["resolution"]
+        note = f"read {len(resolution.canonical)} ingredients from your pantry"
+        if resolution.unknown:
+            note += f" · could not place: {', '.join(resolution.unknown)}"
+        if resolution.llm_used:
+            note += f" · a model resolved the leftovers (${resolution.cost_usd:.5f})"
+        st.caption(note)
+
+        for row in check["checks"]:
+            if row["can_make"]:
+                st.success(f"**{row['title']}** — you have everything, or "
+                           f"something that stands in.")
+            else:
+                st.warning(f"**{row['title']}** — missing "
+                           f"{len(row['missing'])} of {len(row['needed'])}")
+            if row["buy"]:
+                st.markdown("**Buy:** " + ", ".join(row["buy"]))
+            for missing, covers in (row["swaps"] or {}).items():
+                st.markdown(f"**Swap:** no {missing} — use "
+                            f"{' or '.join(covers)}, already on your shelf")
+
