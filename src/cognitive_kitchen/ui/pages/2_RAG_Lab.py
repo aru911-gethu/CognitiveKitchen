@@ -17,6 +17,7 @@ import time
 import pandas as pd
 import streamlit as st
 
+from cognitive_kitchen.ui import chrome
 from cognitive_kitchen.ui import models as MODELS
 from cognitive_kitchen.ui import warmup
 
@@ -28,7 +29,7 @@ from cognitive_kitchen.rag.loaders import load_latest_ingested
 from cognitive_kitchen.ui import explain
 from cognitive_kitchen.ui.progress import Commentary, per_question
 
-st.set_page_config(page_title="RAG Lab", page_icon="🧪", layout="wide")
+chrome.page("RAG Lab", icon="🧪", layout="wide")
 
 for package in ("chunking", "embedding", "retrieval", "query", "generate",
                 "strategies"):
@@ -129,7 +130,11 @@ def best_of(frame: pd.DataFrame, column: str, high: bool = True):
 
 
 # ---------------------------------------------------------------- header
-st.title("RAG Lab")
+chrome.header("RAG Lab",
+              "Six decisions, scored one at a time. Lock a winner and the next "
+              "stage is measured using it.",
+              pills=["8 chunkers", "9 retrievers", "4 strategies",
+                     "graph route"])
 
 source = st.sidebar.selectbox("Corpus", ["pdf", "url", ""],
                               format_func=lambda s: {"pdf": "PDF run",
@@ -202,12 +207,11 @@ cols[1].metric("Characters", f"{info['characters']:,}")
 cols[2].metric("Vocabulary", _vocab_badge())
 cols[3].metric("Graph", _graph_badge())
 
-crumbs = []
-for stage, label in (("chunker", "Chunker"), ("retrieval", "Retrieval"),
-                     ("transform", "Query"), ("strategy", "Generation")):
-    value = SS["locked"].get(stage)
-    crumbs.append(f"**{label}: {value}**" if value else f"{label}: —")
-st.caption("  ·  ".join(crumbs))
+chrome.stepper([(label, str(SS["locked"].get(stage) or ""))
+                for stage, label in (("chunker", "Chunking"),
+                                     ("retrieval", "Retrieval"),
+                                     ("transform", "Query"),
+                                     ("strategy", "Generation"))])
 if SS["locked"]:
     if st.button("Reset pipeline"):
         SS["locked"] = {}

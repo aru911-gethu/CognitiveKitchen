@@ -95,4 +95,43 @@ html, body, [class*="css"] { font-family:'Inter',sans-serif; }
   background:linear-gradient(96deg,#7c3aed,#db2777); color:#fff; }
 .stButton>button:hover { filter:brightness(1.10); }
 .stProgress > div > div > div > div { background:linear-gradient(90deg,#7c3aed,#db2777); }
+
+/* -- interior pages -------------------------------------------------------- */
+.hero-slim { padding:20px 26px; border-radius:16px; margin-bottom:14px;
+  box-shadow:0 10px 26px rgba(109,40,217,.24); }
+.hero-slim h1 { font-size:1.6rem; }
+.hero-slim p { font-size:.9rem; margin-top:5px; }
+
+/* pipeline progress: done / current / not reached */
+.stepper { display:flex; flex-wrap:wrap; gap:8px; margin:2px 0 10px; }
+.stepitem { display:flex; flex-direction:column; padding:8px 14px;
+  border-radius:12px; font-size:.78rem; line-height:1.35; min-width:104px;
+  border:1px solid rgba(139,92,246,.26); background:rgba(139,92,246,.07);
+  color:inherit; }
+.stepitem b { font-weight:700; opacity:.62; font-size:.68rem;
+  text-transform:uppercase; letter-spacing:.08em; }
+.stepitem i { font-style:normal; font-weight:700; font-size:.86rem; }
+.stepitem.done { border-color:rgba(16,185,129,.45);
+  background:rgba(16,185,129,.11); }
+.stepitem.done i { color:#34d399; }
+.stepitem.current { border-color:rgba(219,39,119,.55);
+  background:rgba(219,39,119,.13); }
+.stepitem.current i { color:#f472b6; }
+.stepitem.todo { opacity:.45; }
+
+/* chat answer footer */
+.metachips { display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 2px; }
+.metachip { display:inline-block; padding:3px 10px; border-radius:999px;
+  font-size:.72rem; font-weight:600; color:inherit;
+  background:rgba(139,92,246,.13); border:1px solid rgba(139,92,246,.3); }
+.metachip.ok   { background:rgba(16,185,129,.14); border-color:rgba(16,185,129,.4); }
+.metachip.warn { background:rgba(245,158,11,.15); border-color:rgba(245,158,11,.45); }
+
+/* empty chat */
+.emptychat { border-radius:18px; padding:26px 28px; margin:8px 0 4px;
+  text-align:center; color:inherit;
+  background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(219,39,119,.10));
+  border:1px solid rgba(139,92,246,.3); }
+.emptychat h4 { margin:0 0 6px; font-size:1.1rem; font-weight:800; }
+.emptychat p { margin:0; font-size:.87rem; opacity:.75; }
 </style>

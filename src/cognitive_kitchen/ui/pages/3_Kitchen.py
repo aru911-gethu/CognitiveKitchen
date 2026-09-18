@@ -18,9 +18,9 @@ import streamlit as st
 from cognitive_kitchen.config import settings
 from cognitive_kitchen.rag import memory as M
 from cognitive_kitchen.rag import pipeline as P
+from cognitive_kitchen.ui import chrome
 
-st.set_page_config(page_title="Kitchen", page_icon="🍲", layout="centered")
-st.title("Kitchen")
+chrome.page("Kitchen", icon="🍲", layout="centered")
 
 config = P.load()
 if config is None:
@@ -31,7 +31,10 @@ if config is None:
 
 model_label = (settings.generation_model.split("/")[-1]
                if config.generator == "qwen" else config.generator)
-st.caption(f"using **{config.label()}**  ·  k={config.k}  ·  {model_label}")
+chrome.header("Kitchen",
+              "Answers grounded in the recipes you ingested, using the pipeline "
+              "you locked in the Lab.",
+              pills=[config.label(), f"k={config.k}", model_label])
 
 
 @st.cache_resource(show_spinner="Loading the pipeline...")
@@ -40,6 +43,24 @@ def runtime(signature: str):
 
 
 parts = runtime(config.label() + str(config.k) + str(config.max_new_tokens))
+
+def meta_chips(meta: str) -> None:
+    """Render the answer footer as chips.
+
+    The footer is stored as a plain " . "-joined string because it is persisted
+    with the conversation and re-read on load. Presentation is derived from it
+    rather than stored, so old conversations pick up the new look for free.
+    """
+    if not meta:
+        return
+    out = ['<div class="metachips">']
+    for part in [x.strip() for x in meta.split("\u00b7") if x.strip()]:
+        kind = "ok" if part.startswith("\u2713") else (
+            "warn" if part.startswith("\u26a0") else "")
+        out.append(f'<span class="metachip {kind}">{part}</span>')
+    out.append("</div>")
+    st.markdown("".join(out), unsafe_allow_html=True)
+
 
 # ------------------------------------------------------------------ session
 if "conversation_id" not in st.session_state:
@@ -93,16 +114,33 @@ with st.sidebar:
     pantry = [line.strip() for line in pantry_text.splitlines() if line.strip()]
 
 # ------------------------------------------------------------------ history
+STARTERS = ["what can I make with rice?",
+            "something with no dairy",
+            "what can I use instead of ghee?",
+            "I am avoiding nuts, what can I make?"]
+
+if not conversation.turns:
+    st.markdown('<div class="emptychat"><h4>Ask about your recipes</h4>'
+                "<p>Every answer is built only from what you ingested. If the "
+                "answer is not in there, it says so rather than inventing "
+                "one.</p></div>", unsafe_allow_html=True)
+    st.caption("Or start with one of these:")
+    for column, starter in zip(st.columns(2) + st.columns(2), STARTERS):
+        if column.button(starter, key=f"start-{starter}", width="stretch"):
+            st.session_state["pending_question"] = starter
+            st.rerun()
+
 for turn in conversation.turns:
     with st.chat_message(turn.role):
         st.markdown(turn.content)
         if turn.resolved:
             st.caption(f"↳ retrieved as: _{turn.resolved}_")
         if turn.meta:
-            st.caption(turn.meta)
+            meta_chips(turn.meta)
 
 # ------------------------------------------------------------------ new turn
 question = st.chat_input("Ask about a recipe, or what you can cook")
+question = question or st.session_state.pop("pending_question", None)
 if question:
     with st.chat_message("user"):
         st.markdown(question)
@@ -194,7 +232,7 @@ if question:
                     st.markdown(f"**{index}. {ids}**")
                     st.text(passage.text[:600])
 
-        st.caption(meta)
+        meta_chips(meta)
         conversation.add("assistant", text, meta=meta)
         M.save(conversation)
 
