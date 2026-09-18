@@ -9,6 +9,7 @@ import pandas as pd
 import streamlit as st
 
 from cognitive_kitchen.config import settings
+from cognitive_kitchen.ui import warmup
 
 API = settings.api_base
 HERE = Path(__file__).resolve().parent
@@ -20,12 +21,13 @@ st.markdown((HERE / "theme.css").read_text(encoding="utf-8"), unsafe_allow_html=
 
 st.markdown(
     '<div class="hero"><h1>Cognitive Kitchen</h1>'
-    '<p>Decide what to cook, grounded in recipes you actually own.</p>'
+    '<p>A workbench for building a question-answering system over documents you '
+    'own &mdash; and for proving its answers can be trusted.</p>'
     '<div style="margin-top:14px">'
-    '<span class="pill">Phase 1 &middot; Ingestion</span>'
-    '<span class="pill">PDF to structured</span>'
-    '<span class="pill">Playwright crawl</span>'
-    '<span class="pill">Live page stream</span>'
+    '<span class="pill">1 &middot; Ingest</span>'
+    '<span class="pill">2 &middot; Experiment</span>'
+    '<span class="pill">3 &middot; Lock what wins</span>'
+    '<span class="pill">4 &middot; Chat</span>'
     '</div></div>', unsafe_allow_html=True)
 
 
@@ -111,42 +113,180 @@ with st.sidebar:
         st.caption("Ground truth for all evaluation.")
 
 # ---------------------------------------------------------------- the lede
-# This page used to open on a file uploader, which asks for work before saying
-# what the work is for. The finding goes first now: a reader who leaves after
-# one screen should still leave knowing what this measured.
-st.markdown("#### The best-ranking retriever satisfied the user's stated "
-            "constraint 40% of the time.")
-st.markdown("Four standard retrieval metrics all called it good. "
-            "A fifth one, which had to be written, is the only one that saw it.")
+# Earlier versions opened on a file uploader, then on a pasted metrics table.
+# Neither told a newcomer what the tool is for. This explains the job first,
+# offers the loaded sample as a way in, and keeps the measurement story in an
+# expander for whoever wants it. The nuts example is shown as a before/after
+# rather than described, because that contrast is the whole point.
 
-st.code("""configuration          hit@5   constraint respected   secs
-dense                  0.500                  33.8%    0.3
-bm25                   0.350                  58.8%    0.1
-fusion:rrf             0.600                  38.3%    0.1
-rrf + rerank           0.700                  40.0%   25.8
-rrf + graph            0.700                 100.0%    1.1
-rrf + graph + rerank   0.800                 100.0%   62.5""", language="text")
 
-st.caption("Asked *\"I am avoiding nuts, what can I make?\"* the strongest "
-           "ranker returned Nut Milk, Cashew Nut Chutney and Almond Honey Milk. "
-           "Similarity search has no direction for *without* -- so the better "
-           "the ranker, the more confidently wrong. The graph route fixes it by "
-           "deciding membership before anything is ranked.")
+# Fire the slow loads onto a background thread before anything renders. The
+# first visit to the Lab or the Kitchen otherwise pays for the embedding model
+# and the first Neo4j round trip at once, which reads as the app being slow when
+# it is only cold.
+warmup.start(st.session_state.get("warm_generator", False))
 
-hero_left, hero_right = st.columns(2)
-with hero_left:
-    st.page_link("pages/2_RAG_Lab.py",
-                 label="**RAG Lab** - score every option, stage by stage",
-                 icon=":material/science:")
-with hero_right:
-    st.page_link("pages/3_Kitchen.py",
-                 label="**Kitchen** - chat on the pipeline you locked",
-                 icon=":material/restaurant:")
+
+@st.cache_data(ttl=300, show_spinner=False)
+def local_stats() -> dict:
+    """Counts from disk only. No network, so it is safe to block on."""
+    runs = sorted((ROOT / "data" / "ingested").glob("*.json"))
+    recipes = 0
+    for f in runs:
+        try:
+            recipes += len(json.loads(f.read_text(encoding="utf-8")).get("recipes") or [])
+        except Exception:
+            pass
+    ingredients = 0
+    try:
+        from cognitive_kitchen.rag.vocab import ingredients as _v
+
+        ingredients = len(_v.all_canonical())
+    except Exception:
+        pass
+    return {"runs": len(runs), "recipes": recipes, "ingredients": ingredients}
+
+
+@st.cache_data(ttl=300, show_spinner=False)
+def graph_nodes() -> int:
+    """One network round trip, so it is called last and never gates the page."""
+    try:
+        from cognitive_kitchen.rag.graph import client as _c
+
+        health = _c.health()
+        return int(health.get("nodes") or 0) if health.get("ok") else 0
+    except Exception:
+        return 0
+
+
+S = local_stats()
+
+# The pills hold their place in the layout and are written at the very end of the
+# script, once the graph has answered. The page paints without waiting for it.
+pills_slot = st.empty()
+
+st.markdown('<div class="sectionhead">Build a chatbot over your own documents '
+            "&mdash; and prove it works</div>"
+            '<p class="sectionsub">Most tools let you build one. This one shows '
+            "you, with numbers, which way of building it is actually best. The "
+            "example here is cookbooks, so the questions are about cooking. None "
+            "of the machinery is.</p>", unsafe_allow_html=True)
+
+st.markdown('<div class="sectionhead">How it works</div>'
+            '<p class="sectionsub">Four steps. Each one is measured before you '
+            "move on.</p>", unsafe_allow_html=True)
+
+STEPS = [
+    ("Ingest", "Drop in a cookbook PDF or a few recipe links. It reads them "
+               "page by page and pulls out every recipe, its ingredients and "
+               "its steps."),
+    ("Experiment", "In the Lab, try different ways of slicing the text, "
+                   "searching it and writing the answer. Every option is "
+                   "scored side by side on the same questions."),
+    ("Lock what wins", "Pick the winner at each step. Your choice is saved, "
+                       "and the next step is measured using it rather than "
+                       "some default."),
+    ("Chat", "The Kitchen runs the pipeline you built. Ask it anything, and "
+             "check with one click whether you can actually cook the answer."),
+]
+for col, (index, (title, body)) in zip(st.columns(4), enumerate(STEPS, start=1)):
+    col.markdown(f'<div class="step"><div class="step-num">{index}</div>'
+                 f"<h4>{title}</h4><p>{body}</p></div>", unsafe_allow_html=True)
+
+st.markdown('<div class="sectionhead">Try it right now</div>'
+            '<p class="sectionsub">Two ways in. Neither needs any setup.</p>',
+            unsafe_allow_html=True)
+
+if S["recipes"]:
+    # Chips are inline-block, so the HTML needs real whitespace between them or
+    # they render as one run-on line.
+    chips = "\n".join(f'<span class="chip">{q}</span>' for q in (
+        "what can I make with rice?",
+        "something with no dairy",
+        "what can I use instead of ghee?",
+        "I am avoiding nuts, what can I make?",
+        "what can I cook tonight?"))
+    st.markdown(
+        f'<div class="trybox"><h4>A cookbook is already loaded &mdash; '
+        f'{S["recipes"]} recipes</h4>'
+        f'<p class="sub">Nothing to install, nothing to ingest. Try one of '
+        f"these:</p>{chips}</div>", unsafe_allow_html=True)
+
+    left, right = st.columns(2)
+    with left:
+        st.markdown(
+            '<div class="cta"><div class="tag">Just want to use it</div>'
+            "<h4>Ask the Kitchen</h4>"
+            "<p>A working chatbot over the loaded cookbook. Ask what to cook, "
+            "what to leave out, what to use instead &mdash; then click once to "
+            "check whether your kitchen actually has the ingredients.</p></div>",
+            unsafe_allow_html=True)
+        if st.button("Open the Kitchen", key="cta-kitchen", width="stretch"):
+            st.switch_page("pages/3_Kitchen.py")
+    with right:
+        st.markdown(
+            '<div class="cta"><div class="tag">Want to see the working</div>'
+            "<h4>Open the Lab</h4>"
+            "<p>Every choice behind that chatbot, scored side by side: how to "
+            "split the text, how to search it, how to write the answer. Change "
+            "one, watch the numbers move, lock what wins.</p></div>",
+            unsafe_allow_html=True)
+        if st.button("Open the Lab", key="cta-lab", width="stretch"):
+            st.switch_page("pages/2_RAG_Lab.py")
+else:
+    st.info("Nothing ingested yet. Add a cookbook PDF or some recipe URLs "
+            "below, then head to the Lab.")
+
+with st.expander("Why this needed measuring in the first place"):
+    st.markdown("Someone with a nut allergy asks a perfectly ordinary question. "
+                "The **highest-scoring** search in the whole lab answers it like "
+                "this:")
+    st.markdown(
+        '<div class="bad"><strong>Best search quality &middot; allergy ignored'
+        "</strong>Nut Milk &nbsp;&middot;&nbsp; Cashew Nut Chutney "
+        "&nbsp;&middot;&nbsp; Almond Honey Milk</div>",
+        unsafe_allow_html=True)
+    st.markdown(
+        '<div class="good"><strong>Same question &middot; knowledge graph route'
+        "</strong>Lemon Rice &nbsp;&middot;&nbsp; Tomato Rice "
+        "&nbsp;&middot;&nbsp; Masoor Dhal &mdash; and 23&times; faster</div>",
+        unsafe_allow_html=True)
+    st.markdown("Nothing was broken. Searching by similarity has no way to "
+                "express *without*, so *avoiding nuts* lands closest to the "
+                "recipes that are mostly nuts. **The better the search got, the "
+                "more confidently wrong it became** &mdash; and none of the "
+                "standard quality scores could see it. A fifth measure had to be "
+                "written:")
+    st.dataframe(
+        pd.DataFrame([
+            {"how the search was built": "meaning-based search", "quality": 0.500, "kept to the restriction": 0.338, "seconds": 0.3},
+            {"how the search was built": "keyword search", "quality": 0.350, "kept to the restriction": 0.588, "seconds": 0.1},
+            {"how the search was built": "both, blended", "quality": 0.600, "kept to the restriction": 0.383, "seconds": 0.1},
+            {"how the search was built": "blended + re-ranked", "quality": 0.700, "kept to the restriction": 0.400, "seconds": 25.8},
+            {"how the search was built": "blended + knowledge graph", "quality": 0.700, "kept to the restriction": 1.000, "seconds": 1.1},
+            {"how the search was built": "graph + re-ranked", "quality": 0.800, "kept to the restriction": 1.000, "seconds": 62.5},
+        ]),
+        width="stretch", hide_index=True,
+        column_config={
+            "quality": st.column_config.ProgressColumn(
+                "search quality", min_value=0.0, max_value=1.0, format="%.2f",
+                help="Did a correct recipe make the top five?"),
+            "kept to the restriction": st.column_config.ProgressColumn(
+                "kept to the restriction", min_value=0.0, max_value=1.0,
+                format="percent",
+                help="How often the recipes it found actually avoided what the "
+                     "question ruled out."),
+            "seconds": st.column_config.NumberColumn("secs", format="%.1f")})
+    st.caption("Quality climbs as you read down. Staying within the restriction "
+               "does not follow it. The graph works out which recipes are even "
+               "allowed before anything is ranked, which is why it gets there "
+               "without the slow re-ranking step.")
 
 st.divider()
-st.markdown("##### Bring your own corpus")
-st.caption("Ingest a cookbook PDF or a set of recipe URLs. Everything above is "
-           "measured on whatever you ingest, not on a shipped demo set.")
+st.markdown('<div class="sectionhead">Add your own recipes</div>'
+            '<p class="sectionsub">A PDF cookbook, or recipe pages from the web. '
+            "Everything above is measured on whatever you ingest.</p>",
+            unsafe_allow_html=True)
 
 tab_pdf, tab_url, tab_data = st.tabs(["  PDF  ", "  Web URLs  ", "  Ingested data  "])
 
@@ -226,3 +366,33 @@ with tab_data:
                     use_container_width=True, hide_index=True, height=340)
     else:
         st.info("Nothing ingested yet. Start with the sample PDF.")
+
+
+# --------------------------------------------------------------- warm-up panel
+with st.sidebar:
+    st.divider()
+    st.subheader("Warm-up")
+    st.caption(warmup.summary())
+    if st.toggle("Also preload the answering model",
+                 value=st.session_state.get("warm_generator", False),
+                 key="warm_generator",
+                 help="Loads Qwen2.5-1.5B up front, about 6 GB resident. It is "
+                      "otherwise loaded on your first question rather than on "
+                      "page open, so this helps the first answer and not the "
+                      "first click."):
+        warmup.start(True)
+
+# ------------------------------------------------------------ fill the pills
+# Last statement in the script: everything above is already on screen.
+_pills = []
+if S["recipes"]:
+    _pills.append(f'<span class="statpill">{S["recipes"]} <span>recipes</span></span>')
+if S["ingredients"]:
+    _pills.append(f'<span class="statpill">{S["ingredients"]} <span>ingredients</span></span>')
+_nodes = graph_nodes()
+if _nodes:
+    _pills.append(f'<span class="statpill">{_nodes:,} <span>graph nodes</span></span>')
+_pills.append('<span class="statpill">9 <span>retrievers scored</span></span>')
+pills_slot.markdown('<div style="margin:-4px 0 18px">' + "\n".join(_pills) + "</div>",
+                    unsafe_allow_html=True)
+
