@@ -82,27 +82,15 @@ with st.sidebar:
 
     st.divider()
     st.subheader("Pantry")
-    st.caption("What you have in. Answered by the graph, not by retrieval — "
-               "'missing' appears in no document.")
-    pantry_text = st.text_area("one per line",
-                               value=st.session_state.get(
-                                   "pantry", "onion\ntomato\noil\nsalt\nturmeric"),
-                               height=130)
+    st.caption("What you actually have in. Used further down to check whether "
+               "you can cook an answer.")
+    pantry_text = st.text_area(
+        "one per line",
+        value=st.session_state.get("pantry",
+                                   "onion\ntomato\noil\nsalt\nturmeric"),
+        height=150)
     st.session_state["pantry"] = pantry_text
     pantry = [line.strip() for line in pantry_text.splitlines() if line.strip()]
-
-    if st.button("What can I make?", width="stretch"):
-        try:
-            from cognitive_kitchen.rag.graph import traverse
-
-            st.session_state["pantry_results"] = traverse.pantry_gap(
-                pantry, max_missing=2, limit=8)
-        except Exception as exc:
-            st.error(f"Graph unavailable: {exc}")
-
-    for row in st.session_state.get("pantry_results", []) or []:
-        st.markdown(f"**{row['title'][:36]}**  \nmissing {row['n_missing']} of "
-                    f"{row['n_needed']}: {', '.join(row['missing']) or 'nothing'}")
 
 # ------------------------------------------------------------------ history
 for turn in conversation.turns:
@@ -179,10 +167,25 @@ if question:
             # The graph key of every cited recipe, kept for the pantry check
             # below. Streamlit reruns the script on a button press, so this has
             # to outlive the turn that produced it.
-            st.session_state["last_keys"] = [
-                f"{passage.meta.get('source')}:{(passage.meta.get('recipe_ids') or [''])[0]}"
-                for passage in contexts
-                if passage.meta.get("source") and passage.meta.get("recipe_ids")]
+            # Key plus a human label, taken from the passage itself rather
+            # than from the graph -- reading a title should not need a network
+            # round trip, and this list is built on every answer.
+            cited = []
+            for passage in contexts:
+                src = passage.meta.get("source")
+                ids = passage.meta.get("recipe_ids") or []
+                if not src or not ids:
+                    continue
+                head = next((ln.strip() for ln in passage.text.splitlines()
+                             if ln.strip()), ids[0])
+                cited.append({"key": f"{src}:{ids[0]}",
+                              "label": head[:58]})
+            seen, unique = set(), []
+            for row in cited:
+                if row["key"] not in seen:
+                    seen.add(row["key"])
+                    unique.append(row)
+            st.session_state["last_sources"] = unique
 
             meta = " · ".join(badges)
             with st.expander("Sources"):
@@ -197,52 +200,69 @@ if question:
 
 
 # ------------------------------------------------- can I actually make it?
-# The generator answers from retrieved text. This asks the graph whether the
-# cook can act on that answer, which retrieval structurally cannot: "missing"
-# appears in no document. The recipe is identified by the answer's cited source,
-# never by parsing the answer text.
-keys = st.session_state.get("last_keys") or []
-if keys:
+# The generator answers from retrieved text. This asks the graph whether the cook
+# can act on that answer, which retrieval structurally cannot: "missing" appears
+# in no document. Recipes are identified by the answer's cited sources, never by
+# parsing the answer text.
+sources = st.session_state.get("last_sources") or []
+if sources:
     st.divider()
     st.subheader("Can I actually make it?")
-    st.caption("Checks the recipe this answer came from against your pantry. "
-               "Answered by the graph — retrieval has no notion of what you lack.")
+    st.caption("Compare a recipe from the answer above against your pantry. "
+               "Answered by the graph, not by retrieval.")
 
-    if st.button("Check against my pantry", width="stretch"):
-        with st.spinner("Resolving your pantry, then asking the graph..."):
+    labels = [row["label"] for row in sources]
+    picked = st.selectbox("Which recipe?", range(len(labels)),
+                          format_func=lambda i: labels[i])
+
+    if not pantry:
+        st.info("Add what you have to the Pantry in the sidebar first.")
+    elif st.button("Compare with my pantry", width="stretch"):
+        with st.spinner("Reading your pantry, then asking the graph..."):
             try:
                 from cognitive_kitchen.rag.graph import pantry as PN
 
                 resolution = PN.resolve_pantry(pantry)
                 st.session_state["pantry_check"] = {
                     "resolution": resolution,
-                    "checks": [PN.can_i_make(key, resolution.canonical)
-                               for key in keys[:3]]}
+                    "row": PN.can_i_make(sources[picked]["key"],
+                                         resolution.canonical)}
             except Exception as exc:
-                st.session_state["pantry_check"] = {"error": str(exc)}
+                st.session_state["pantry_check"] = {
+                    "error": f"{type(exc).__name__}: {exc}"}
 
     check = st.session_state.get("pantry_check") or {}
     if check.get("error"):
-        st.error(f"Graph unavailable: {check['error']}")
-    elif check.get("checks"):
-        resolution = check["resolution"]
-        note = f"read {len(resolution.canonical)} ingredients from your pantry"
+        # Bolt is port 7687, which corporate VPNs routinely block. Say that
+        # rather than showing a routing-table stack trace.
+        st.warning("The graph is not reachable, so this cannot be answered right "
+                   "now. Everything else on this page still works.")
+        with st.expander("Details"):
+            st.caption(check["error"])
+            st.caption("Neo4j speaks Bolt on port 7687. A VPN blocking that "
+                       "port produces exactly this, even when the instance is "
+                       "healthy and port 443 on the same host is open.")
+    elif check.get("row"):
+        resolution, row = check["resolution"], check["row"]
+
+        note = f"matched {len(resolution.canonical)} pantry items"
         if resolution.unknown:
-            note += f" · could not place: {', '.join(resolution.unknown)}"
+            note += f" · not recognised: {', '.join(resolution.unknown)}"
         if resolution.llm_used:
             note += f" · a model resolved the leftovers (${resolution.cost_usd:.5f})"
         st.caption(note)
 
-        for row in check["checks"]:
-            if row["can_make"]:
-                st.success(f"**{row['title']}** — you have everything, or "
-                           f"something that stands in.")
-            else:
-                st.warning(f"**{row['title']}** — missing "
-                           f"{len(row['missing'])} of {len(row['needed'])}")
-            if row["buy"]:
-                st.markdown("**Buy:** " + ", ".join(row["buy"]))
-            for missing, covers in (row["swaps"] or {}).items():
-                st.markdown(f"**Swap:** no {missing} — use "
-                            f"{' or '.join(covers)}, already on your shelf")
+        if row["can_make"]:
+            st.success(f"**{row['title']}** — you have everything, or something "
+                       f"that stands in for it.")
+        else:
+            st.warning(f"**{row['title']}** — missing {len(row['missing'])} of "
+                       f"{len(row['needed'])} ingredients")
+        if row["buy"]:
+            st.markdown("**Buy:** " + ", ".join(row["buy"]))
+        for missing, covers in (row["swaps"] or {}).items():
+            st.markdown(f"**Swap:** no {missing} — use {' or '.join(covers)}, "
+                        f"already on your shelf")
+        with st.expander("What the recipe needs"):
+            st.caption(", ".join(row["needed"]) or "nothing recorded")
 

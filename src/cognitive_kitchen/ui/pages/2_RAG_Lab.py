@@ -107,6 +107,21 @@ def show_metrics(group: str) -> None:
             st.caption(detail)
 
 
+def graph_offline(exc: Exception) -> None:
+    """Say the graph is unreachable, instead of printing a routing stack trace.
+
+    Bolt is port 7687, which corporate VPNs routinely block, so this is the most
+    common failure on this page and it has nothing to do with the query.
+    """
+    st.warning("The graph is not reachable, so this panel cannot answer right "
+               "now. Every stage that does not use the graph still works.")
+    with st.expander("Details"):
+        st.caption(f"{type(exc).__name__}: {exc}")
+        st.caption("Neo4j speaks Bolt on port 7687. A VPN blocking that port "
+                   "produces exactly this, even when the instance is healthy "
+                   "and port 443 on the same host is open.")
+
+
 def best_of(frame: pd.DataFrame, column: str, high: bool = True):
     if column not in frame or frame[column].isna().all():
         return None
@@ -711,7 +726,8 @@ with st.expander("STAGE 5 · Pure graph — standalone, not part of the chain"):
     show_models("stage5")
     show_metrics("stage5")
     tab_scored, tab_gen, tab_pantry, tab_subs = st.tabs(
-        ["Retrieval scored", "End to end", "Pantry", "Substitutes"])
+        ["Retrieval scored", "End to end", "Try it: pantry",
+         "Try it: substitutes"])
 
     with tab_scored:
         n5 = st.slider("questions", 5, 40, 20, 5, key="n5")
@@ -864,34 +880,44 @@ with st.expander("STAGE 5 · Pure graph — standalone, not part of the chain"):
                         for x in trace]), width="stretch", hide_index=True)
 
     with tab_pantry:
-        st.caption("The answer here appears in no document. It is "
-                   "(ingredients needed) minus (ingredients you have), which is "
-                   "arithmetic over the graph and not something any retriever "
-                   "can find.")
+        st.caption("Not scored - a demonstration. The answer here appears in no "
+                   "document: it is (ingredients needed) minus (ingredients you "
+                   "have), which is arithmetic over the graph and not something "
+                   "any retriever can find.")
         have = st.text_input("I have", "onion, tomato, oil, salt, turmeric")
         missing = st.slider("missing at most", 0, 4, 2)
         if st.button("Find", key="pantry"):
-            from cognitive_kitchen.rag.graph import traverse
+            try:
+                from cognitive_kitchen.rag.graph import traverse
 
-            names = [x.strip() for x in have.split(",") if x.strip()]
-            st.dataframe(pd.DataFrame(traverse.pantry_gap(
-                names, max_missing=int(missing), limit=15))[
-                ["title", "n_missing", "n_needed", "missing"]],
-                width="stretch", hide_index=True)
+                names = [x.strip() for x in have.split(",") if x.strip()]
+                found = traverse.pantry_gap(names, max_missing=int(missing),
+                                            limit=15)
+                if found:
+                    st.dataframe(pd.DataFrame(found)[
+                        ["title", "n_missing", "n_needed", "missing"]],
+                        width="stretch", hide_index=True)
+                else:
+                    st.info("Nothing is within that many missing ingredients.")
+            except Exception as exc:
+                graph_offline(exc)
 
     with tab_subs:
-        st.caption("Substitutes come from distributional similarity: two "
-                   "ingredients are alike when they keep the same company, even "
-                   "if they never meet. Plain co-occurrence gives the wrong "
-                   "answer — the things most often found next to ghee are water "
-                   "and salt, because those are in nearly every recipe.")
+        st.caption("Not scored - a demonstration. Substitutes come from "
+                   "distributional similarity: two ingredients are alike when "
+                   "they keep the same company, even if they never meet. Plain "
+                   "co-occurrence gives the wrong answer, because the things most "
+                   "often found next to ghee are water and salt.")
         target = st.text_input("Instead of", "ghee")
         if st.button("Suggest", key="subs"):
-            from cognitive_kitchen.rag.graph import traverse
+            try:
+                from cognitive_kitchen.rag.graph import traverse
 
-            found = traverse.substitutes(target, limit=8)
-            if found:
-                st.dataframe(pd.DataFrame(found), width="stretch",
-                             hide_index=True)
-            else:
-                st.warning(f"{target!r} is not in the ingredient vocabulary.")
+                found = traverse.substitutes(target, limit=8)
+                if found:
+                    st.dataframe(pd.DataFrame(found), width="stretch",
+                                 hide_index=True)
+                else:
+                    st.warning(f"{target!r} is not in the ingredient vocabulary.")
+            except Exception as exc:
+                graph_offline(exc)
