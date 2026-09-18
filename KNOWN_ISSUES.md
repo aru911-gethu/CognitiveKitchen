@@ -154,3 +154,36 @@ Related: 86 recipes match "avoiding dairy" and 5 reach the generator. A traversa
 has no relevance ranking, so which 5 is a heuristic -- fewest ingredients first,
 in `retrieval/graph_only.py`. Documented rather than hidden, because it is a real
 weakness of answering from structure alone.
+
+## Hand curation does not scale, and it is load-bearing
+
+**Status:** open, and the most likely question an interviewer reaches first.
+
+The 100% constraint compliance figure rests on `rag/vocab/curated.py` -- 478
+hand-written lines mapping 1,776 raw ingredient strings onto 158 canonical names.
+Every graph traversal depends on that mapping being right. A corpus with 50,000
+entities cannot be curated this way.
+
+**Why it is hand-written rather than generated.** The failure mode is measurable,
+not hypothetical. A model that files besan as gluten, or collapses coriander seeds
+and coriander leaves into one ingredient, produces a vocabulary that is wrong in
+precisely the cases a cook notices -- and those errors are invisible to every
+metric here, because the graph will confidently report compliance against a wrong
+category. Two earlier attempts are recorded in the file: protecting `cloves` as a
+spice fragmented clean `garlic` into six variants, because the corpus uses cloves
+as a unit of garlic. The `gram` guard stayed, because gram flour is not wheat
+flour.
+
+**The plausible path** is machine-proposed, human-ratified -- the same shape as the
+truth-set argument in `docs/golden-dataset.md`.
+
+**The open question, unanswered:** what accuracy does the proposal step need before
+ratification is cheaper than curating by hand? That experiment has not been run,
+and until it is, this project has demonstrated the approach works at 158
+ingredients and nothing beyond that.
+
+**What would resolve it:** generate a vocabulary for the same corpus with a model,
+diff it against the curated one, and count the disagreements that change a
+category assignment. That number is the whole answer, and the corpus to run it on
+is already here.
+

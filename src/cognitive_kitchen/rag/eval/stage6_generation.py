@@ -144,8 +144,14 @@ def evaluate(strategy, retriever, corpus: Corpus, query_transform=None,
     except Exception:
         pass
 
-    questions = [q for q in load_questions()
-                 if families is None or q["family"] in families]
+    from .golden import questions_for_eval
+
+    # Nothing here reads relevant_ids, so this stage works unchanged on a plain
+    # question list. Only the family filter has to let "user" through.
+    pool = questions_for_eval()
+    labelled = any(q.get("relevant_ids") for q in pool)
+    questions = [q for q in pool
+                 if families is None or not labelled or q["family"] in families]
     if limit and len(questions) > limit:
         step = len(questions) / limit
         questions = [questions[int(i * step)] for i in range(limit)]

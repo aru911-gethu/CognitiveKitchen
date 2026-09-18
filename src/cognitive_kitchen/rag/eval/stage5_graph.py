@@ -128,8 +128,13 @@ def evaluate(corpus: Corpus, limit: int | None = 20,
     judged = {rid for ids in mapping.values() for rid in ids}
 
     wanted = families or ANSWERABLE
-    questions = [q for q in load_questions()
-                 if q["family"] in wanted and set(q["relevant_ids"]) & known]
+    from .golden import questions_for_eval
+
+    pool = questions_for_eval()
+    labelled = any(q.get("relevant_ids") for q in pool)
+    questions = [q for q in pool
+                 if (q["family"] in wanted or not labelled)
+                 and (not labelled or set(q["relevant_ids"]) & known)]
     if limit is not None and len(questions) > limit:
         step = len(questions) / limit
         questions = [questions[int(i * step)] for i in range(limit)]

@@ -171,9 +171,95 @@ hash.
 It is evaluation-only truth. Nothing on the build side reads it, which is the
 point -- a benchmark the system can see is a benchmark the system will fit.
 
+**You do not need one to start.** The split is between questions and labels, not
+between golden and nothing:
+
+```
+documents only        chunk purity, self-sufficiency, latency, cost
++ data/questions.txt  + faithfulness, relevancy, cookability, abstention,
+                        diversity, and constraint compliance
++ relevance labels    + recall, hit@k, MAP, k@90, set recall
+```
+
+One question per line in `data/questions.txt` is enough to score most of the
+pipeline, including the constraint metric that no comparable tool has. Verified by
+hiding the golden dataset and running Stage 3 on three plain questions:
+
+```
+hit_at_k               None    needs labels, reported blank rather than zero
+recall_at_k            None
+map                    None
+diversity_at_k         1.0     computed
+constraint_respected   0.9     computed
+```
+
+Labels buy recall, and recall cannot come from an LLM judge: to know a retriever
+missed something you must know what existed, and a judge only sees what you showed
+it. [docs/golden-dataset.md](docs/golden-dataset.md) covers building one.
+
 I also found it wrong twice. Two queries listed fish and prawn recipes as valid
 answers to "no meat". Both are corrected, and the correction is recorded in the
 `provenance` block rather than quietly fixed.
+
+## Related work
+
+I measured these independently on my own corpus, then went looking and found the
+work that names them. Situating them is more useful than implying I got there
+first.
+
+**Negation in dense retrieval has a name.** [Negation is Not Semantic: Diagnosing
+Dense Retrieval Failure Modes](https://arxiv.org/abs/2603.17580) calls the
+mechanism *semantic collapse* -- negation signals become indistinguishable in
+vector space -- and reports the same counterintuitive twist I hit, where the more
+sophisticated retrieval strategies degrade worse. My cross-encoder at 40.0%
+compliance against bm25 at 58.8% is that shape.
+[Exclusion-Sensitive Penalization for Negative-Constraint Retrieval](https://arxiv.org/html/2608.30130v2)
+frames the problem as retrievers supplying evidence about concepts the user
+explicitly excluded, and [DEO](https://arxiv.org/pdf/2603.09185v1) proposes
+decomposing queries into positive and negative components -- architecturally close
+to what the graph pre-filter does here.
+
+**Structure-aware chunking beating semantic chunking is a published result.**
+[Evaluating Chunking Strategies for RAG in Oil and Gas Enterprise Documents](https://arxiv.org/abs/2603.24556)
+found structure-aware chunking wins on retrieval effectiveness and costs less
+compute, and [Is Semantic Chunking Worth the Computational Cost?](https://arxiv.org/html/2410.13070v1)
+concluded the gains do not justify the expense. That is my `recipe` versus
+`semantic_adjacent` result in a different domain.
+
+**Food knowledge graphs are an established area.**
+[FoodKG](http://www.cs.rpi.edu/~zaki/PaperDir/ISWC19.pdf) (RPI, ISWC 2019) is the
+canonical recipe-ingredient-nutrition graph, and a
+[2025 paper](https://www.mdpi.com/2073-431X/14/10/412) builds personalised
+multi-diet retrieval on Neo4j combining knowledge graphs, RAG and LLMs.
+
+**Even the bug I deferred is documented.**
+[Evaluation of LLMs in retrieving food and nutritional context for RAG](https://arxiv.org/abs/2603.09704v2)
+found that filtering works when constraints are explicitly expressible and breaks
+when queries exceed what the metadata can represent -- which is exactly why my
+`constraint` family scores 0.000.
+
+**And `reordered` beating `stuff_strict` on identical chunks** is the
+lost-in-the-middle effect from Liu et al. 2023.
+
+*Content above was rephrased for compliance with licensing restrictions.*
+
+**What is not in the literature is the tooling.** I checked four open RAG
+evaluation projects -- [ChunkLab](https://github.com/selvin-paul-raj/chunklab),
+[enterprise-rag-bench](https://github.com/sunilp/enterprise-rag-bench),
+[crag-bench](https://github.com/AliHamzaAzam/crag-bench-rag-strategies) and
+[google/rag-playground](https://github.com/google/rag-playground). Their metric
+sets are P@k/MRR/NDCG, faithfulness/groundedness/context-precision, accuracy, and
+Vertex Rapid Evals respectively. **Not one measures whether retrieval respected an
+exclusion.** That gap is the reason this repo exists.
+
+## Where to read next
+
+```
+RESULTS.md                 every measured number, with its provenance
+PRODUCT.md                 the job, the buyers, the north star, the scaling ceiling
+docs/golden-dataset.md     how to build a truth set for your own corpus
+KNOWN_ISSUES.md            open items with enough diagnosis to pick up cold
+```
 
 ## Known issues
 

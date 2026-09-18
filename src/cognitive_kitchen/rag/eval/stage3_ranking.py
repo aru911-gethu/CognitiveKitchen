@@ -159,6 +159,17 @@ def diversity_at_k(hits: list[Scored], k: int) -> float:
 
 
 @traced("stage3.evaluate")
+def _r(value, digits: int):
+    """round() that passes None through instead of raising."""
+    return None if value is None else round(value, digits)
+
+
+def _mean(values, digits: int):
+    """Mean over the values we actually have. None when we have none."""
+    present = [v for v in values if v is not None]
+    return round(statistics.fmean(present), digits) if present else None
+
+
 def evaluate(retriever, corpus: Corpus, query_transform=None, k: int = 5,
              limit: int | None = 20, families: set[str] | None = None,
              extractor=None, check_constraints: bool = True,
@@ -167,9 +178,16 @@ def evaluate(retriever, corpus: Corpus, query_transform=None, k: int = 5,
     fingerprints = build_fingerprints(golden, corpus)
     known = {r.recipe_id for r in golden}
 
-    questions = [q for q in load_questions()
+    # Without labels the relevance filter would reject every question, because
+    # relevant_ids is empty by construction. Keep them and let the label-dependent
+    # metrics report None, which is the honest answer to "we were never told".
+    from .golden import questions_for_eval
+
+    pool = questions_for_eval()
+    labelled = any(q.get("relevant_ids") for q in pool)
+    questions = [q for q in pool
                  if (families is None or q["family"] in families)
-                 and set(q["relevant_ids"]) & known]
+                 and (not labelled or set(q["relevant_ids"]) & known)]
     if limit is not None and len(questions) > limit:
         step = len(questions) / limit
         questions = [questions[int(i * step)] for i in range(limit)]
@@ -203,9 +221,15 @@ def evaluate(retriever, corpus: Corpus, query_transform=None, k: int = 5,
         ranked = collapse_to_recipes(hits, fingerprints)
         relevant = set(question["relevant_ids"]) & known
 
-        h = hit_at_k(ranked, relevant, k)
-        r = recall_at_k(ranked, relevant, k)
-        m = mean_average_precision(ranked, relevant, k)
+        if relevant:
+            h = hit_at_k(ranked, relevant, k)
+            r = recall_at_k(ranked, relevant, k)
+            m = mean_average_precision(ranked, relevant, k)
+        else:
+            # Nobody said which recipes are correct, so these are unanswerable
+            # rather than zero. None renders blank; a zero would read as a
+            # retriever that found nothing, which is a different claim.
+            h = r = m = None
         d = diversity_at_k(hits, k)
         per_family.setdefault(question["family"], []).append((h, r, m, d))
 
@@ -230,15 +254,15 @@ def evaluate(retriever, corpus: Corpus, query_transform=None, k: int = 5,
 
         rows.append({"query_id": question["query_id"], "family": question["family"],
                      "question": question["question"][:70],
-                     "hit": h, "recall": round(r, 3), "map": round(m, 4),
-                     "diversity": round(d, 3),
+                     "hit": h, "recall": _r(r, 3), "map": _r(m, 4),
+                     "diversity": _r(d, 3),
                      "constraint_respected": None if cr is None else round(cr, 3),
                      "n_queries": len(queries),
                      "n_relevant": len(relevant), "top_recipes": ranked[:3]})
         if progress is not None:
             progress(len(rows), len(questions), question["question"],
                      family=question["family"], hit=h,
-                     recall=round(r, 2),
+                     recall=_r(r, 2),
                      constraint=None if cr is None else round(cr, 2))
 
     flat = [v for values in per_family.values() for v in values]
@@ -247,20 +271,20 @@ def evaluate(retriever, corpus: Corpus, query_transform=None, k: int = 5,
         "query_transform": getattr(query_transform, "name", "passthrough"),
         "k": k,
         "questions": len(questions),
-        "hit_at_k": round(statistics.fmean(v[0] for v in flat), 4) if flat else None,
-        "recall_at_k": round(statistics.fmean(v[1] for v in flat), 4) if flat else None,
-        "map": round(statistics.fmean(v[2] for v in flat), 4) if flat else None,
-        "diversity_at_k": round(statistics.fmean(v[3] for v in flat), 4) if flat else None,
+        "hit_at_k": _mean((v[0] for v in flat), 4),
+        "recall_at_k": _mean((v[1] for v in flat), 4),
+        "map": _mean((v[2] for v in flat), 4),
+        "diversity_at_k": _mean((v[3] for v in flat), 4),
         "constraint_respected": (round(statistics.fmean(respected), 4)
                                  if respected else None),
         "constrained_questions": len(respected),
         "breaches": breaches,
         "by_family": {name: {
             "n": len(values),
-            "hit": round(statistics.fmean(v[0] for v in values), 3),
-            "recall": round(statistics.fmean(v[1] for v in values), 3),
-            "map": round(statistics.fmean(v[2] for v in values), 3),
-            "diversity": round(statistics.fmean(v[3] for v in values), 3),
+            "hit": _mean((v[0] for v in values), 3),
+            "recall": _mean((v[1] for v in values), 3),
+            "map": _mean((v[2] for v in values), 3),
+            "diversity": _mean((v[3] for v in values), 3),
         } for name, values in sorted(per_family.items())},
         "elapsed_s": round(time.perf_counter() - started, 2),
         "telemetry": ledger.as_dict(),
