@@ -17,6 +17,8 @@ import time
 import pandas as pd
 import streamlit as st
 
+from cognitive_kitchen.ui import models as MODELS
+
 from cognitive_kitchen.config import settings
 from cognitive_kitchen.rag import pipeline as P
 from cognitive_kitchen.rag import registry
@@ -114,6 +116,40 @@ source = st.sidebar.selectbox("Corpus", ["pdf", "url", ""],
                               format_func=lambda s: {"pdf": "PDF run",
                                                      "url": "Web run",
                                                      "": "newest run"}[s])
+
+# ---------------------------------------------------------------- models
+# Every factory already takes model_name; this is the control that was missing.
+# Switching one clears the resource cache, because a cached embedder would
+# otherwise outlive the change and label a table with a model it did not use.
+with st.sidebar:
+    st.divider()
+    st.subheader("Models")
+    st.caption("Re-measure any stage on a different model. Verify before a long "
+               "run, or a bad id fails forty seconds in.")
+    for role in ("embedding_model", "generation_model", "reranker_model"):
+        options = MODELS.KNOWN[role] + [MODELS.OTHER]
+        now = MODELS.current(role)
+        picked = st.selectbox(
+            MODELS.LABELS[role], options,
+            index=options.index(now) if now in options else len(options) - 1,
+            key="pick-" + role, format_func=lambda s: s.split("/")[-1])
+        if picked == MODELS.OTHER:
+            picked = st.text_input("model id", value=now, key="free-" + role,
+                                   placeholder="org/model-name")
+        left, right = st.columns(2)
+        if left.button("Use", key="use-" + role, width="stretch"):
+            if MODELS.apply(role, picked):
+                st.cache_resource.clear()
+                st.cache_data.clear()
+                SS["results"] = {}
+                st.rerun()
+        if right.button("Verify", key="ver-" + role, width="stretch"):
+            SS["verdict-" + role] = MODELS.verify(role, picked)
+        verdict = SS.get("verdict-" + role)
+        if verdict:
+            ok, detail = verdict
+            (st.success if ok else st.error)(detail)
+
 info = summarise(corpus_for(source))
 cols = st.columns(4)
 cols[0].metric("Recipes", info["recipes"])

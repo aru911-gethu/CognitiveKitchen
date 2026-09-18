@@ -110,6 +110,44 @@ with st.sidebar:
         st.metric("Golden queries", len(g["evaluation"]["queries"]))
         st.caption("Ground truth for all evaluation.")
 
+# ---------------------------------------------------------------- the lede
+# This page used to open on a file uploader, which asks for work before saying
+# what the work is for. The finding goes first now: a reader who leaves after
+# one screen should still leave knowing what this measured.
+st.markdown("#### The best-ranking retriever satisfied the user's stated "
+            "constraint 40% of the time.")
+st.markdown("Four standard retrieval metrics all called it good. "
+            "A fifth one, which had to be written, is the only one that saw it.")
+
+st.code("""configuration          hit@5   constraint respected   secs
+dense                  0.500                  33.8%    0.3
+bm25                   0.350                  58.8%    0.1
+fusion:rrf             0.600                  38.3%    0.1
+rrf + rerank           0.700                  40.0%   25.8
+rrf + graph            0.700                 100.0%    1.1
+rrf + graph + rerank   0.800                 100.0%   62.5""", language="text")
+
+st.caption("Asked *\"I am avoiding nuts, what can I make?\"* the strongest "
+           "ranker returned Nut Milk, Cashew Nut Chutney and Almond Honey Milk. "
+           "Similarity search has no direction for *without* -- so the better "
+           "the ranker, the more confidently wrong. The graph route fixes it by "
+           "deciding membership before anything is ranked.")
+
+hero_left, hero_right = st.columns(2)
+with hero_left:
+    st.page_link("pages/2_RAG_Lab.py",
+                 label="**RAG Lab** - score every option, stage by stage",
+                 icon=":material/science:")
+with hero_right:
+    st.page_link("pages/3_Kitchen.py",
+                 label="**Kitchen** - chat on the pipeline you locked",
+                 icon=":material/restaurant:")
+
+st.divider()
+st.markdown("##### Bring your own corpus")
+st.caption("Ingest a cookbook PDF or a set of recipe URLs. Everything above is "
+           "measured on whatever you ingest, not on a shipped demo set.")
+
 tab_pdf, tab_url, tab_data = st.tabs(["  PDF  ", "  Web URLs  ", "  Ingested data  "])
 
 with tab_pdf:
