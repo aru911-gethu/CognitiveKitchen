@@ -18,6 +18,7 @@ import pandas as pd
 import streamlit as st
 
 from cognitive_kitchen.ui import models as MODELS
+from cognitive_kitchen.ui import warmup
 
 from cognitive_kitchen.config import settings
 from cognitive_kitchen.rag import pipeline as P
@@ -36,6 +37,9 @@ for package in ("chunking", "embedding", "retrieval", "query", "generate",
 SS = st.session_state
 SS.setdefault("locked", {})
 SS.setdefault("results", {})
+
+# Idempotent: no-op if the console already started it.
+warmup.start()
 
 
 # ---------------------------------------------------------------- resources
@@ -150,23 +154,38 @@ with st.sidebar:
             ok, detail = verdict
             (st.success if ok else st.error)(detail)
 
+# The header used to call client.health() on every render, which is a Neo4j
+# round trip. Streamlit re-runs the whole script on any navigation, so opening
+# the Lab meant waiting on the network before the page appeared. Both badges are
+# cached now: the numbers move rarely, and a stale-by-two-minutes node count is
+# worth far more than a page that stalls every time you come back.
+@st.cache_data(ttl=300, show_spinner=False)
+def _vocab_badge() -> str:
+    try:
+        from cognitive_kitchen.rag.vocab import ingredients as vocab
+
+        return f"{len(vocab.all_canonical())} ingredients"
+    except Exception:
+        return "not built"
+
+
+@st.cache_data(ttl=120, show_spinner=False)
+def _graph_badge() -> str:
+    try:
+        from cognitive_kitchen.rag.graph import client
+
+        health = client.health()
+        return f"{health['nodes']:,} nodes" if health["ok"] else "offline"
+    except Exception:
+        return "offline"
+
+
 info = summarise(corpus_for(source))
 cols = st.columns(4)
 cols[0].metric("Recipes", info["recipes"])
 cols[1].metric("Characters", f"{info['characters']:,}")
-try:
-    from cognitive_kitchen.rag.vocab import ingredients as vocab
-
-    cols[2].metric("Vocabulary", f"{len(vocab.all_canonical())} ingredients")
-except Exception:
-    cols[2].metric("Vocabulary", "not built")
-try:
-    from cognitive_kitchen.rag.graph import client
-
-    health = client.health()
-    cols[3].metric("Graph", f"{health['nodes']:,} nodes" if health["ok"] else "offline")
-except Exception:
-    cols[3].metric("Graph", "offline")
+cols[2].metric("Vocabulary", _vocab_badge())
+cols[3].metric("Graph", _graph_badge())
 
 crumbs = []
 for stage, label in (("chunker", "Chunker"), ("retrieval", "Retrieval"),

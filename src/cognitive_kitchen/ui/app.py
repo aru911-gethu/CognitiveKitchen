@@ -132,9 +132,13 @@ def local_stats() -> dict:
     """Counts from disk only. No network, so it is safe to block on."""
     runs = sorted((ROOT / "data" / "ingested").glob("*.json"))
     recipes = 0
+    origins: list[str] = []
     for f in runs:
         try:
-            recipes += len(json.loads(f.read_text(encoding="utf-8")).get("recipes") or [])
+            blob = json.loads(f.read_text(encoding="utf-8"))
+            recipes += len(blob.get("recipes") or [])
+            if blob.get("origin"):
+                origins.append(str(blob["origin"]))
         except Exception:
             pass
     ingredients = 0
@@ -144,7 +148,8 @@ def local_stats() -> dict:
         ingredients = len(_v.all_canonical())
     except Exception:
         pass
-    return {"runs": len(runs), "recipes": recipes, "ingredients": ingredients}
+    return {"runs": len(runs), "recipes": recipes,
+            "ingredients": ingredients, "origins": origins}
 
 
 @st.cache_data(ttl=300, show_spinner=False)
@@ -237,50 +242,49 @@ else:
     st.info("Nothing ingested yet. Add a cookbook PDF or some recipe URLs "
             "below, then head to the Lab.")
 
-with st.expander("Why this needed measuring in the first place"):
-    st.markdown("Someone with a nut allergy asks a perfectly ordinary question. "
-                "The **highest-scoring** search in the whole lab answers it like "
-                "this:")
-    st.markdown(
-        '<div class="bad"><strong>Best search quality &middot; allergy ignored'
-        "</strong>Nut Milk &nbsp;&middot;&nbsp; Cashew Nut Chutney "
-        "&nbsp;&middot;&nbsp; Almond Honey Milk</div>",
-        unsafe_allow_html=True)
-    st.markdown(
-        '<div class="good"><strong>Same question &middot; knowledge graph route'
-        "</strong>Lemon Rice &nbsp;&middot;&nbsp; Tomato Rice "
-        "&nbsp;&middot;&nbsp; Masoor Dhal &mdash; and 23&times; faster</div>",
-        unsafe_allow_html=True)
-    st.markdown("Nothing was broken. Searching by similarity has no way to "
-                "express *without*, so *avoiding nuts* lands closest to the "
-                "recipes that are mostly nuts. **The better the search got, the "
-                "more confidently wrong it became** &mdash; and none of the "
-                "standard quality scores could see it. A fifth measure had to be "
-                "written:")
-    st.dataframe(
-        pd.DataFrame([
-            {"how the search was built": "meaning-based search", "quality": 0.500, "kept to the restriction": 0.338, "seconds": 0.3},
-            {"how the search was built": "keyword search", "quality": 0.350, "kept to the restriction": 0.588, "seconds": 0.1},
-            {"how the search was built": "both, blended", "quality": 0.600, "kept to the restriction": 0.383, "seconds": 0.1},
-            {"how the search was built": "blended + re-ranked", "quality": 0.700, "kept to the restriction": 0.400, "seconds": 25.8},
-            {"how the search was built": "blended + knowledge graph", "quality": 0.700, "kept to the restriction": 1.000, "seconds": 1.1},
-            {"how the search was built": "graph + re-ranked", "quality": 0.800, "kept to the restriction": 1.000, "seconds": 62.5},
-        ]),
-        width="stretch", hide_index=True,
-        column_config={
-            "quality": st.column_config.ProgressColumn(
-                "search quality", min_value=0.0, max_value=1.0, format="%.2f",
-                help="Did a correct recipe make the top five?"),
-            "kept to the restriction": st.column_config.ProgressColumn(
-                "kept to the restriction", min_value=0.0, max_value=1.0,
-                format="percent",
-                help="How often the recipes it found actually avoided what the "
-                     "question ruled out."),
-            "seconds": st.column_config.NumberColumn("secs", format="%.1f")})
-    st.caption("Quality climbs as you read down. Staying within the restriction "
-               "does not follow it. The graph works out which recipes are even "
-               "allowed before anything is ranked, which is why it gets there "
-               "without the slow re-ranking step.")
+st.markdown('<div class="sectionhead">What the Lab actually decides</div>'
+            '<p class="sectionsub">A chatbot over documents is not one thing. It '
+            "is six decisions stacked on each other, and picking wrongly at any "
+            "one of them quietly ruins the answers. Each stage below is a real "
+            "choice, and the Lab scores every option so you pick on evidence "
+            "rather than on a blog post.</p>", unsafe_allow_html=True)
+
+STAGES = [
+    ("Ingest", "Turn documents into records",
+     "A PDF reader and a web crawler, both producing the same shape. You see "
+     "how many recipes were found and what was skipped."),
+    ("Chunking", "How big a piece of text to search",
+     "8 ways to cut the text. You learn whether a piece holds a whole answer, "
+     "or the end of one recipe glued to the start of another."),
+    ("Retrieval", "How to find the right pieces",
+     "9 searchers, keyword to hybrid to knowledge-graph. You learn which finds "
+     "the answer, and separately which respects what you ruled out."),
+    ("Query rewriting", "Whether to reword the question first",
+     "3 options, including inventing a fake ideal answer to search with. You "
+     "learn whether the extra model call is worth its cost."),
+    ("Knowledge graph", "Answer from structure, not text",
+     "Traversal instead of similarity. You learn which questions no document "
+     "can answer, like what is missing from your kitchen."),
+    ("Answering", "How to write the answer from what was found",
+     "4 strategies. You learn whether the answer stuck to the sources, and "
+     "whether a human could actually act on it."),
+]
+for row in (STAGES[:3], STAGES[3:]):
+    for col, (name, decision, detail) in zip(st.columns(3), row):
+        col.markdown(f'<div class="step"><div class="tag" style="font-size:.68rem;'
+                     f"text-transform:uppercase;letter-spacing:.09em;"
+                     f'font-weight:700;color:#a78bfa">{decision}</div>'
+                     f"<h4>{name}</h4><p>{detail}</p></div>",
+                     unsafe_allow_html=True)
+
+st.markdown("")
+st.markdown('<div class="sectionsub" style="padding-left:0">Cooking is the '
+            "example, not the point. The same six decisions apply to contracts "
+            "where clauses carve things out, to policy documents where questions "
+            "are about what is <i>not</i> covered, and to runbooks where the "
+            "answer has to be one you can act on. Anywhere the right answer "
+            "depends on what to leave out, the retrieval stage is where it goes "
+            "wrong.</div>", unsafe_allow_html=True)
 
 st.divider()
 st.markdown('<div class="sectionhead">Add your own recipes</div>'
@@ -292,30 +296,65 @@ tab_pdf, tab_url, tab_data = st.tabs(["  PDF  ", "  Web URLs  ", "  Ingested dat
 
 with tab_pdf:
     st.markdown("#### Ingest a cookbook PDF")
-    st.caption("Pages stream as they are read. Uploads are saved under data/uploads.")
+    st.caption("Drop a file and it starts reading straight away. Pages stream as "
+               "they are read, and the upload is kept under data/uploads.")
+
     left, right = st.columns([3, 2])
     with left:
-        up = st.file_uploader("Drop a PDF", type=["pdf"], label_visibility="collapsed")
-        if up is not None and st.button("Ingest upload", key="go_up"):
-            r = httpx.post(f"{API}/ingest/pdf",
-                           files={"file": (up.name, up.getvalue(), "application/pdf")},
-                           timeout=180)
-            r.raise_for_status()
-            info = r.json()
-            st.info(f"Saved to {info['saved_pdf']} ({info['bytes']:,} bytes)")
-            consume(info["job_id"], "Pages")
+        st.markdown("**Your own PDF**")
+        up = st.file_uploader("Drop a PDF", type=["pdf"],
+                              label_visibility="collapsed")
+        if up is not None:
+            # Streamlit reruns the whole script on any interaction, so an
+            # unguarded ingest would fire again on every click elsewhere on the
+            # page. Fingerprinting the file means one upload ingests once, while
+            # a genuinely different file still triggers a fresh run.
+            fingerprint = f"{up.name}:{len(up.getvalue())}"
+            if st.session_state.get("ingested_upload") != fingerprint:
+                st.session_state["ingested_upload"] = fingerprint
+                r = httpx.post(f"{API}/ingest/pdf",
+                               files={"file": (up.name, up.getvalue(),
+                                               "application/pdf")},
+                               timeout=180)
+                r.raise_for_status()
+                info = r.json()
+                st.info(f"Saved to {info['saved_pdf']} ({info['bytes']:,} bytes)")
+                consume(info["job_id"], "Pages")
+            else:
+                st.success(f"**{up.name}** has been read. Pick a different file "
+                           f"to ingest another.")
+        else:
+            st.caption("Nothing selected. Reading starts as soon as you drop a "
+                       "file in.")
+
     with right:
         # The source PDF may sit in data/ or, once uploaded, in data/uploads/
-        sample = next((p for p in [
+        sample = next((q for q in [
             ROOT / "data" / "indian-dishes-for-you-to-try-at-home.pdf",
             *sorted((ROOT / "data" / "uploads").glob("*.pdf")),
-        ] if p.exists()), ROOT / "data" / "indian-dishes-for-you-to-try-at-home.pdf")
-        st.markdown("**Sample already on disk**")
-        st.caption(sample.name if sample.exists() else "sample missing")
-        if sample.exists() and st.button("Ingest sample PDF", key="go_sample"):
-            r = httpx.post(f"{API}/ingest/pdf-path", params={"path": str(sample)}, timeout=60)
-            r.raise_for_status()
-            consume(r.json()["job_id"], "Pages")
+        ] if q.exists()), ROOT / "data" / "indian-dishes-for-you-to-try-at-home.pdf")
+
+        st.markdown("**Or the bundled sample**")
+        if not sample.exists():
+            st.caption("Sample PDF not found on disk.")
+        else:
+            # Say plainly whether this is already done, so nobody spends two
+            # minutes re-reading a book that is already indexed.
+            already = any(sample.name in origin for origin in S.get("origins", []))
+            st.caption(f"`{sample.name}`")
+            if already:
+                st.success(f"Already read - {S['recipes']} recipes are indexed "
+                           f"and ready. Nothing to do here.")
+                st.caption("Only worth repeating if the file itself changed.")
+                label = "Read it again anyway"
+            else:
+                st.info("Not read yet. Quickest way to see the whole thing work.")
+                label = "Read the sample"
+            if st.button(label, key="go_sample", width="stretch"):
+                r = httpx.post(f"{API}/ingest/pdf-path",
+                               params={"path": str(sample)}, timeout=60)
+                r.raise_for_status()
+                consume(r.json()["job_id"], "Pages")
 
 with tab_url:
     st.markdown("#### Ingest from the web")
