@@ -340,8 +340,33 @@ if is_locked("chunker"):
                             if try_rerank else "")
                          + (f" · constraints {settings.judge_model}"
                             if try_graph else ""))
+                # The sweep takes a minute or more. Rendering only at the
+                # end leaves the screen blank for all of it, which reads as a
+                # hang. This paints every configuration up front as queued and
+                # fills each row as it lands, so progress and scope are both
+                # visible and partial results are readable before the end.
                 rows = []
-                for base, mmr, rerank, graph in combos:
+                labels = [base + (" +mmr" if mmr else "")
+                          + (" +rerank" if rerank else "")
+                          + (" +graph" if graph else "")
+                          for base, mmr, rerank, graph in combos]
+                status = ["queued"] * len(labels)
+                landed: dict[str, dict] = {}
+                slot = st.empty()
+
+                def paint_partial() -> None:
+                    slot.dataframe(pd.DataFrame([
+                        {"configuration": name, "status": status[i],
+                         "hit@k": landed.get(name, {}).get("hit@k"),
+                         "constraint": landed.get(name, {}).get("constraint"),
+                         "secs": landed.get(name, {}).get("secs")}
+                        for i, name in enumerate(labels)]),
+                        width="stretch", hide_index=True)
+
+                paint_partial()
+                for index, (base, mmr, rerank, graph) in enumerate(combos):
+                    status[index] = "running"
+                    paint_partial()
                     spec = P.Pipeline(source=base, sparse=sparse, use_mmr=mmr,
                                       use_rerank=rerank, use_graph=graph)
                     name, params = spec.retriever_spec()
@@ -375,6 +400,11 @@ if is_locked("chunker"):
                             "_spec": (base, mmr, rerank, graph),
                             "_breaches": metrics.get("breaches") or [],
                         })
+                        landed[labels[index]] = {
+                            "hit@k": metrics["hit_at_k"], "constraint": cr,
+                            "secs": round(time.perf_counter() - started, 1)}
+                        status[index] = "done"
+                        paint_partial()
                         note.result(f"hit@{k} {metrics['hit_at_k']} · "
                                     f"recall {metrics['recall_at_k']} · "
                                     f"MAP {metrics['map']} · constraint "
@@ -382,6 +412,10 @@ if is_locked("chunker"):
                                     f"{time.perf_counter() - started:.1f}s")
                     except Exception as exc:
                         note.warn(f"{name}: {type(exc).__name__}: {exc}")
+                        status[index] = "failed"
+                        paint_partial()
+                # the full table renders below; drop the running preview
+                slot.empty()
                 SS["results"]["stage3"] = rows
                 note.finish(f"{len(rows)} configurations compared")
 
