@@ -29,6 +29,7 @@ dependencies = [
     "sentence-transformers>=6.0.1",
     "sse-starlette>=3.4.11",
     "streamlit>=1.63.0",
+    "torchvision>=0.29.0",
     "uvicorn[standard]>=0.53.0",
 ]
 
