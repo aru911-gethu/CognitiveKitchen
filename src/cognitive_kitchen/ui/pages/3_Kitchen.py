@@ -36,7 +36,7 @@ if config is None:
     st.page_link("pages/2_RAG_Lab.py", label="Go to the RAG Lab", icon="🧪")
     st.stop()
 
-from cognitive_kitchen.rag.loaders import list_runs
+from cognitive_kitchen.rag.loaders.json_loader import list_runs
 
 # ------------------------------------------------------------------ sidebar datasets
 runs = list_runs()

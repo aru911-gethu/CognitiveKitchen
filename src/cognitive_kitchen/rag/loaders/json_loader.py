@@ -64,6 +64,18 @@ def load_latest_ingested(source_type: str | None = None) -> list[Document]:
     return load_ingested_json(files[0])
 
 
+def load_gds_ingested() -> list[Document]:
+    """Load the golden dataset corpus run (indian-dishes-for-you-to-try-at-home.pdf)."""
+    for p in sorted(settings.ingested_dir.glob("pdf-*.json")):
+        try:
+            d = json.loads(p.read_text(encoding="utf-8"))
+            if "indian-dishes-for-you-to-try-at-home.pdf" in str(d.get("origin", "")):
+                return load_ingested_json(p)
+        except Exception:
+            continue
+    return load_latest_ingested("pdf")
+
+
 def list_runs() -> list[dict]:
     out = []
     for p in sorted(settings.ingested_dir.glob("*.json")):
@@ -71,6 +83,9 @@ def list_runs() -> list[dict]:
             d = json.loads(p.read_text(encoding="utf-8"))
         except Exception:
             continue
+        n_recipes = len(d.get("recipes", [])) if d.get("recipes") is not None else d.get("n_recipes", 0)
         out.append({"file": p.name, "source_type": d.get("source_type"),
-                    "n_recipes": d.get("n_recipes"), "origin": d.get("origin")})
+                    "n_recipes": n_recipes, "origin": d.get("origin"),
+                    "mtime": p.stat().st_mtime})
+    out.sort(key=lambda x: x["mtime"], reverse=True)
     return out
