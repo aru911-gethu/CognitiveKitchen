@@ -1,6 +1,14 @@
 """Cognitive Kitchen - RAG over recipes you own."""
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+# Ensure src/ directory is prioritized over stale site-packages
+_src_dir = str(Path(__file__).resolve().parents[1])
+if _src_dir not in sys.path:
+    sys.path.insert(0, _src_dir)
+
 __version__ = "0.1.0"
 
 
