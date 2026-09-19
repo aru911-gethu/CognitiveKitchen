@@ -3,6 +3,12 @@
 .env.*
 !.env.example
 
+# ---- Internal dev notes ----
+PRODUCT.md
+RESULTS.md
+KNOWN_ISSUES.md
+docs/CODEBASE.md
+
 # ---- Virtual environments ----
 .venv/
 venv/
