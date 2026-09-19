@@ -5,7 +5,16 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-ROOT = Path(__file__).resolve().parents[2]
+def _find_root() -> Path:
+    if Path("/app/pyproject.toml").exists():
+        return Path("/app")
+    p = Path(__file__).resolve().parents[2]
+    if (p / "data").exists() or (p / "pyproject.toml").exists():
+        return p
+    return Path.cwd()
+
+
+ROOT = _find_root()
 
 
 class Settings(BaseSettings):
