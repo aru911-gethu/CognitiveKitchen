@@ -92,19 +92,29 @@ def load() -> Pipeline | None:
     return Pipeline(**{k: v for k, v in data.items() if k in known})
 
 
-def build_runtime(pipeline: Pipeline):
+def build_runtime(pipeline: Pipeline, dataset_file: str | Path | None = None):
     """Turn a saved pipeline into live objects. Used by the chat page."""
     from .corpus import build_corpus
-    from .loaders import load_latest_ingested
+    from .loaders import load_ingested_json, load_latest_ingested
     from .registry import build, discover
 
     discover("cognitive_kitchen.rag.chunking", "cognitive_kitchen.rag.embedding",
              "cognitive_kitchen.rag.retrieval", "cognitive_kitchen.rag.query",
              "cognitive_kitchen.rag.generate", "cognitive_kitchen.rag.strategies")
 
-    corpus = build_corpus(load_latest_ingested(source_type=pipeline.corpus_source
-                                              or None),
-                          source=pipeline.corpus_source)
+    if dataset_file:
+        file_path = settings.ingested_dir / dataset_file if isinstance(dataset_file, str) else dataset_file
+        if file_path.exists():
+            docs = load_ingested_json(file_path)
+            source_name = file_path.name
+        else:
+            docs = load_latest_ingested(source_type=pipeline.corpus_source or None)
+            source_name = pipeline.corpus_source
+    else:
+        docs = load_latest_ingested(source_type=pipeline.corpus_source or None)
+        source_name = pipeline.corpus_source
+
+    corpus = build_corpus(docs, source=source_name)
     embedder = build("embedder", "st")
     passages = build("chunker", pipeline.chunker,
                      **(pipeline.chunker_params or {})).split(corpus)
