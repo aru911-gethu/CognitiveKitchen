@@ -29,6 +29,36 @@ if config is None:
     st.page_link("pages/2_RAG_Lab.py", label="Go to the RAG Lab", icon="🧪")
     st.stop()
 
+from cognitive_kitchen.rag.loaders import list_runs
+
+# ------------------------------------------------------------------ sidebar datasets
+runs = list_runs()
+selected_dataset = None
+if runs:
+    options = {r["file"]: f"{r.get('origin') or r['file']} ({r.get('n_recipes', 0)} recipes)" for r in runs}
+    files_list = list(options.keys())
+
+    default_idx = 0
+    active = st.session_state.get("active_dataset")
+    if active and active in options:
+        default_idx = files_list.index(active)
+    else:
+        for idx, f in enumerate(files_list):
+            if "indian-dishes-for-you-to-try-at-home.pdf" in options[f]:
+                default_idx = idx
+                break
+
+    with st.sidebar:
+        st.subheader("Ingested Cookbook")
+        selected_dataset = st.selectbox(
+            "Active Dataset",
+            options=files_list,
+            index=default_idx,
+            format_func=lambda f: options[f],
+            help="Choose an ingested PDF or Web dataset to chat with."
+        )
+        st.divider()
+
 model_label = (settings.generation_model.split("/")[-1]
                if config.generator == "qwen" else config.generator)
 chrome.header("Kitchen",
@@ -38,11 +68,11 @@ chrome.header("Kitchen",
 
 
 @st.cache_resource(show_spinner="Loading the pipeline...")
-def runtime(signature: str):
-    return P.build_runtime(P.load())
+def runtime(signature: str, dataset_file: str | None = None):
+    return P.build_runtime(P.load(), dataset_file=dataset_file)
 
 
-parts = runtime(config.label() + str(config.k) + str(config.max_new_tokens))
+parts = runtime(config.label() + str(config.k) + str(config.max_new_tokens) + str(selected_dataset), selected_dataset)
 
 def meta_chips(meta: str) -> None:
     """Render the answer footer as chips.

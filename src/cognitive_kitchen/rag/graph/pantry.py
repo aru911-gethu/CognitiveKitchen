@@ -167,6 +167,34 @@ def _dedupe(res: PantryResolution) -> PantryResolution:
     return res
 
 
+def _fallback_recipe_card(key: str) -> dict | None:
+    """Extract recipe title & canonical ingredients directly from ingested JSON files if Neo4j graph has no node for key."""
+    parts = key.split(":", 1)
+    recipe_id = parts[-1]
+    source_name = parts[0] if len(parts) > 1 else ""
+
+    files = list(settings.ingested_dir.glob("*.json"))
+    if source_name:
+        files.sort(key=lambda p: 0 if p.name == source_name or source_name in p.name else 1)
+
+    for p in files:
+        try:
+            d = json.loads(p.read_text(encoding="utf-8"))
+            for recipe in d.get("recipes", []):
+                if recipe.get("recipe_id") == recipe_id:
+                    title = recipe.get("title") or "(untitled)"
+                    raw_ings = recipe.get("ingredient_lines") or []
+                    canonical_ings: set[str] = set()
+                    for line in raw_ings:
+                        c = vocab.canonical(line)
+                        if c:
+                            canonical_ings.add(c)
+                    return {"key": key, "title": title, "ingredients": sorted(canonical_ings)}
+        except Exception:
+            continue
+    return None
+
+
 def can_i_make(key: str, pantry: list[str], max_swaps: int = 6) -> dict:
     """Given a recipe and a resolved pantry: what is missing, what can be swapped.
 
@@ -178,7 +206,17 @@ def can_i_make(key: str, pantry: list[str], max_swaps: int = 6) -> dict:
     """
     cards = traverse.recipe_cards([key])
     card = cards.get(key) or {}
-    needed = sorted({n for n in (card.get("ingredients") or []) if n})
+    title = card.get("title")
+    ingredients = card.get("ingredients")
+
+    if not title or not ingredients:
+        fallback = _fallback_recipe_card(key)
+        if fallback:
+            title = title or fallback.get("title")
+            ingredients = ingredients or fallback.get("ingredients")
+
+    title = title or "(untitled)"
+    needed = sorted({n for n in (ingredients or []) if n})
     have = set(pantry)
 
     missing = [n for n in needed if n not in have]
@@ -197,7 +235,7 @@ def can_i_make(key: str, pantry: list[str], max_swaps: int = 6) -> dict:
             buy.append(item)
     buy.extend(missing[max_swaps:])
 
-    return {"key": key, "title": card.get("title") or "(untitled)",
+    return {"key": key, "title": title,
             "needed": needed, "have": sorted(have & set(needed)),
             "missing": missing, "buy": sorted(buy), "swaps": swaps,
             "can_make": not buy and bool(needed)}
