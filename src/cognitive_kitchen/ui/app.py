@@ -212,19 +212,16 @@ if S["recipes"]:
         "I am avoiding nuts, what can I make?",
         "what can I cook tonight?"))
     st.markdown(
-        f'<div class="trybox"><h4>A cookbook is already loaded &mdash; '
-        f'{S["recipes"]} recipes</h4>'
-        f'<p class="sub">Nothing to install, nothing to ingest. Try one of '
-        f"these:</p>{chips}</div>", unsafe_allow_html=True)
+        f'<div class="trybox"><h4>Explore the Assistant</h4>'
+        f'<p class="sub">Ingest your own cookbook PDF or Web URLs below to chat in the Kitchen, or evaluate strategies in the Lab:</p>'
+        f'{chips}</div>', unsafe_allow_html=True)
 
     left, right = st.columns(2)
     with left:
         st.markdown(
             '<div class="cta"><div class="tag">Just want to use it</div>'
             "<h4>Ask the Kitchen</h4>"
-            "<p>A working chatbot over the loaded cookbook. Ask what to cook, "
-            "what to leave out, what to use instead &mdash; then click once to "
-            "check whether your kitchen actually has the ingredients.</p></div>",
+            "<p>A working chatbot over your custom ingested cookbooks. Select your dataset in the Kitchen sidebar, ask questions, and check ingredient availability.</p></div>",
             unsafe_allow_html=True)
         if st.button("Open the Kitchen", key="cta-kitchen", width="stretch"):
             st.switch_page("pages/3_Kitchen.py")
@@ -287,74 +284,37 @@ st.markdown('<div class="sectionsub" style="padding-left:0">Cooking is the '
             "wrong.</div>", unsafe_allow_html=True)
 
 st.divider()
-st.markdown('<div class="sectionhead">Add your own recipes</div>'
-            '<p class="sectionsub">A PDF cookbook, or recipe pages from the web. '
-            "Everything above is measured on whatever you ingest.</p>",
+st.markdown('<div class="sectionhead">Ingest your own PDF or Web URLs for Kitchen Chat</div>'
+            '<p class="sectionsub">Bring your own PDF cookbook or Web URLs to ingest and chat in the Kitchen interface.</p>',
             unsafe_allow_html=True)
 
-tab_pdf, tab_url, tab_data = st.tabs(["  PDF  ", "  Web URLs  ", "  Ingested data  "])
+tab_pdf, tab_url = st.tabs(["  PDF  ", "  Web URLs  "])
 
 with tab_pdf:
     st.markdown("#### Ingest a cookbook PDF")
-    st.caption("Drop a file and it starts reading straight away. Pages stream as "
-               "they are read, and the upload is kept under data/uploads.")
+    st.caption("Drop a PDF file below to start ingesting your custom cookbook for Kitchen Chat.")
 
-    left, right = st.columns([3, 2])
-    with left:
-        st.markdown("**Your own PDF**")
-        up = st.file_uploader("Drop a PDF", type=["pdf"],
-                              label_visibility="collapsed")
-        if up is not None:
-            # Streamlit reruns the whole script on any interaction, so an
-            # unguarded ingest would fire again on every click elsewhere on the
-            # page. Fingerprinting the file means one upload ingests once, while
-            # a genuinely different file still triggers a fresh run.
-            fingerprint = f"{up.name}:{len(up.getvalue())}"
-            if st.session_state.get("ingested_upload") != fingerprint:
-                st.session_state["ingested_upload"] = fingerprint
-                r = httpx.post(f"{API}/ingest/pdf",
-                               files={"file": (up.name, up.getvalue(),
-                                               "application/pdf")},
-                               timeout=180)
-                r.raise_for_status()
-                info = r.json()
-                st.info(f"Saved to {info['saved_pdf']} ({info['bytes']:,} bytes)")
-                consume(info["job_id"], "Pages")
-            else:
-                st.success(f"**{up.name}** has been read. Pick a different file "
-                           f"to ingest another.")
+    up = st.file_uploader("Drop a PDF", type=["pdf"], label_visibility="collapsed")
+    if up is not None:
+        # Streamlit reruns the whole script on any interaction, so an
+        # unguarded ingest would fire again on every click elsewhere on the
+        # page. Fingerprinting the file means one upload ingests once, while
+        # a genuinely different file still triggers a fresh run.
+        fingerprint = f"{up.name}:{len(up.getvalue())}"
+        if st.session_state.get("ingested_upload") != fingerprint:
+            st.session_state["ingested_upload"] = fingerprint
+            r = httpx.post(f"{API}/ingest/pdf",
+                           files={"file": (up.name, up.getvalue(),
+                                           "application/pdf")},
+                           timeout=180)
+            r.raise_for_status()
+            info = r.json()
+            st.info(f"Saved to {info['saved_pdf']} ({info['bytes']:,} bytes)")
+            consume(info["job_id"], "Pages")
         else:
-            st.caption("Nothing selected. Reading starts as soon as you drop a "
-                       "file in.")
-
-    with right:
-        # The source PDF may sit in data/ or, once uploaded, in data/uploads/
-        sample = next((q for q in [
-            ROOT / "data" / "indian-dishes-for-you-to-try-at-home.pdf",
-            *sorted((ROOT / "data" / "uploads").glob("*.pdf")),
-        ] if q.exists()), ROOT / "data" / "indian-dishes-for-you-to-try-at-home.pdf")
-
-        st.markdown("**Or the bundled sample**")
-        if not sample.exists():
-            st.caption("Sample PDF not found on disk.")
-        else:
-            # Say plainly whether this is already done, so nobody spends two
-            # minutes re-reading a book that is already indexed.
-            already = any(sample.name in origin for origin in S.get("origins", []))
-            st.caption(f"`{sample.name}`")
-            if already:
-                st.success(f"Already read - {S['recipes']} recipes are indexed "
-                           f"and ready. Nothing to do here.")
-                st.caption("Only worth repeating if the file itself changed.")
-                label = "Read it again anyway"
-            else:
-                st.info("Not read yet. Quickest way to see the whole thing work.")
-                label = "Read the sample"
-            if st.button(label, key="go_sample", width="stretch"):
-                r = httpx.post(f"{API}/ingest/pdf-path",
-                               params={"path": str(sample)}, timeout=60)
-                r.raise_for_status()
-                consume(r.json()["job_id"], "Pages")
+            st.success(f"**{up.name}** has been read. Select that cookbook in the Kitchen interface to chat with it.")
+    else:
+        st.caption("Nothing selected. Ingestion starts as soon as you drop a file in.")
 
 with tab_url:
     st.markdown("#### Ingest from the web")
@@ -375,36 +335,7 @@ with tab_url:
             r.raise_for_status()
             consume(r.json()["job_id"], "Pages")
 
-with tab_data:
-    st.markdown("#### Ingested datasets")
-    st.button("Refresh", key="refresh")
-    try:
-        rows = httpx.get(f"{API}/datasets", timeout=10).json()
-    except Exception as exc:
-        rows = []
-        st.error(f"Cannot reach API: {exc}")
-    if rows:
-        metric_row(st.columns(3), [
-            ("Runs saved", len(rows)),
-            ("Recipes total", sum(r["n_recipes"] or 0 for r in rows)),
-            ("Units read", sum(r["n_units_read"] or 0 for r in rows)),
-        ])
-        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
-        pick = st.selectbox("Inspect a run", [r["file"] for r in rows])
-        if pick:
-            d = json.loads((settings.ingested_dir / pick).read_text(encoding="utf-8"))
-            st.json({k: v for k, v in d.items() if k != "recipes"}, expanded=False)
-            if d.get("recipes"):
-                st.caption(f"{len(d['recipes'])} recipes")
-                st.dataframe(pd.DataFrame([
-                    {"id": x["recipe_id"], "title": x["title"],
-                     "ingredients": len(x["ingredient_lines"]),
-                     "steps": len(x["step_lines"]),
-                     "pages": ",".join(map(str, x["pages"])) or None,
-                     "detected_by": x["detected_by"]} for x in d["recipes"]]),
-                    use_container_width=True, hide_index=True, height=340)
-    else:
-        st.info("Nothing ingested yet. Start with the sample PDF.")
+
 
 
 # --------------------------------------------------------------- warm-up panel
