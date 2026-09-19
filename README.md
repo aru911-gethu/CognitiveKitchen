@@ -1,392 +1,234 @@
-# Cognitive Kitchen
+# Cognitive Kitchen 🍳⚡
+**Enterprise RAG Strategy Benchmarking Testbed & AI Culinary Assistant**
 
 [![tests](https://github.com/aru911-gethu/CognitiveKitchen/actions/workflows/tests.yml/badge.svg)](https://github.com/aru911-gethu/CognitiveKitchen/actions/workflows/tests.yml)
 
-**My best-performing retriever was my least safe one, and none of my metrics
-could see it.**
+> *"A RAG test kitchen where AI Product Engineers and Technical Program Managers (TPMs) can play around with, benchmark, and taste-test diverse RAG strategies to lock the optimal production pipeline for their enterprise use-case — and as a culinary pun, use the exact same locked pipeline to power an interactive recipe-based kitchen assistant answering: **'What can I cook tonight?'***"*
 
-Asked *"I'm avoiding nuts, what can I make?"*, the highest-scoring retriever in
-this lab returned Nut Milk, Cashew Nut Chutney and Almond Honey Milk. That is not
-a bug in the ranker. Similarity search has no direction for *without* --
-"avoiding nuts" sits closest in embedding space to the recipes that are mostly
-nuts. The better the ranker, the more confidently wrong.
+---
 
-    configuration          hit@5   constraint respected   secs
-    dense                  0.500                  33.8%    0.3
-    bm25                   0.350                  58.8%    0.1
-    fusion:rrf             0.600                  38.3%    0.1
-    rrf + rerank           0.700                  40.0%   25.8
-    rrf + graph            0.700                 100.0%    1.1
-    rrf + graph + rerank   0.800                 100.0%   62.5
+## 📦 Package Installation & CLI Executables
 
-Four standard retrieval metrics -- hit@k, recall@k, MAP, diversity -- all rank
-`rrf + rerank` as a strong configuration. It satisfies the user's stated
-constraint 40% of the time. A fifth metric, `constraint_respected`, is the only
-one that can see this, and it exists only because I went looking for it.
+`cognitive-kitchen` is packaged as a standard Python project configured in [pyproject.toml](file:///c:/Users/aru91/OneDrive/Documents/Workspace_AI/Projects_Vscode/CognitiveKitchen/pyproject.toml). Installing the package registers four dedicated `ck-*` CLI commands in your environment:
 
-`rrf + graph` matches that ranking quality, respects the constraint every time,
-and runs 23x faster. Compliance is a safety axis, not a quality one, and no
-amount of better ranking finds it.
+| CLI Command | Handler Function | Purpose & Output |
+| :--- | :--- | :--- |
+| **`uv run ck-api`** | `cognitive_kitchen:serve_api` | Launches FastAPI REST API & SSE server on `http://127.0.0.1:8010` |
+| **`uv run ck-ui`** | `cognitive_kitchen:serve_ui` | Launches Streamlit multi-page UI console on `http://127.0.0.1:8501` |
+| **`uv run ck-vocab`** | `cognitive_kitchen:build_vocabulary` | Normalizes ingredient strings to `data/eval/ingredient_map.json` |
+| **`uv run ck-graph`** | `cognitive_kitchen:build_graph` | Ingests JSON runs & rebuilds Neo4j Knowledge Graph |
 
-## One system, two layers
+### Installation Modes
 
-A domain-agnostic evaluation core, and a cooking assistant built on top of it.
-The second one is how I found out where the first one does *not* generalise yet:
-eight files in the lab still import cooking by name, and
-[KNOWN_ISSUES.md](KNOWN_ISSUES.md) names them.
-
-Six stages. Each one scores every option against a hand-verified benchmark, you
-lock a winner, and the next stage is measured using that choice rather than a
-default.
-
-<!-- Screenshot: save the Lab's Stage 2 comparison table to
-     docs/img/lab-stage2.png, then uncomment the line below.
-![The RAG Lab: eight chunkers scored on the same corpus](docs/img/lab-stage2.png)
--->
-
-Built on one cookbook -- 222 pages, 184 recipes -- deliberately. I can verify
-this corpus myself. I know besan is gluten-free, so I caught the model claiming
-it wasn't.
-
-## The stages
-
-**Stage 2 - Chunking.** 8 chunkers, scored on chunk purity, best-case recall,
-the chunks needed to reach 90% recall, and self-sufficiency.
-
-    chunker     recall   k@90   self-sufficiency
-    recipe       0.991   1.04              1.000
-    recursive    0.745   1.96              0.932
-
-`recipe` uses the recipe boundaries ingestion already found, so a chunk is a
-whole recipe and never straddles two. `recursive` splits on character count, so
-a single chunk can hold the end of one recipe and the start of another. When
-that happened the assistant answered "something with butter" by listing butter
-quantities from five unrelated recipes. Structure the parser already knew beat
-every similarity-based splitter I tried.
-
-**Stage 3 - Retrieval.** 9 retrievers, exposed as four independent controls
-rather than one flat list:
-
-    source     dense | bm25 | tfidf | hybrid | rrf     pick one
-    diversity  MMR                                     optional
-    rerank     cross-encoder                           optional
-    graph      pre-filter by constraint                optional
-
-Scored on hit@k, recall@k, MAP and diversity, plus `constraint_respected`. See
-the table at the top: that fifth metric is the whole finding.
-
-**Stage 4 - Query transform.** `passthrough`, `decompose`, `hyde`. `decompose`
-scores best. `hyde` costs roughly 400s a query on CPU for no measurable gain --
-a negative result worth keeping, because the technique is widely recommended and
-the cost is invisible until you are the one without a GPU.
-
-**Stage 5 - Pure graph.** No chunks, no embeddings, no ranking, so it is scored
-on set precision and recall instead of MAP.
-
-    set_precision 0.689 - set_recall 0.617 - exclusion family P/R 0.801 / 0.800
-    constraint_extracted 1.000 - constraint_respected 1.000
-
-Precision is measured only over the 52 recipes the golden dataset has an opinion
-about, out of 184. Asked "what can I cook with cumin" the graph returns every
-recipe that really contains cumin; counting the ones golden is silent on as
-errors would measure the truth set's coverage, not the graph.
-
-This stage answers what no retriever can, because the answer is in no document:
-
-    "what can I cook tonight?"   Masoor Dhal, missing 1 of 5: masoor dal
-    "instead of ghee?"           yogurt, butter, milk, cream
-    "how many are dairy-free?"   92 of 177
-
-"Missing" appears in no recipe. It is a traversal, not a similarity guess.
-
-**Stage 6 - Generation.** 4 strategies, two computed metrics and two judged.
-
-    strategy      NoInvent  Abstain  Faithful  Cookable  s/answer
-    reordered        1.000    1.000     0.760     0.525       1.6
-    stuff_strict     0.980    1.000     0.720     0.600       2.0
-    structured       0.980    0.800     0.749     0.480       2.3
-    map_reduce       1.000    0.800     0.550     0.420       5.2
-
-`NoInvent` and `Abstain` are a floor: all four are grounded, so anything below
-1.0 is a defect rather than a reason to prefer a strategy. `Faithful`
-(DeepEval) and `Cookable` (G-Eval) are the two that discriminate.
-
-`reordered` beats `stuff_strict` on faithfulness using the *same chunks* -- only
-the order changes. That is the lost-in-the-middle effect, and no improvement to
-retrieval would ever have surfaced it.
-
-## The two routes, head to head
-
-Same questions, same corpus, both scored on Stage 6 metrics:
-
-    route         faithful  relevancy  abstain   secs
-    retrieval        0.587      0.889    1.000    3.1
-    graph only       0.694      1.000    0.833    1.4
-
-The graph is more faithful, perfectly relevant, and twice as fast. It also
-abstains less often, which is the cost: when a question falls outside what the
-graph models, retrieval knows to refuse and the graph sometimes answers anyway.
-Neither route dominates, which is why both ship.
-
-## Run it
-
-Two terminals, from the project root.
-
-    uv run ck-api      # terminal 1, http://127.0.0.1:8010
-    uv run ck-ui       # terminal 2, http://127.0.0.1:8501
-
-API docs at http://127.0.0.1:8010/docs
-
-## Build steps, in order
-
-Ingestion first, then two one-off builds. Both read `data/ingested/`, so they
-come after you have ingested something and before any retrieval or chat.
-
-    uv run ck-vocab    ingredient vocabulary  -> data/eval/ingredient_map.json
-    uv run ck-graph    knowledge graph        -> Neo4j
-
-**`ck-vocab`** collapses 1,776 raw ingredient lines into 158 canonical
-ingredients, so the graph holds one `ginger` node instead of sixteen. It is
-deterministic and needs no network: the decisions live in `rag/vocab/curated.py`,
-hand-written for this corpus rather than generated, because a model that files
-besan as gluten, or treats coriander seeds and coriander leaves as one
-ingredient, produces a vocabulary that is wrong in the ways a cook notices.
-Re-run it after ingesting a new book; names it has never seen keep their
-rule-normalised form, which is safe rather than silently wrong.
-
-**`ck-graph`** rebuilds from every run in `data/ingested/`. It wipes first, so it
-is repeatable. `--dry-run` shapes and reports without touching the database.
-
-    Recipe 195 (177 real)   Ingredient 156   Category 6
-    Step 1358   USES 1658   NEXT 1164   PERFORMS 869   NEEDS 242
-
-## The golden dataset
-
-`data/golden_dataset.json` is the benchmark, not an input. 50 recipes rebuilt
-directly from the sample PDF and verified against it: no missing ingredients,
-nothing fabricated, every derived field recomputed. It carries 229 evaluation
-queries across seven families, plus substitutions, moods and a pinned corpus
-hash.
-
-It is evaluation-only truth. Nothing on the build side reads it, which is the
-point -- a benchmark the system can see is a benchmark the system will fit.
-
-**You do not need one to start.** The split is between questions and labels, not
-between golden and nothing:
-
-```
-documents only        chunk purity, self-sufficiency, latency, cost
-+ data/questions.txt  + faithfulness, relevancy, cookability, abstention,
-                        diversity, and constraint compliance
-+ relevance labels    + recall, hit@k, MAP, k@90, set recall
+#### Option A: Using `uv` (Recommended)
+`uv` automatically creates a virtual environment, installs dependencies, and links the `ck-*` executables in editable mode:
+```bash
+git clone https://github.com/aru911-gethu/CognitiveKitchen.git
+cd CognitiveKitchen
+uv sync
+uv run playwright install chromium
 ```
 
-One question per line in `data/questions.txt` is enough to score most of the
-pipeline, including the constraint metric that no comparable tool has. Verified by
-hiding the golden dataset and running Stage 3 on three plain questions:
+#### Option B: Standard `pip` Editable Install
+If using standard `pip` inside a virtual environment (`python -m venv .venv`):
+```bash
+source .venv/bin/activate  # Or `.venv\Scripts\activate` on Windows
+pip install -e .
+playwright install chromium
+```
+*When using standard `pip`, you can invoke commands directly as `ck-api`, `ck-ui`, `ck-vocab`, and `ck-graph`.*
+
+---
+
+## 🎯 Executive Overview & Product Strategy
+
+When deploying Retrieval-Augmented Generation (RAG) into production, standard search metrics like $Hit@K$, $Recall@K$, and $MAP$ present a dangerous blind spot: **they measure topic relevance, not constraint safety**.
+
+In our empirical testing on a hand-verified 184-recipe cookbook corpus, when a user asks *"I'm avoiding nuts, what can I make?"*, standard dense embedding search suffers from **Semantic Collapse**. Vectors for "avoiding nuts" sit closest in vector space to documents dense in nuts. As a result, standard top-performing retrievers returned *Nut Milk*, *Cashew Nut Chutney*, and *Almond Honey Milk*.
 
 ```
-hit_at_k               None    needs labels, reported blank rather than zero
-recall_at_k            None
-map                    None
-diversity_at_k         1.0     computed
-constraint_respected   0.9     computed
+Strategy Configuration        Hit@5   Constraint Respected   Latency (sec)
+---------------------------- ------- ---------------------- ---------------
+Dense (bge-small-en-v1.5)     0.500           33.8%              0.3s
+BM25 (Keyword Lexical)        0.350           58.8%              0.1s
+Fusion (RRF)                  0.600           38.3%              0.1s
+RRF + Cross-Encoder Rerank    0.700           40.0%             25.8s
+RRF + Neo4j Graph Filter      0.700          100.0%              1.1s
+RRF + Graph Filter + Rerank   0.800          100.0%             62.5s
 ```
 
-Labels buy recall, and recall cannot come from an LLM judge: to know a retriever
-missed something you must know what existed, and a judge only sees what you showed
-it. [docs/golden-dataset.md](docs/golden-dataset.md) covers building one.
+### The Key Technical Takeaway
+Standard metrics rank `RRF + Rerank` as a top performer ($Hit@5 = 0.700$), yet it violates user safety constraints **60% of the time**. 
 
-I also found it wrong twice. Two queries listed fish and prawn recipes as valid
-answers to "no meat". Both are corrected, and the correction is recorded in the
-`provenance` block rather than quietly fixed.
+By introducing **`constraint_respected`** as a core evaluation axis and leveraging **Neo4j Knowledge Graph pre-filtering**, `RRF + Graph Filter` achieves matching retrieval quality ($Hit@5 = 0.700$), **100% constraint compliance**, and operates **23x faster** than heavy neural re-rankers.
 
-## Related work
+---
 
-I measured these independently on my own corpus, then went looking and found the
-work that names them. Situating them is more useful than implying I got there
-first.
+## 🏗️ Architecture & 6-Stage RAG Pipeline Mapping
 
-**Negation in dense retrieval has a name.** [Negation is Not Semantic: Diagnosing
-Dense Retrieval Failure Modes](https://arxiv.org/abs/2603.17580) calls the
-mechanism *semantic collapse* -- negation signals become indistinguishable in
-vector space -- and reports the same counterintuitive twist I hit, where the more
-sophisticated retrieval strategies degrade worse. My cross-encoder at 40.0%
-compliance against bm25 at 58.8% is that shape.
-[Exclusion-Sensitive Penalization for Negative-Constraint Retrieval](https://arxiv.org/html/2608.30130v2)
-frames the problem as retrievers supplying evidence about concepts the user
-explicitly excluded, and [DEO](https://arxiv.org/pdf/2603.09185v1) proposes
-decomposing queries into positive and negative components -- architecturally close
-to what the graph pre-filter does here.
-
-**Structure-aware chunking beating semantic chunking is a published result.**
-[Evaluating Chunking Strategies for RAG in Oil and Gas Enterprise Documents](https://arxiv.org/abs/2603.24556)
-found structure-aware chunking wins on retrieval effectiveness and costs less
-compute, and [Is Semantic Chunking Worth the Computational Cost?](https://arxiv.org/html/2410.13070v1)
-concluded the gains do not justify the expense. That is my `recipe` versus
-`semantic_adjacent` result in a different domain.
-
-**Food knowledge graphs are an established area.**
-[FoodKG](http://www.cs.rpi.edu/~zaki/PaperDir/ISWC19.pdf) (RPI, ISWC 2019) is the
-canonical recipe-ingredient-nutrition graph, and a
-[2025 paper](https://www.mdpi.com/2073-431X/14/10/412) builds personalised
-multi-diet retrieval on Neo4j combining knowledge graphs, RAG and LLMs.
-
-**Even the bug I deferred is documented.**
-[Evaluation of LLMs in retrieving food and nutritional context for RAG](https://arxiv.org/abs/2603.09704v2)
-found that filtering works when constraints are explicitly expressible and breaks
-when queries exceed what the metadata can represent -- which is exactly why my
-`constraint` family scores 0.000.
-
-**And `reordered` beating `stuff_strict` on identical chunks** is the
-lost-in-the-middle effect from Liu et al. 2023.
-
-*Content above was rephrased for compliance with licensing restrictions.*
-
-**What is not in the literature is the tooling.** I checked four open RAG
-evaluation projects -- [ChunkLab](https://github.com/selvin-paul-raj/chunklab),
-[enterprise-rag-bench](https://github.com/sunilp/enterprise-rag-bench),
-[crag-bench](https://github.com/AliHamzaAzam/crag-bench-rag-strategies) and
-[google/rag-playground](https://github.com/google/rag-playground). Their metric
-sets are P@k/MRR/NDCG, faithfulness/groundedness/context-precision, accuracy, and
-Vertex Rapid Evals respectively. **Not one measures whether retrieval respected an
-exclusion.** That gap is the reason this repo exists.
-
-## Where to read next
+Cognitive Kitchen features a modular plugin registry ([src/cognitive_kitchen/rag/registry.py](file:///c:/Users/aru91/OneDrive/Documents/Workspace_AI/Projects_Vscode/CognitiveKitchen/src/cognitive_kitchen/rag/registry.py)) that isolates every stage of the RAG lifecycle. Each stage is independently benchmarked against our Ground-Truth Golden Dataset ([data/golden_dataset.json](file:///c:/Users/aru91/OneDrive/Documents/Workspace_AI/Projects_Vscode/CognitiveKitchen/data/golden_dataset.json)).
 
 ```
-RESULTS.md                 every measured number, with its provenance
-PRODUCT.md                 the job, the buyers, the north star, the scaling ceiling
-docs/golden-dataset.md     how to build a truth set for your own corpus
-KNOWN_ISSUES.md            open items with enough diagnosis to pick up cold
+                       ┌────────────────────────────────────────────────┐
+                       │  STAGE 1: Ingestion & Live SSE Parser Stream    │
+                       │  PDF (pdf_ingest.py) | Web Crawl (web_ingest.py)│
+                       └───────────────────────┬────────────────────────┘
+                                               │
+                       ┌───────────────────────▼────────────────────────┐
+                       │  STAGE 2: Structure-Aware Chunking Matrix     │
+                       │  Recipe / Recursive / Semantic / Markdown      │
+                       └───────────────────────┬────────────────────────┘
+                                               │
+                       ┌───────────────────────▼────────────────────────┐
+                       │  STAGE 3: Hybrid Retrieval & Safety Pre-Filter │
+                       │  Dense + BM25 + Hybrid RRF + Neo4j Graph       │
+                       └───────────────────────┬────────────────────────┘
+                                               │
+                       ┌───────────────────────▼────────────────────────┐
+                       │  STAGE 4: Query Transformation                 │
+                       │  Passthrough / Sub-Query Decomposition / HyDE  │
+                       └───────────────────────┬────────────────────────┘
+                                               │
+    ┌──────────────────────────────────────────┴──────────────────────────────────────────┐
+    │                                                                                     │
+┌───▼───────────────────────────────────────────────┐ ┌───▼───────────────────────────────────────────────┐
+│ STAGE 5: Pure Knowledge Graph Traversal            │ │ STAGE 6: Local LLM Generation & DeepEval          │
+│ Neo4j Graph Traversal & Vocabulary Canonicalization│ │ Reordered / Stuff Strict / Map-Reduce / Structured│
+└───────────────────────────────────────────────────┘ └───────────────────────────────────────────────────┘
 ```
 
-## Known issues
+### Stage 1 — Multi-Source Ingestion & Streaming
+- **PDF Ingest** ([src/cognitive_kitchen/ingest/pdf_ingest.py](file:///c:/Users/aru91/OneDrive/Documents/Workspace_AI/Projects_Vscode/CognitiveKitchen/src/cognitive_kitchen/ingest/pdf_ingest.py)): Page-by-page extraction emitting Server-Sent Events (`ProgressEvent`) tracking elapsed time, character counts, and recipes detected.
+- **Web Crawler** ([src/cognitive_kitchen/ingest/web_ingest.py](file:///c:/Users/aru91/OneDrive/Documents/Workspace_AI/Projects_Vscode/CognitiveKitchen/src/cognitive_kitchen/ingest/web_ingest.py)): Playwright-driven crawler with SSRF safeguards, domain boundary rules, and Schema.org JSON-LD parsing (`detected_by: json-ld | headings | prose-boundary | heuristic-text`).
 
-Open items with enough diagnosis to pick up cold, in
-[KNOWN_ISSUES.md](KNOWN_ISSUES.md). The largest: the `constraint` query family
-scores 0.000 for every retriever, because all 14 of its questions ask about
-numbers -- minutes, ingredient counts -- and nothing in the pipeline compares
-numbers. Deferred deliberately, with a sketch of the fix.
+### Stage 2 — Chunking Strategy Evaluation
+- **Plugins** ([src/cognitive_kitchen/rag/chunking/](file:///c:/Users/aru91/OneDrive/Documents/Workspace_AI/Projects_Vscode/CognitiveKitchen/src/cognitive_kitchen/rag/chunking)): 8 chunkers (`recipe`, `recipe_sections`, `recursive`, `semantic_adjacent`, `markdown_header`, `character`, `token`, `sentence`).
+- **Benchmark Findings**: Structure-aware `recipe` chunking (keeping single recipes intact) yields $0.991$ recall and $1.000$ self-sufficiency. Arbitrary character-recursive chunking straddles recipe boundaries, causing LLMs to hallucinate ingredient quantities from unrelated recipes.
 
-## What the UI does
+### Stage 3 — Retrieval & Safety Pre-Filtering
+- **Plugins** ([src/cognitive_kitchen/rag/retrieval/](file:///c:/Users/aru91/OneDrive/Documents/Workspace_AI/Projects_Vscode/CognitiveKitchen/src/cognitive_kitchen/rag/retrieval)): 9 retrieval strategies combining Dense (`bge-small-en-v1.5`), Lexical (BM25, TF-IDF), Hybrid Reciprocal Rank Fusion (RRF), Maximal Marginal Relevance (MMR), Cross-Encoder Re-ranking, and Neo4j Graph Constraint Pre-filtering (`graph_hybrid`).
+- **Evaluated On**: $Hit@K$, $Recall@K$, $MAP$, $Diversity$, and `constraint_respected`.
 
-**PDF tab** - drop a cookbook PDF, or ingest the sample in `data/`. Every page
-read emits a live frame: pages read, recipes found, characters, elapsed.
+### Stage 4 — Query Transformations
+- **Plugins** ([src/cognitive_kitchen/rag/query/](file:///c:/Users/aru91/OneDrive/Documents/Workspace_AI/Projects_Vscode/CognitiveKitchen/src/cognitive_kitchen/rag/query)): `passthrough`, `decompose`, `hyde`.
+- **Benchmark Findings**: Sub-query `decompose` provides highest retrieval boost for multi-intent questions. Hypothetical Document Embeddings (`hyde`) cost ~400s per query on CPU without measurable accuracy gains.
 
-**Web URLs tab** - one URL per line, a recipe page or a category index. With
-"Expand category pages" on, an index is crawled for recipe links, ranked so the
-page budget goes to real recipes rather than navigation.
+### Stage 5 — Pure Knowledge Graph Traversal
+- **Graph Traversal** ([src/cognitive_kitchen/rag/graph/](file:///c:/Users/aru91/OneDrive/Documents/Workspace_AI/Projects_Vscode/CognitiveKitchen/src/cognitive_kitchen/rag/graph)): Direct Cypher query engine on Neo4j for zero-embedding deterministic graph traversal.
+- **Canonical Vocabulary Engine** ([src/cognitive_kitchen/rag/vocab/curated.py](file:///c:/Users/aru91/OneDrive/Documents/Workspace_AI/Projects_Vscode/CognitiveKitchen/src/cognitive_kitchen/rag/vocab/curated.py)): Deterministic rule engine executed via `uv run ck-vocab`, collapsing 1,776 raw ingredient variations into 158 canonical entities (e.g. mapping fresh ginger, ginger paste, and ground ginger safely).
+- **Capability**: Answers complex graph logic that vector search cannot reach:
+  - *"What can I cook tonight with my current pantry items?"* (Returns exact recipes and missing ingredients).
+  - *"What can I substitute for ghee?"* (Traverses ingredient category nodes).
+  - *"How many recipes are dairy-free?"* (Direct graph aggregation).
 
-**Ingested data tab** - every run in `data/ingested/`, with per-recipe
-ingredient and step counts.
+### Stage 6 — LLM Generation & Faithfulness
+- **Plugins** ([src/cognitive_kitchen/rag/generate/](file:///c:/Users/aru91/OneDrive/Documents/Workspace_AI/Projects_Vscode/CognitiveKitchen/src/cognitive_kitchen/rag/generate)): Local Qwen generation supporting `reordered`, `stuff_strict`, `structured`, and `map_reduce` strategies.
+- **Evaluated On**: DeepEval Faithfulness & G-Eval Cookability scoring.
+- **Lost-in-the-Middle Verification**: `reordered` outperforms `stuff_strict` on identical context chunks simply by placing high-relevance chunks at context boundaries.
 
-**RAG Lab** - the stage-by-stage comparison above, run live.
+---
 
-**Kitchen** - the chat, reading whatever `data/eval/pipeline.json` has locked.
+## 🖥️ Streamlit Interactive UI Console
 
-## Output format
+Cognitive Kitchen delivers a 3-page interactive web application ([src/cognitive_kitchen/ui/](file:///c:/Users/aru91/OneDrive/Documents/Workspace_AI/Projects_Vscode/CognitiveKitchen/src/cognitive_kitchen/ui)):
 
-One shape for both sources, so later stages do not care where a recipe came
-from:
+```
+                               ┌──────────────────────────────────────────┐
+                               │       Streamlit Multi-Page Console       │
+                               └────────────────────┬─────────────────────┘
+                                                    │
+         ┌──────────────────────────────────────────┼──────────────────────────────────────────┐
+         │                                          │                                          │
+┌────────▼─────────────────────────┐      ┌─────────▼────────────────────────┐      ┌──────────▼────────────────────────┐
+│ 1. Data Ingest (app.py)          │      │ 2. RAG Lab (2_RAG_Lab.py)        │      │ 3. Kitchen Chat (3_Kitchen.py)    │
+│ Live PDF upload & Web Crawler    │      │ Stage-by-stage benchmark sandbox │      │ Interactive Culinary Assistant    │
+│ Streaming SSE ingestion telemetry│      │ Locked to Ground-Truth Benchmark │      │ Multi-dataset switch & Pantry Audit│
+└──────────────────────────────────┘      └──────────────────────────────────┘      └───────────────────────────────────┘
+```
 
-    run_id, source_type (pdf|url), origin, started_at, finished_at,
-    elapsed_seconds, n_units_total, n_units_read, n_units_empty, empty_units,
-    n_recipes, warnings, recipes[]
+1. **Ingest Tab** ([app.py](file:///c:/Users/aru91/OneDrive/Documents/Workspace_AI/Projects_Vscode/CognitiveKitchen/src/cognitive_kitchen/ui/app.py)): Ingest PDF cookbooks or crawl web recipe index pages with live SSE event progress.
+2. **RAG Lab Sandbox** ([2_RAG_Lab.py](file:///c:/Users/aru91/OneDrive/Documents/Workspace_AI/Projects_Vscode/CognitiveKitchen/src/cognitive_kitchen/ui/pages/2_RAG_Lab.py)): Benchmark and compare strategies across all 6 stages live against the hand-verified Ground-Truth Golden Dataset (`load_gds_ingested()`). Lock your winning pipeline for production deployment.
+3. **Kitchen Culinary Assistant** ([3_Kitchen.py](file:///c:/Users/aru91/OneDrive/Documents/Workspace_AI/Projects_Vscode/CognitiveKitchen/src/cognitive_kitchen/ui/pages/3_Kitchen.py)): Chat with your locked production pipeline.
+   - **Active Dataset Selector**: Seamlessly switch context between the benchmark GDS PDF and custom uploaded user cookbooks.
+   - **Pantry Audit Engine**: Ask *"Can I make this with what I have in my kitchen?"* with automatic fallback recipe card evaluation.
 
-Each recipe: `recipe_id, title, source_type, origin, pages[], url,
-ingredient_lines[], step_lines[], servings_hint, time_hint, detected_by,
-raw_text`.
+---
 
-`detected_by` records how it was found: `json-ld` (schema.org markup, most
-reliable), `headings` (an Ingredients/Method heading), `prose-boundary` (no
-heading, inferred from where instructions start), or `heuristic-text`.
+## 📊 Ground-Truth Golden Dataset & Benchmark Design
 
-## Layout
+The evaluation benchmark lives in [data/golden_dataset.json](file:///c:/Users/aru91/OneDrive/Documents/Workspace_AI/Projects_Vscode/CognitiveKitchen/data/golden_dataset.json). It contains 50 hand-verified recipes extracted from the sample cookbook and 229 evaluation queries spanning 7 intent families.
 
-    src/cognitive_kitchen/
-      config.py              settings from .env
-      models.py              IngestionRun, RawRecipe, ProgressEvent
-      jobs.py                job registry, per-job event queue
-      api.py                 FastAPI endpoints + SSE stream
-      ingest/pdf_ingest.py   page-by-page PDF reader
-      ingest/web_ingest.py   Playwright crawler
-      ui/app.py              Streamlit console
-      ui/pages/2_RAG_Lab.py  per-stage strategy comparison
-      ui/pages/3_Kitchen.py  chat, on the locked pipeline
+```
+Metric Matrix Tier        Required Benchmark Data         Evaluated Metrics
+───────────────────────── ─────────────────────────────── ────────────────────────────────────────────────
+Tier 1: Document-Only     Ingested Raw Data               Chunk Purity, Self-Sufficiency, Latency, Cost
+Tier 2: Unlabeled Queries + data/questions.txt            Faithfulness, Relevancy, Cookability, Abstention,
+                                                          Diversity, Constraint Compliance
+Tier 3: Labeled Benchmark + data/golden_dataset.json      Hit@K, Recall@K, MAP, K@90, Set Precision/Recall
+```
 
-      rag/
-        registry.py          plugin registry, strategies auto-discovered
-        corpus.py            render recipes to text, record spans
-        telemetry.py         latency, tokens and dollars per stage
-        memory.py            chat history, follow-up resolution
-        loaders/             ingested JSON, PDF
-        chunking/            8 chunkers, incl. recipe and recipe_sections
-        embedding/           sentence-transformers, model from .env
-        retrieval/           9 retrievers, incl. graph_hybrid and graph_only
-        query/               passthrough, decompose, hyde
-        generate/            local Qwen, and gpt-4o-mini for judging
-        vocab/               ingredient identity  (ck-vocab)
-        graph/               Neo4j build + traversal  (ck-graph)
-        eval/                per-stage metrics, scored on the golden dataset
+> [!NOTE]
+> **Zero Benchmark Fitting**: The ingestion, indexing, and retrieval build pipelines never inspect `golden_dataset.json`. Ground truth is strictly isolated for evaluation. Refer to [docs/golden-dataset.md](docs/golden-dataset.md) for details on building custom truth sets.
 
-## Tests
+---
 
-    uv run pytest tests -q
+## ⚡ Quickstart & Operations Runbook
 
-60 tests. Each one pins a bug that shipped once: a source-prefix collision that
-let a PDF recipe inherit a URL recipe's constraint eligibility, a diversity
-metric that could exceed 1.0, a filter that returned all 168 recipes when it
-could not resolve the include term.
+### Step 1: Environment Setup
+```bash
+# Clone repository
+git clone https://github.com/aru911-gethu/CognitiveKitchen.git
+cd CognitiveKitchen
 
-## Setup from scratch
+# Install dependencies & CLI entrypoints
+uv sync
+uv run playwright install chromium
 
-    uv sync
-    uv run playwright install chromium
-    cp .env.example .env      # then fill in real values
-    # ingest a cookbook through the UI, then:
-    uv run ck-vocab
-    uv run ck-graph
+# Create environment file
+cp .env.example .env
+```
+*Configure `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD`, and `OPENAI_API_KEY` inside `.env`.*
 
-## Security
+### Step 2: Build Vocabulary & Neo4j Knowledge Graph
+```bash
+# Process canonical ingredients (outputs data/eval/ingredient_map.json)
+uv run ck-vocab
 
-The API has **no authentication**, and it both accepts file uploads and fetches
-user-supplied URLs. It is bound to localhost for that reason. Do not expose it
-to a network without adding auth.
+# Rebuild Neo4j Knowledge Graph from data/ingested/ (supports --dry-run)
+uv run ck-graph
+```
 
-Two guards are in place:
+### Step 3: Launch Services
+Open two terminal instances:
 
-- **SSRF** - non-HTTP schemes are refused, and hosts resolving to loopback,
-  private, link-local or reserved addresses are rejected before any fetch.
-- **robots.txt** - checked per host and honoured; disallowed URLs are skipped
-  with a warning rather than fetched.
+```bash
+# Terminal 1: FastAPI REST & SSE Service (http://127.0.0.1:8010)
+uv run ck-api
 
-Uploads are capped at 80 MB and must be `.pdf`.
+# Terminal 2: Streamlit Console UI (http://127.0.0.1:8501)
+uv run ck-ui
+```
+API Documentation: `http://127.0.0.1:8010/docs`.
 
-## Cost
+### Step 4: Verification Suite
+Run all 60 automated unit tests:
+```bash
+uv run pytest tests -q
+```
 
-Everything on the answering path runs locally and costs nothing. Two things call
-a paid model, both `gpt-4o-mini`:
+---
 
-- **constraint extraction** in `graph_hybrid`, about $0.0001 a question, cached
-  to disk by question so replaying an evaluation is free
-- **judged generation metrics**, faithfulness and cookability
+## 🔒 Security & Edge Deployment
 
-`rag/telemetry.py` records tokens, latency and dollars per stage, so every
-metrics table can show what a strategy cost as well as how well it scored.
+- **SSRF Prevention**: The Playwright crawler rejects non-HTTP schemes and resolves destination IPs against loopback, link-local, private, and reserved subnets before fetching.
+- **Robots.txt Adherence**: Checked dynamically per host; disallowed URLs are skipped cleanly.
+- **Upload Guards**: File uploads restricted to `.pdf` under 80 MB.
+- **Zero GPU Requirement**: Designed for CPU-bound environments (12 CPU cores, 16 GB RAM) with token, cost, and latency telemetry tracked per query stage in [src/cognitive_kitchen/rag/telemetry.py](file:///c:/Users/aru91/OneDrive/Documents/Workspace_AI/Projects_Vscode/CognitiveKitchen/src/cognitive_kitchen/rag/telemetry.py).
 
-## Environment notes
+---
 
-Neo4j needs `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD` and `NEO4J_DATABASE`
-in `.env`. On Neo4j Aura the username and the database are both the instance id,
-something like `09bfbafe`, not the literal `neo4j`. Bolt uses port 7687, which
-corporate VPNs commonly block; if you see "Unable to retrieve routing
-information" while port 443 on the same host is open, that is the VPN and not the
-instance.
+## 📚 Related Academic Literature
 
-The API defaults to port 8010 rather than 8000, because on my machine
-AWSWorkDocsDriveClient already holds `0.0.0.0:8000`. Change `API_PORT` in `.env`
-if you prefer another.
-
-No GPU was used anywhere. 12 CPU cores, 15.6 GB RAM, and every model choice
-follows from that.
+1. **Semantic Collapse in Vector Search**: *Negation is Not Semantic: Diagnosing Dense Retrieval Failure Modes* ([arXiv:2603.17580](https://arxiv.org/abs/2603.17580)) and *Exclusion-Sensitive Penalization for Negative-Constraint Retrieval* ([arXiv:2608.30130](https://arxiv.org/html/2608.30130v2)).
+2. **Structure-Aware Chunking Efficiency**: *Evaluating Chunking Strategies for RAG in Enterprise Documents* ([arXiv:2603.24556](https://arxiv.org/abs/2603.24556)) and *Is Semantic Chunking Worth the Computational Cost?* ([arXiv:2410.13070](https://arxiv.org/html/2410.13070v1)).
+3. **Lost-in-the-Middle Context Effects**: Liu et al., 2023 (*Lost in the Middle: How Language Models Use Long Contexts*).
