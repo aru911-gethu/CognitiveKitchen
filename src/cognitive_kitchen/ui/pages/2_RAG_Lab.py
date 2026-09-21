@@ -32,7 +32,7 @@ from cognitive_kitchen.config import settings
 from cognitive_kitchen.rag import pipeline as P
 from cognitive_kitchen.rag import registry
 from cognitive_kitchen.rag.corpus import build_corpus, summarise
-from cognitive_kitchen.rag.loaders import load_latest_ingested
+from cognitive_kitchen.rag.loaders import load_gds_ingested, load_latest_ingested
 from cognitive_kitchen.ui import explain
 from cognitive_kitchen.ui.progress import Commentary, per_question
 
@@ -53,6 +53,11 @@ warmup.start()
 # ---------------------------------------------------------------- resources
 @st.cache_resource(show_spinner=False)
 def corpus_for(source: str):
+    if source == "pdf" or not source:
+        try:
+            return build_corpus(load_gds_ingested(), source="pdf")
+        except Exception:
+            pass
     return build_corpus(load_latest_ingested(source_type=source or None),
                         source=source)
 
@@ -83,6 +88,13 @@ def chunk(source: str, chunker: str, size: int, overlap: int):
     return registry.build("chunker", chunker, **kwargs).split(corpus_for(source))
 
 
+def locked_passages():
+    cp = SS.get("chunk_params", {})
+    size = int(cp.get("size") or cp.get("chunk_size", 600))
+    overlap = int(cp.get("overlap", 80))
+    return chunk(source, SS["locked"]["chunker"], size, overlap)
+
+
 def lock(stage: str, value) -> None:
     SS["locked"][stage] = value
     st.rerun()
@@ -104,7 +116,7 @@ def show_options(title: str, table: dict, keys) -> None:
         for key in keys:
             if key in table:
                 headline, detail = table[key]
-                st.markdown(f"**`{key}`** — {headline}  \n{detail}")
+                st.markdown(f"**{explain.label_for(key)}** (`{key}`) — {headline}  \n{detail}")
 
 
 def show_metrics(group: str) -> None:
@@ -237,7 +249,8 @@ with st.expander("STAGE 2 · Chunking",
         st.success(f"Locked: **{SS['locked']['chunker']}**")
     else:
         available = registry.available("chunker")
-        chosen = st.multiselect("Compare", available, default=available)
+        chosen = st.multiselect("Compare", available, default=available,
+                                format_func=explain.label_for)
         show_options("chunker", explain.CHUNKERS, chosen or available)
         show_metrics("stage2")
         c1, c2, c3 = st.columns(3)
@@ -299,10 +312,13 @@ with st.expander("STAGE 2 · Chunking",
         rows = SS["results"].get("stage2")
         if rows:
             frame = pd.DataFrame(rows)
-            st.dataframe(frame, width="stretch", hide_index=True)
+            display_frame = frame.copy()
+            display_frame["chunker"] = display_frame["chunker"].map(explain.label_for)
+            display_frame = display_frame.rename(columns={"chunker": "Chunking Strategy"})
+            st.dataframe(display_frame, width="stretch", hide_index=True)
             top = frame.sort_values("word_purity", ascending=False).iloc[0]
             st.info(
-                f"**{top['chunker']}** has the highest purity "
+                f"**{explain.label_for(top['chunker'])}** has the highest purity "
                 f"({top['word_purity']:.3f}). Purity is how much of a chunk "
                 f"belongs to one recipe; a low score means the retriever cannot "
                 f"return one dish without dragging in another.\n\n"
@@ -312,8 +328,9 @@ with st.expander("STAGE 2 · Chunking",
                 "recipes inherits both recipe ids and slips the gate if either "
                 "one qualifies.")
             pick = st.selectbox("Lock", frame["chunker"].tolist(),
-                                index=int(frame["word_purity"].argmax()))
-            if st.button(f"Lock {pick} → Stage 3", type="primary", key="lock2"):
+                                index=int(frame["word_purity"].argmax()),
+                                format_func=explain.label_for)
+            if st.button(f"Lock {explain.label_for(pick)} → Stage 3", type="primary", key="lock2"):
                 SS["chunk_params"] = {"size": int(size), "overlap": int(overlap)}
                 lock("chunker", pick)
 
@@ -327,9 +344,7 @@ if is_locked("chunker"):
         if is_locked("retrieval"):
             st.success(f"Locked: **{SS['locked']['retrieval']}**")
         else:
-            passages = chunk(source, SS["locked"]["chunker"],
-                             *(SS.get("chunk_params", {"size": 600,
-                                                       "overlap": 80}).values()))
+            passages = locked_passages()
             st.caption(f"{len(passages)} chunks from "
                        f"{SS['locked']['chunker']}")
 
@@ -338,9 +353,11 @@ if is_locked("chunker"):
                 st.markdown("**① Candidate source**")
                 sources = st.multiselect("compare",
                                          ["dense", "bm25", "tfidf", "hybrid", "rrf"],
-                                         default=["bm25", "rrf"])
+                                         default=["bm25", "rrf"],
+                                         format_func=explain.label_for)
                 sparse = st.radio("sparse half of a fuser", ["bm25", "tfidf"],
                                   horizontal=True,
+                                  format_func=explain.label_for,
                                   help="hybrid and rrf each combine dense with "
                                        "ONE sparse retriever. This picks which.")
             with c2:
@@ -348,6 +365,16 @@ if is_locked("chunker"):
                 try_mmr = st.checkbox("diversity (MMR)", value=False)
                 try_rerank = st.checkbox("cross-encoder rerank", value=True)
                 try_graph = st.checkbox("graph pre-filter", value=True)
+                if try_graph:
+                    try:
+                        from cognitive_kitchen.rag.graph import client as _gc
+                        _gh = _gc.health()
+                        if not _gh.get("ok"):
+                            st.warning("⚠️ **Neo4j Aura is currently paused or unreachable.**  \n"
+                                       "Please click **'Resume'** at [console.neo4j.io](https://console.neo4j.io) "
+                                       "before running with graph pre-filter, or uncheck this option.")
+                    except Exception:
+                        pass
                 k = st.slider("k", 3, 10, 5,
                               help="Chunks handed to generation. Stage 2's "
                                    "k_at_90 tells you what this should be for "
@@ -391,9 +418,7 @@ if is_locked("chunker"):
                 # fills each row as it lands, so progress and scope are both
                 # visible and partial results are readable before the end.
                 rows = []
-                labels = [base + (" +mmr" if mmr else "")
-                          + (" +rerank" if rerank else "")
-                          + (" +graph" if graph else "")
+                labels = [explain.format_composition(base, mmr, rerank, graph)
                           for base, mmr, rerank, graph in combos]
                 status = ["queued"] * len(labels)
                 landed: dict[str, dict] = {}
@@ -432,10 +457,9 @@ if is_locked("chunker"):
                                            limit=int(n_questions),
                                            progress=per_question(note, every=5))
                         cr = metrics["constraint_respected"]
+                        full_label = explain.format_composition(base, mmr, rerank, graph)
                         rows.append({
-                            "source": base,
-                            "mmr": "✓" if mmr else "", "rerank": "✓" if rerank else "",
-                            "graph": "✓" if graph else "",
+                            "configuration": full_label,
                             "hit@k": metrics["hit_at_k"],
                             "recall@k": metrics["recall_at_k"],
                             "MAP": metrics["map"],
@@ -466,9 +490,31 @@ if is_locked("chunker"):
 
             rows = SS["results"].get("stage3")
             if rows:
-                frame = pd.DataFrame(rows).drop(columns=["_spec", "_breaches"])
+                formatted_rows = []
+                for r in rows:
+                    fr = dict(r)
+                    if "configuration" not in fr:
+                        if "_spec" in fr:
+                            fr["configuration"] = explain.format_composition(*fr["_spec"])
+                        elif "source" in fr:
+                            fr["configuration"] = explain.format_composition(
+                                fr["source"], bool(fr.get("mmr")), bool(fr.get("rerank")), bool(fr.get("graph"))
+                            )
+                    fr.pop("_spec", None)
+                    fr.pop("_breaches", None)
+                    fr.pop("source", None)
+                    fr.pop("mmr", None)
+                    fr.pop("rerank", None)
+                    fr.pop("graph", None)
+                    formatted_rows.append(fr)
+
+                frame = pd.DataFrame(formatted_rows)
+                cols = ["configuration"] + [c for c in frame.columns if c != "configuration"]
+                frame = frame[cols]
                 st.dataframe(frame, width="stretch", hide_index=True,
                              column_config={
+                                 "configuration": st.column_config.TextColumn(
+                                     "Retrieval Strategy / Pipeline"),
                                  "constraint": st.column_config.NumberColumn(
                                      "constraint", format="%.0f%%",
                                      help="Of the recipes handed to generation, "
@@ -478,9 +524,7 @@ if is_locked("chunker"):
                 quality = frame.loc[frame["hit@k"].idxmax()]
                 safe = frame[frame["constraint"] == frame["constraint"].max()]
                 st.info(
-                    f"**Best quality:** {quality['source']} "
-                    f"{'+rerank' if quality['rerank'] else ''}"
-                    f"{'+graph' if quality['graph'] else ''} at hit@k "
+                    f"**Best quality:** {quality['configuration']} at hit@k "
                     f"{quality['hit@k']:.3f} in {quality['secs']}s.\n\n"
                     f"**Compliance is a separate axis.** The four quality "
                     f"metrics cannot see it. Asked \"I am avoiding nuts\", a "
@@ -494,10 +538,7 @@ if is_locked("chunker"):
                     with st.expander(f"{len(breaches)} constraint breaches"):
                         st.dataframe(pd.DataFrame(breaches), width="stretch",
                                      hide_index=True)
-                labels = [f"{r['source']}"
-                          f"{' +mmr' if r['mmr'] else ''}"
-                          f"{' +rerank' if r['rerank'] else ''}"
-                          f"{' +graph' if r['graph'] else ''}" for r in rows]
+                labels = [explain.format_composition(*r["_spec"]) for r in rows]
                 pick = st.selectbox("Lock", range(len(labels)),
                                     format_func=lambda i: labels[i])
                 if st.button(f"Lock {labels[pick]} → Stage 4", type="primary",
@@ -520,16 +561,15 @@ if is_locked("retrieval"):
         else:
             options = registry.available("query")
             chosen = st.multiselect("Compare", options,
-                                    default=[o for o in options if o != "hyde"])
+                                    default=[o for o in options if o != "hyde"],
+                                    format_func=explain.label_for)
             show_options("transform", explain.TRANSFORMS, chosen or options)
             show_metrics("stage3")
             n = st.slider("questions", 3, 20, 5, key="n4")
             if st.button("Run comparison", type="primary", key="run4"):
                 from cognitive_kitchen.rag.eval.stage3_ranking import evaluate
 
-                passages = chunk(source, SS["locked"]["chunker"],
-                                 *(SS.get("chunk_params",
-                                          {"size": 600, "overlap": 80}).values()))
+                passages = locked_passages()
                 spec = P.Pipeline(**SS["retrieval_spec"])
                 name, params = spec.retriever_spec()
                 if name in ("dense", "hybrid", "rrf", "mmr", "cross_encoder",
@@ -571,15 +611,19 @@ if is_locked("retrieval"):
             rows = SS["results"].get("stage4")
             if rows:
                 frame = pd.DataFrame(rows)
-                st.dataframe(frame, width="stretch", hide_index=True)
+                display_frame = frame.copy()
+                display_frame["transform"] = display_frame["transform"].map(explain.label_for)
+                display_frame = display_frame.rename(columns={"transform": "Query Transform Strategy"})
+                st.dataframe(display_frame, width="stretch", hide_index=True)
                 st.info("decompose splits a compound question and retrieves for "
                         "each part. hyde writes a hypothetical recipe first and "
                         "searches with that, which costs around 400s per query "
                         "on CPU for no measured gain here — leave it until the "
                         "GPU machine.")
                 pick = st.selectbox("Lock", frame["transform"].tolist(),
-                                    index=int(frame["hit@k"].argmax()))
-                if st.button(f"Lock {pick} → Stage 6", type="primary", key="lock4"):
+                                    index=int(frame["hit@k"].argmax()),
+                                    format_func=explain.label_for)
+                if st.button(f"Lock {explain.label_for(pick)} → Stage 6", type="primary", key="lock4"):
                     lock("transform", pick)
 
 
@@ -592,11 +636,14 @@ if is_locked("transform"):
             st.success(f"Locked: **{SS['locked']['strategy']}**")
         else:
             options = registry.available("strategy")
-            chosen = st.multiselect("Compare", options, default=options)
+            chosen = st.multiselect("Compare", options, default=options,
+                                    format_func=explain.label_for)
             show_options("strategy", explain.STRATEGIES, chosen or options)
             show_metrics("stage6")
             c1, c2, c3 = st.columns(3)
-            gen_name = c1.selectbox("generator", registry.available("generator"))
+            available_gens = registry.available("generator")
+            gen_default_idx = available_gens.index("qwen") if "qwen" in available_gens else 0
+            gen_name = c1.selectbox("generator", available_gens, index=gen_default_idx)
             tokens = c2.number_input("max_new_tokens", 60, 512, 120, 20,
                                      help="Answer length cap. On CPU the local "
                                           "model produces roughly 3 tokens a "
@@ -615,9 +662,7 @@ if is_locked("transform"):
                 from cognitive_kitchen.rag.eval import stage6_generation as S6
                 from cognitive_kitchen.rag.eval.judge import Judge
 
-                passages = chunk(source, SS["locked"]["chunker"],
-                                 *(SS.get("chunk_params",
-                                          {"size": 600, "overlap": 80}).values()))
+                passages = locked_passages()
                 spec = P.Pipeline(**SS["retrieval_spec"])
                 name, params = spec.retriever_spec()
                 if name in ("dense", "hybrid", "rrf", "mmr", "cross_encoder",
@@ -660,11 +705,8 @@ if is_locked("transform"):
                                 f"abstain {metrics['honest_abstention']} · "
                                 f"faithful {metrics.get('faithfulness')} · "
                                 f"relevancy {metrics.get('answer_relevancy')} · "
-                                f"relevancy {metrics.get('answer_relevancy')} · "
                                 f"cookable {metrics.get('cookable')} · "
                                 f"{time.perf_counter() - started:.1f}s")
-                    for failure in (metrics.get("judge_failures") or []):
-                        note.warn(failure)
                     for failure in (metrics.get("judge_failures") or []):
                         note.warn(failure)
                     rows.append({
@@ -687,24 +729,28 @@ if is_locked("transform"):
             rows = SS["results"].get("stage6")
             if rows:
                 frame = pd.DataFrame(rows).drop(columns=["_rows"])
-                st.dataframe(frame, width="stretch", hide_index=True)
+                display_frame = frame.copy()
+                display_frame["strategy"] = display_frame["strategy"].map(explain.label_for)
+                display_frame = display_frame.rename(columns={"strategy": "Generation Strategy"})
+                st.dataframe(display_frame, width="stretch", hide_index=True)
                 st.info(
                     "NoInvented and Abstention are a safety floor, not a "
                     "ranking: all four strategies are grounded, so a score "
                     "below 1.0 is a defect to fix rather than a strategy to "
                     "reject. Faithfulness and Cookable do the discriminating.\n\n"
-                    "Watch reordered against stuff_strict. Same chunks, same "
+                    "Watch Context-Reordered against Strict Context Stuffing. Same chunks, same "
                     "count, same cost — only the order changes. A gap between "
                     "them is the lost-in-the-middle effect, and no amount of "
                     "better retrieval would have revealed it.")
                 with st.expander("Answers"):
                     for row in rows:
-                        st.markdown(f"**{row['strategy']}**")
+                        st.markdown(f"**{explain.label_for(row['strategy'])}**")
                         st.dataframe(pd.DataFrame(row["_rows"])[
                             ["question", "refused", "no_invented",
                              "abstention"]], width="stretch", hide_index=True)
-                pick = st.selectbox("Lock", frame["strategy"].tolist())
-                if st.button(f"Lock {pick} and save pipeline", type="primary",
+                pick = st.selectbox("Lock", frame["strategy"].tolist(),
+                                    format_func=explain.label_for)
+                if st.button(f"Lock {explain.label_for(pick)} and save pipeline", type="primary",
                              key="lock6"):
                     lock("strategy", pick)
 
@@ -721,7 +767,7 @@ if is_locked("strategy"):
         corpus_source=source,
         **SS.get("gen_choice", {}))
     st.subheader("Pipeline")
-    st.code(config.label(), language="text")
+    st.code(explain.format_pipeline_label(config.label()), language="text")
     if st.button("Save and open the Kitchen", type="primary"):
         P.save(config)
         st.success(f"Saved to {P.path()}")
@@ -835,9 +881,7 @@ with st.expander("STAGE 5 · Pure graph — standalone, not part of the chain"):
 
                 if also_retrieval and is_locked("retrieval"):
                     note.step("locked retrieval route")
-                    passages = chunk(source, SS["locked"]["chunker"],
-                                     *(SS.get("chunk_params",
-                                              {"size": 600, "overlap": 80}).values()))
+                    passages = locked_passages()
                     spec = P.Pipeline(**SS["retrieval_spec"])
                     name, params = spec.retriever_spec()
                     if name in ("dense", "hybrid", "rrf", "mmr", "cross_encoder",
@@ -868,7 +912,13 @@ with st.expander("STAGE 5 · Pure graph — standalone, not part of the chain"):
 
         rows = SS["results"].get("stage5gen")
         if rows:
-            st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
+            display_rows = []
+            for r in rows:
+                dr = dict(r)
+                if "route" in dr:
+                    dr["route"] = explain.format_pipeline_label(dr["route"])
+                display_rows.append(dr)
+            st.dataframe(pd.DataFrame(display_rows), width="stretch", hide_index=True)
             st.info(
                 "A dish name is not a graph pattern. Asked \"give me the recipe "
                 "for Samosa\", the graph can narrow to course=snack and no "

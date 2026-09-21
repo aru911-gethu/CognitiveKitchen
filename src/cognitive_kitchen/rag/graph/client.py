@@ -28,11 +28,25 @@ def driver():
         if not settings.graph_configured:
             raise GraphUnavailable(
                 "NEO4J_URI, NEO4J_USERNAME and NEO4J_PASSWORD must be set in .env")
+        import traceback
         from neo4j import GraphDatabase
 
-        _driver = GraphDatabase.driver(
-            settings.neo4j_uri,
-            auth=(settings.neo4j_username, settings.neo4j_password))
+        uri = settings.neo4j_uri
+        auth = (settings.neo4j_username, settings.neo4j_password)
+        try:
+            d = GraphDatabase.driver(uri, auth=auth)
+            d.verify_connectivity()
+            _driver = d
+        except Exception:
+            tb = traceback.format_exc()
+            if "certificate" in tb.lower() or "ssl" in tb.lower():
+                fallback_uri = uri.replace("neo4j+s://", "neo4j+ssc://").replace(
+                    "bolt+s://", "bolt+ssc://")
+                d = GraphDatabase.driver(fallback_uri, auth=auth)
+                d.verify_connectivity()
+                _driver = d
+            else:
+                raise
     return _driver
 
 

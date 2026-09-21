@@ -32,7 +32,7 @@ def header(title: str, subtitle: str = "", pills: list[str] | None = None) -> No
     if subtitle:
         parts.append(f"<p>{subtitle}</p>")
     if pills:
-        parts.append('<div style="margin-top:12px">')
+        parts.append('<div style="margin-top:12px; display:flex; flex-wrap:wrap; gap:8px; align-items:center;">')
         parts.extend(f'<span class="pill">{p}</span>' for p in pills)
         parts.append("</div>")
     parts.append("</div>")

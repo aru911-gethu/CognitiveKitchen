@@ -8,6 +8,66 @@ from __future__ import annotations
 
 from ..config import settings
 
+# ------------------------------------------------------------- display labels
+LABELS: dict[str, str] = {
+    # Stage 2: Chunking
+    "recipe": "Structure-Aware (Full Recipe)",
+    "recipe_sections": "Recipe Sections (Ingredients & Method Split)",
+    "recursive": "Recursive Character (Paragraph/Sentence Split)",
+    "semantic_adjacent": "Semantic Adjacent (Embedding Distance Split)",
+    "semantic_centroid": "Semantic Centroid (Running Drift Split)",
+    "recursive_semantic_adjacent": "Recursive + Semantic Adjacent",
+    "recursive_semantic_centroid": "Recursive + Semantic Centroid",
+    "naive": "Fixed Window Character Split",
+    "markdown_header": "Markdown Header Split",
+    "character": "Raw Character Window Split",
+    "token": "Token Window Split",
+    "sentence": "Sentence Boundary Split",
+    # Stage 3: Candidate Sources
+    "bm25": "Keyword Search (BM25)",
+    "dense": "Semantic Vector Search (Qwen3 Embeddings)",
+    "tfidf": "Keyword Search (TF-IDF)",
+    "hybrid": "Hybrid Search (Linear Weighted: Dense + BM25)",
+    "rrf": "Hybrid Search (RRF: Dense + BM25)",
+    # Stage 3: Modifiers
+    "mmr": "MMR Diversity",
+    "rerank": "Cross-Encoder (bge-reranker)",
+    "graph": "Knowledge Graph Pre-Filter (Neo4j Cypher)",
+    # Stage 4: Query Transforms
+    "passthrough": "Direct Passthrough (Raw Question)",
+    "decompose": "Sub-Query Decomposition (Multi-Intent)",
+    "hyde": "Hypothetical Document Embeddings (HyDE)",
+    # Stage 6: Generation Strategies
+    "reordered": "Context-Reordered (Lost-in-the-Middle Fix)",
+    "stuff_strict": "Strict Context Stuffing (Grounded Refusal)",
+    "structured": "Structured JSON Schema Output",
+    "map_reduce": "Map-Reduce Chunk Summarization",
+}
+
+
+def label_for(key: str) -> str:
+    """Return the human-friendly descriptive display label for any strategy key."""
+    return LABELS.get(key, key)
+
+
+def format_composition(base: str, mmr: bool, rerank: bool, graph: bool) -> str:
+    """Return a descriptive, human-friendly title for a Stage 3 composition."""
+    parts = [label_for(base)]
+    if mmr:
+        parts.append("+ MMR Diversity")
+    if rerank:
+        parts.append("+ Cross-Encoder Rerank (bge-reranker)")
+    if graph:
+        parts.append("+ Knowledge Graph Pre-Filter (Neo4j)")
+    return " ".join(parts)
+
+
+def format_pipeline_label(label: str) -> str:
+    """Turn 'recipe -> rrf -> graph -> passthrough -> stuff_strict' into clean titles."""
+    tokens = [t.strip() for t in label.split("->")]
+    return " → ".join(label_for(t) for t in tokens)
+
+
 # --------------------------------------------------------------- chunkers
 CHUNKERS: dict[str, tuple[str, str]] = {
     "naive": (

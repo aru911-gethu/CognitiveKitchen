@@ -96,7 +96,7 @@ def build_runtime(pipeline: Pipeline, dataset_file: str | Path | None = None):
     """Turn a saved pipeline into live objects. Used by the chat page."""
     from .corpus import build_corpus
     from .loaders import load_ingested_json, load_latest_ingested
-    from .registry import build, discover
+    from .registry import build, discover, signature
 
     discover("cognitive_kitchen.rag.chunking", "cognitive_kitchen.rag.embedding",
              "cognitive_kitchen.rag.retrieval", "cognitive_kitchen.rag.query",
@@ -116,8 +116,20 @@ def build_runtime(pipeline: Pipeline, dataset_file: str | Path | None = None):
 
     corpus = build_corpus(docs, source=source_name)
     embedder = build("embedder", "st")
-    passages = build("chunker", pipeline.chunker,
-                     **(pipeline.chunker_params or {})).split(corpus)
+
+    accepted = signature("chunker", pipeline.chunker)
+    chunker_kwargs: dict[str, Any] = {}
+    p = pipeline.chunker_params or {}
+    size = p.get("chunk_size") or p.get("size", 600)
+    overlap = p.get("overlap", 80)
+    if "chunk_size" in accepted:
+        chunker_kwargs["chunk_size"] = size
+    if "overlap" in accepted:
+        chunker_kwargs["overlap"] = overlap
+    if "embedder" in accepted:
+        chunker_kwargs["embedder"] = embedder
+
+    passages = build("chunker", pipeline.chunker, **chunker_kwargs).split(corpus)
 
     name, params = pipeline.retriever_spec()
     if name in ("dense", "hybrid", "rrf", "mmr", "cross_encoder", "graph_hybrid"):

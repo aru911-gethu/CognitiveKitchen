@@ -226,7 +226,7 @@ def can_i_make(key: str, pantry: list[str], max_swaps: int = 6) -> dict:
     for item in missing[:max_swaps]:
         try:
             covered = [c["name"] for c in traverse.substitutes(item, limit=8)
-                       if c["name"] in have]
+                       if c["name"] in have and c.get("same_category", True)]
         except Exception:
             covered = []
         if covered:

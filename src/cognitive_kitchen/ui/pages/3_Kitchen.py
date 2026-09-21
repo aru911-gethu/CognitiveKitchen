@@ -25,7 +25,7 @@ import streamlit as st
 from cognitive_kitchen.config import settings
 from cognitive_kitchen.rag import memory as M
 from cognitive_kitchen.rag import pipeline as P
-from cognitive_kitchen.ui import chrome
+from cognitive_kitchen.ui import chrome, explain
 
 chrome.page("Kitchen", icon="🍲", layout="centered")
 
@@ -71,7 +71,7 @@ model_label = (settings.generation_model.split("/")[-1]
 chrome.header("Kitchen",
               "Answers grounded in the recipes you ingested, using the pipeline "
               "you locked in the Lab.",
-              pills=[config.label(), f"k={config.k}", model_label])
+              pills=[explain.format_pipeline_label(config.label()), f"k={config.k}", model_label])
 
 
 @st.cache_resource(show_spinner="Loading the pipeline...")

@@ -217,11 +217,12 @@ def substitutes(name: str, limit: int = 8,
         WITH c, shared_ctx, together, t.category AS t_cat,
              toFloat(shared_ctx) / union_ctx AS similarity,
              1.0 - (toFloat(together) / t_n) AS apart
+        WHERE (t_cat <> "none" AND c.category = t_cat) OR (t_cat = "none" AND c.category = "none")
         RETURN c.name AS name, c.category AS category,
                shared_ctx AS shared_context, together,
                round(similarity * apart * 1000) / 1000 AS score,
                c.category = t_cat AS same_category
-        ORDER BY same_category DESC, score DESC
+        ORDER BY score DESC
         LIMIT $limit""", target=target, limit=limit,
         min_shared=min_shared_context)
 

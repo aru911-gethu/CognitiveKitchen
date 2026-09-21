@@ -38,6 +38,7 @@ data/eval/corpus-*.json
 data/eval/judged.json
 data/chat/
 data/eval/constraints.json
+data/eval/pantry-*.json
 
 # Tracked: hand-curated or paid-for once, and cheap to keep.
 !data/eval/ingredient_map.json
