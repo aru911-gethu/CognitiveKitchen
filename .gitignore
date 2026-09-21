@@ -83,8 +83,8 @@ Thumbs.db
 # public.
 docs/linkedin-series.md
 
-# Large video files (use webm for repository docs; keep mp4 locally for social media upload)
-docs/assets/*.mp4
+# Large video files
+# docs/assets/*.mp4
 
 # ---- Scratch ----
 # Throwaway scripts and run logs from development. Named so they cannot be
