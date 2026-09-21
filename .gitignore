@@ -77,14 +77,16 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
-# ---- Personal career content ----
-# Positioning drafts, not project documentation. Kept in the working tree so it
-# travels with the project, out of git so it does not ship if the repo goes
-# public.
-docs/linkedin-series.md
+# ---- Personal career content & social media marketing drafts ----
+# Positioning drafts and promotional assets, not project documentation.
+# Kept in the local working tree so they travel with the project on disk,
+# but out of git so they never ship to the public repository.
+docs/linkedin*.md
+docs/assets/*.pdf
+docs/assets/*architecture*.png
 
-# Large video files
-# docs/assets/*.mp4
+# Large video files (keep webm for repo docs; keep mp4 locally for social media upload)
+docs/assets/*.mp4
 
 # ---- Scratch ----
 # Throwaway scripts and run logs from development. Named so they cannot be
