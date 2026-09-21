@@ -7,67 +7,101 @@
 
 ---
 
-## 📌 Episode 1: The 9:30 PM Tiffin Crisis
+## 📌 Episode 1: The 9:30 PM Tiffin Crisis & The Birth of the RAG Sandbox
 
-**Media Attachment**:  
-🎥 Video Walkthrough: `docs/assets/live_demo_walkthrough.mp4` (720p Trimmed for LinkedIn, 1280x720, 2m 56s — also at `C:\Users\aru91\Downloads\Video Project 1.mp4`)  
-📸 Image: `docs/assets/1_ingest_landing.png` (Live Console: 184 recipes · 1,746 graph nodes · 158 ingredients · 229 queries)
+**Media Attachments**:  
+🎥 **Option A (Video Upload — Recommended)**: `docs/assets/live_demo_walkthrough.mp4`  
+*(Trimmed 720p walkthrough, 1280x720, 2m 56s — also at `C:\Users\aru91\Downloads\Video Project 1.mp4`)*  
 
----
-
-Every night at 9:30 PM, right after dinner, my house turns into a negotiation room.
-
-*"What are we packing for tomorrow morning's school tiffin and office lunch?"* 🍱
-
-The constraints are brutal:
-→ Swiggy doesn't exist at 7:00 AM when the school bus rolls up at 8:00 AM.
-→ The kids have declared war on monotony (*"Not Idli or Dosa AGAIN!"* 🙈).
-→ We inspect the pantry, debate for 20 minutes, and inevitably default to the **same Idli/Dosa batter for the 4th time this week.**
-
-So I did what any product person would do.
-
-I asked ChatGPT. 🤖
-
-It confidently recommended Paneer Tikka Wraps.
-My pantry had rava, mustard seeds, and curry leaves.
-
-Then I tried building a standard vector RAG app.
-It failed even worse:
-
-🔴 **The Allergy Trap (Semantic Collapse)**: A vector search for *"nut-free breakfast"* placed the query right next to Cashew Upma and Almond Milk. Vectors measure topic proximity — they have zero clue what *WITHOUT* means. The better your ranker, the more confidently it sends you to the ER. 🚑
-
-🔴 **The Phantom Pantry**: Recommended elaborate dishes requiring 8 extra ingredients I didn't own. Zero inventory grounding.
-
-🔴 **Relational Blindness**: *"What's the ONE ingredient I'm missing for Rava Upma?"* → silence. Vector similarity cannot calculate set-differences.
+📸 **Option B (Multi-Image Carousel — 4-Slide Story)**:  
+1. Slide 1: `docs/assets/1_ingest_landing.png` — *The Production Console (184 recipes · 1,746 graph nodes · 158 ingredients · 229 benchmark queries)*  
+2. Slide 2: `docs/assets/2_rag_lab.png` — *The RAG Lab Sandbox (8 chunkers & 9 retrievers competing head-to-head)*  
+3. Slide 3: `docs/assets/4_retrieval_benchmark.png` — *The Benchmark Proof (Hybrid RRF + Neo4j hitting 0.850 Hit@5 in 0.7s with 100% safety)*  
+4. Slide 4: `docs/assets/8_kitchen_pantry_comparison.png` — *The Payoff (Live chat & Neo4j graph pantry set-difference audit)*  
 
 ---
 
-So I built **Cognitive Kitchen** — and created its biggest breakthrough: **The RAG Lab Sandbox** 🧪
+Every night at 9:30 PM, right after dinner, my house turns into an intense negotiation room. 🍱
 
-Here is the twist: The real product isn't a cooking chatbot.
+"What are we packing for tomorrow morning's school tiffin and office lunch?"
 
-It's a **domain-agnostic RAG test workbench** where you can benchmark 8 chunkers, 9 retrievers, and 4 generation strategies against ground truth *before* locking your production pipeline.
+The real-world constraints are unforgiving:
+→ Swiggy doesn't deliver at 7:00 AM when the school bus rolls up at 8:00 AM.
+→ The kids have declared war on monotony: *"Not Idli or Dosa AGAIN, please!"* 🙈
+→ We stare into the fridge, debate for 20 minutes, and inevitably default to the **same Idli/Dosa batter for the 4th time this week.**
 
-The cooking domain? That's just the first proof point.
+So I did what any AI engineer would do.
 
-The workflow: **1 · Ingest → 2 · Experiment → 3 · Lock what wins → 4 · Chat.**
+I opened ChatGPT. 🤖
+It confidently recommended: *"Paneer Tikka Wraps with fresh mint chutney!"*
+My pantry had: semolina (rava), mustard seeds, and curry leaves. Zero paneer. Zero wraps.
 
-And the technical headline:
-A **1.5B open-source model** (`Qwen2.5-1.5B-Instruct`) running on CPU — paired with a **Neo4j** knowledge graph + **FAISS** vector index — outperformed massive proprietary models on safety, accuracy, and latency.
+Then I built a standard vector RAG app using popular framework tutorials.
+It failed even more catastrophically:
 
-🛠️ **The Marquee Stack**:
-**Docker** · **Streamlit** · **FastAPI (SSE)** · **Neo4j Aura** · **FAISS** · **Qwen 1.5B (CPU)** · **DeepEval** · **LangSmith**
+🔴 **The Allergy Trap (Semantic Collapse)**: When I queried *"nut-free breakfast"*, vector similarity placed the query closest to Cashew Upma and Almond Milk. Vectors measure topic proximity — they have zero clue what logical exclusion (*WITHOUT*) means. The higher your vector similarity score, the faster it sends someone to the emergency room. 🚑
 
-Check out the live app running on VPS:
-🌐 https://techideas.tech/
-💻 https://github.com/aru911-gethu/CognitiveKitchen
+🔴 **The Phantom Pantry**: It retrieved elaborate recipes requiring 8 obscure ingredients I didn't own. Zero inventory grounding.
 
-Over the next 7 posts, I'm opening the kitchen hood — benchmarks, failure modes, and lessons from every stage.
-
-👇 What's your family's 9:30 PM tiffin debate? Drop your go-to quick breakfast in the comments!
+🔴 **Relational Blindness**: *"What is the ONE ingredient I'm missing for Rava Upma?"* → Total silence. Vector embeddings cannot calculate set-differences.
 
 ---
-#CognitiveKitchen #RAG #GraphRAG #AIProduct #OpenSource #GenAI #Qwen #Neo4j #FAISS #FastAPI #Streamlit #Docker #BuildInPublic
+
+### The Spark: Why We Built a Sandbox, Not Just Another App 💡
+
+During that late-night debate, an uncomfortable truth struck us:
+
+*Why are AI teams building production RAG systems blindly by stitching together whatever tutorials recommend?*
+
+One blog swears by "Semantic Chunking". Another claims "HyDE is king". Another says "just throw a Cross-Encoder reranker at it".
+Yet, almost no one measures these choices against a hand-verified ground truth before pushing to production. They build an entire pipeline on gut feeling — and wonder why users complain about hallucinations, latency spikes, and safety leaks.
+
+That discussion triggered the core breakthrough: **The RAG Lab Sandbox.** 🧪
+
+We decided: Don't just build a cooking assistant.
+Build an **industrial, domain-agnostic RAG experimentation workbench** where every architectural layer — chunkers, retrievers, query transforms, and generators — is forced to compete head-to-head on the same ground truth before a single pipeline is locked into production.
+
+The workflow: **1 · Ingest → 2 · Experiment in Sandbox → 3 · Lock What Wins → 4 · Chat.**
+
+The cooking domain was simply our toughest testing ground. Because if your RAG can't reliably distinguish coriander leaves from coriander seeds, or exclude peanuts from a child's breakfast, it has no business handling medical records, legal contracts, or customer support.
+
+---
+
+### 🛠️ The Production Stack Behind the Sandbox
+
+We deployed this live to a self-hosted VPS, proving that an open-source **1.5B model** running 100% on CPU — paired with a Knowledge Graph — can outperform massive proprietary LLMs on safety, speed, and cost.
+
+Here is the engineering architecture:
+
+• **Interactive Frontend**: **Streamlit** multi-page console (`app.py`, `2_RAG_Lab.py`, `3_Kitchen.py`) providing live telemetry, parameter sliders, and side-by-side metric tables.
+• **Asynchronous Backend**: **FastAPI** streaming real-time ingestion chunking and token events over **Server-Sent Events (SSE)**.
+• **Knowledge Graph (Relational Logic)**: **Neo4j Aura** running Cypher queries to enforce strict allergy exclusion pre-filtering (100% compliance) and graph set-difference calculations (pantry inventory matching).
+• **Dense + Lexical Retrieval**: **FAISS** vector store paired with **BM25** lexical search, fused via **Reciprocal Rank Fusion (RRF)**.
+• **100% Local CPU Inference**: Open-source **Qwen2.5-1.5B-Instruct** running entirely on CPU (12 cores, 16 GB RAM, $0 GPU cost) answering in 1.6s to 1.9s.
+• **Document Ingestion**: **PyMuPDF** & **pypdf** for structural PDF slicing + **Playwright** headless browser for dynamic recipe web crawling with JSON-LD schema parsing.
+• **Evaluation & Observability**: **DeepEval** offline LLM-as-a-judge (evaluating Faithfulness, Relevancy, G-Eval Cookability) scored with `gpt-4o-mini`, with 100% execution trace visibility in **LangSmith**.
+• **Deployment**: Fully self-hosted container orchestration via **Docker Compose** on Hostinger VPS.
+
+---
+
+### What the RAG Lab Decides (Before You Lock Production)
+
+In the sandbox, every choice is backed by hard numbers:
+1. **8 Chunking Strategies**: Fixed-window, Recursive, Sentence, Structure-Aware, and 4 Semantic variations benchmarked on Purity, Recall, and Self-Sufficiency. *(Spoiler: The most expensive semantic chunker lost).*
+2. **9 Retrieval Configurations**: Dense vector, Lexical BM25, Hybrid RRF, Cross-Encoders, and Neo4j Graph Pre-Filters compared on Hit@K, MAP, and safety compliance. *(Spoiler: Graph pre-filtering was 23x faster than cross-encoders with 100% allergy safety).*
+3. **4 Generation Strategies**: Strict Stuffing, JSON Schema, Map-Reduce, and Context-Reordering scored on DeepEval Faithfulness. *(Spoiler: Rearranging context order gave +10% faithfulness for free).*
+4. **The Lock**: With one click, your winning benchmark configuration is saved as the production pipeline.
+
+---
+
+🌐 **Try the live app**: https://techideas.tech/  
+💻 **GitHub source**: https://github.com/aru911-gethu/CognitiveKitchen  
+
+Over the next 7 posts, I'll break down the exact benchmark data, the unexpected negative results (HyDE & Semantic Chunking), and the design patterns from every stage.
+
+👇 What's your family's 9:30 PM tiffin debate? And what RAG architecture choice has given your team the biggest headache? Let's discuss in the comments!
+
+#CognitiveKitchen #RAG #GraphRAG #AIProduct #OpenSource #GenAI #Qwen #Neo4j #FAISS #FastAPI #Streamlit #Docker #DeepEval #LangSmith #BuildInPublic
 
 ---
 ---
