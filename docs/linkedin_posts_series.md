@@ -10,8 +10,8 @@
 ## 📌 Episode 1: The 9:30 PM Tiffin Crisis
 
 **Media Attachment**:  
-🎥 Video Walkthrough: `docs/assets/live_demo_walkthrough.webm`  
-📸 Image: `docs/assets/1_ingest_landing.png` (Live Console: 184 recipes · 1,746 graph nodes · 158 ingredients)
+🎥 Video Walkthrough: `docs/assets/live_demo_walkthrough.mp4` (720p Trimmed for LinkedIn, 1280x720, 2m 56s — also at `C:\Users\aru91\Downloads\Video Project 1.mp4`)  
+📸 Image: `docs/assets/1_ingest_landing.png` (Live Console: 184 recipes · 1,746 graph nodes · 158 ingredients · 229 queries)
 
 ---
 
@@ -75,7 +75,7 @@ Over the next 7 posts, I'm opening the kitchen hood — benchmarks, failure mode
 ## 📌 Episode 2: The RAG Lab Sandbox
 
 **Media Attachment**:  
-📸 Image: `docs/assets/2_rag_lab.png` (RAG Lab: 8 chunkers · 9 retrievers · 4 strategies · 1,746 nodes)
+📸 Image: `docs/assets/2_rag_lab.png` (RAG Lab Console: Stage 2 Chunking showing all 8 chunking strategies in clear nomenclature)
 
 ---
 
@@ -128,7 +128,7 @@ Tomorrow in Ep. 3: I benchmarked 8 chunking strategies. The most expensive one l
 ## 📌 Episode 3: Chunking — The Expensive One Lost
 
 **Media Attachment**:  
-📸 Image: `docs/assets/2_rag_lab_expanded.png` (RAG Lab: Stage 2 Chunking benchmark selector)
+📸 Image: `docs/assets/3_chunking_benchmark.png` (RAG Lab: Stage 2 Chunking benchmark table showing Structure-Aware hitting 0.991 recall vs Semantic Adjacent 0.469)
 
 ---
 
@@ -194,7 +194,7 @@ Ep. 4 tomorrow: Our top-scoring retriever had an allergy safety defect that woul
 ## 📌 Episode 4: The Top Retriever Failed Safety
 
 **Media Attachment**:  
-📸 Image: `docs/assets/3_kitchen_nut_free_result.png` (Live App: Allergy test query returning 0 sources / refusal to hallucinate)
+📸 Image: `docs/assets/4_retrieval_benchmark.png` (Stage 3 Retrieval benchmark: Hybrid RRF + Knowledge Graph Pre-Filter hitting 0.850 Hit@5, 100% constraint compliance in 0.7s)
 
 ---
 
@@ -210,19 +210,11 @@ With perfect confidence. 🚑
 
 In Stage 3, I evaluated **9 retrieval configurations** combining **FAISS** (dense vectors) + BM25 (lexical) + Cross-Encoder Rerankers:
 
-Standard metrics ranked **Hybrid Search (RRF: Dense + BM25) + Cross-Encoder Rerank (`bge-reranker-base`)** as #1 ($Hit@5 = 0.700$).
+Standard metrics ranked **Hybrid Search (RRF: Dense + BM25) + Cross-Encoder Rerank (`bge-reranker-base`)** high on Hit@5.
 
-The catch? It scored **40% on constraint compliance.**
+The catch? Without graph filtering, it scored abysmal marks on constraint compliance (returning excluded ingredients 6-9 times out of 10).
 
-That means 6 out of 10 allergy-restricted queries returned the exact excluded ingredient!
-
----
-
-**Why — Semantic Collapse:**
-
-Vector embeddings for *"avoiding nuts"* map directly adjacent to documents dense in nuts. That's how vector embeddings work — topic proximity, not logical exclusion.
-
-The cross-encoder reranker *amplifies* this defect. It is more confident about the wrong answer.
+Why? The cross-encoder reranker *amplifies* topic proximity. It is more confident about the wrong answer.
 
 ---
 
@@ -230,14 +222,16 @@ The cross-encoder reranker *amplifies* this defect. It is more confident about t
 
 Before **FAISS** vectors even run, a Cypher query on **Neo4j Aura** strips out recipes containing excluded ingredients from the candidate set.
 
-📊 **Results:**
+📊 **Live Benchmark Scorecard:**
 
 | Config | Hit@5 | Constraint Respected | Latency |
 |--------|-------|---------------------|---------|
-| Hybrid RRF + Cross-Encoder Rerank (`bge-reranker`) | 0.700 | 40% | 25.8s |
-| **Hybrid RRF + Knowledge Graph Pre-Filter (`Neo4j`)** | **0.700** | **100%** | **1.1s** |
+| Keyword Search (BM25) | 0.500 | 1% | 0.2s |
+| Keyword Search (BM25) + Knowledge Graph Pre-Filter (Neo4j) | 0.600 | 1% | 0.8s |
+| Hybrid Search (RRF: Dense + BM25) | 0.700 | 1% | 0.2s |
+| **Hybrid Search (RRF: Dense + BM25) + Knowledge Graph Pre-Filter (Neo4j)** | **0.850** | **100%** | **0.7s** |
 
-Same retrieval quality. Zero safety violations. **23x faster.**
+Highest retrieval quality (0.850 Hit@5). Zero safety violations (100% compliance). **Sub-second latency (0.7s).**
 
 ---
 
@@ -258,7 +252,7 @@ Ep. 5 next: Why I stopped forcing vector databases to answer relational question
 ## 📌 Episode 5: Not Everything is a Vector Problem
 
 **Media Attachment**:  
-📸 Image: `docs/assets/8_kitchen_pantry_comparison.png` (Live Pantry Audit: Missing ingredients set-difference calculation)
+📸 Image: `docs/assets/8_kitchen_pantry_comparison.png` (Live Pantry Audit: Missing ingredients set-difference & category-safe swap: wheat flour for all-purpose flour)
 
 ---
 
@@ -323,7 +317,7 @@ Ep. 6 tomorrow: +5.5% faithfulness without changing the model or the prompt. �
 ## 📌 Episode 6: Free Faithfulness — No Model Change, No Prompt Change
 
 **Media Attachment**:  
-📸 Image: `docs/assets/7_kitchen_live_chat_response.png` (Live chat telemetry: 5 sources · 6.0s · $0.00077 cost)
+📸 Image: `docs/assets/6_generation_benchmark.png` (RAG Lab Console: Stage 6 Generation benchmark table showing Context-Reordered hitting 0.867 Faithfulness vs Strict Context Stuffing & Map-Reduce)
 
 ---
 
@@ -331,7 +325,7 @@ Same model.
 Same prompt.
 Same retrieved chunks.
 
-**+5.5% DeepEval Faithfulness. For free.**
+**+10.0% DeepEval Faithfulness. For free.**
 
 How? I just changed the **order** of the chunks in the context window. 🤯
 
@@ -341,10 +335,10 @@ In Stage 6, I evaluated 4 generation strategies using **Qwen2.5-1.5B-Instruct** 
 
 | Strategy | Faithfulness | Cookability | s/answer |
 |----------|-------------|-------------|----------|
-| **Context-Reordered (`reordered` - Lost-in-the-Middle Fix)** | **0.760** | 0.525 | 1.6 |
-| Strict Context Stuffing (`stuff_strict` - Grounded Refusal) | 0.720 | 0.600 | 2.0 |
-| Structured JSON Output (`structured`) | 0.749 | 0.480 | 2.3 |
-| Map-Reduce Chunk Summarization (`map_reduce`) | 0.550 | 0.420 | 5.2 |
+| **Context-Reordered (`reordered` - Lost-in-the-Middle Fix)** | **0.867** | **0.720** | **1.9s** |
+| Strict Context Stuffing (`stuff_strict` - Grounded Refusal) | 0.767 | 0.694 | 1.6s |
+| Structured JSON Schema Output (`structured`) | 0.750 | 0.632 | 3.4s |
+| Map-Reduce Chunk Summarization (`map_reduce`) | 0.550 | 0.546 | 5.8s |
 
 `reordered` and `stuff_strict` used the **exact same chunks.**
 Only the order changed.
@@ -356,7 +350,7 @@ Only the order changed.
 LLMs pay maximum attention to context at the **beginning and end** of the prompt window. Information buried in the middle gets overlooked, increasing hallucinations.
 
 By placing high-relevance chunks at prompt boundaries:
-✅ **Faithfulness: +5.5%**
+✅ **Faithfulness: +10.0%** (0.867 vs 0.767)
 ✅ Additional cost: **$0**
 ✅ Additional latency: **0s**
 
@@ -381,8 +375,8 @@ Ep. 7 next: Everything the sandbox proved — now applied to the real 9:30 PM ti
 ## 📌 Episode 7: The Kitchen in Action
 
 **Media Attachment**:  
-🎥 Video Walkthrough: `docs/assets/live_demo_walkthrough.webm`  
-📸 Image: `docs/assets/8_kitchen_pantry_comparison.png` (Live Pantry Audit)
+🎥 Video Walkthrough: `docs/assets/live_demo_walkthrough.mp4` (720p Trimmed for LinkedIn, 1280x720, 2m 56s — also at `C:\Users\aru91\Downloads\Video Project 1.mp4`)  
+📸 Image: `docs/assets/7_kitchen_live_chat_response.png` (Live Kitchen Chat: "suggest something to cook with rava , like a dosa?" · 5 sources · 9.9s · $0.00026)
 
 ---
 
@@ -418,9 +412,9 @@ Here's what happens when you apply all of it to the actual 9:30 PM tiffin proble
 
 3️⃣ **Lock**: The winning config becomes the production pipeline.
 
-4️⃣ **Chat**: Ask: *"What can I make with rice?"*  
-The model answers in 5.2s, cites 5 source recipes, costs **$0.00077** in tokens, and runs a **live pantry audit** with 1 click:  
-*`Plain Savoury Rice — missing 3 of 4 ingredients. Buy: ghee, rice, water.`*
+4️⃣ **Chat**: Ask: *"suggest something to cook with rava , like a dosa?"*  
+The model answers in 9.9s, cites 5 source recipes, costs **$0.00026** in tokens, and runs a **live pantry audit** with 1 click:  
+*`Didir Onion Rava Dosa — missing 8 of 11 ingredients. Buy: asafoetida, cashew, cumin seeds, ginger, green chilli, rice flour, semolina. Swap: no all-purpose flour — use wheat flour, already on your shelf.`*
 
 ---
 
