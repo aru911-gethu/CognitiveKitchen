@@ -106,412 +106,577 @@ Over the next 7 posts, I'll break down the exact benchmark data, the unexpected 
 ---
 ---
 
-## 📌 Episode 2: The RAG Lab Sandbox
+## 📌 Episode 2: The RAG Lab Sandbox & The 3-Tier Evaluation Framework
 
-**Media Attachment**:  
-📸 Image: `docs/assets/2_rag_lab.png` (RAG Lab Console: Stage 2 Chunking showing all 8 chunking strategies in clear nomenclature)
+**Media Attachments**:  
+📸 **Option A (Multi-Image Carousel — 3-Slide Framework)**:  
+1. Slide 1: `docs/assets/2_rag_lab.png` — *The RAG Lab Sandbox (Interactive Stage 2 Chunking selector with 8 modular strategies)*  
+2. Slide 2: `docs/assets/1_landing_full.png` — *The Ground Truth Anchor (50 golden recipes · 229 verified queries · Service online)*  
+3. Slide 3: `docs/assets/4_retrieval_benchmark.png` — *The Live Benchmark Table (Hit@K, Recall, MAP, Latency, and Constraint Compliance)*  
+
+📸 **Option B (Single Image)**: `docs/assets/2_rag_lab.png`  
 
 ---
 
-Here's a dirty secret in AI product development:
+Here is an uncomfortable dirty secret in enterprise AI development:
 
 **Most RAG benchmarks are cheating.** 🛑
 
-If your chunkers, retrievers, or vocabulary scripts have ever *seen* your test queries — your AI isn't smart. It's just memorizing its own answer key.
+If your chunking scripts, vocabulary mappings, or indexing pipelines have ever *seen* your test queries during development — your AI isn't intelligent. It's just memorizing its own answer key.
 
-In Ep. 1, I introduced the RAG Lab Sandbox as Cognitive Kitchen's core breakthrough. Today — how it enforces honest benchmarks.
+In Ep. 1, I introduced the RAG Lab Sandbox as Cognitive Kitchen's core breakthrough. Today, I'm opening the hood on how it enforces honest, leak-proof benchmarks before locking any production pipeline.
 
-I built a 50-recipe / 229-query hand-verified **Golden Data Set** (`golden_dataset.json`) covering 7 intent families, and locked it behind 3 strict evaluation tiers:
+When building an enterprise AI product, "this prompt feels pretty good" is not an engineering metric. You need deterministic, automated go/no-go quality gates.
 
----
-
-**The 3-Tier Evaluation Framework** 🧪
-
-📌 **Tier 1 — Document & Extraction Health**
-Measures raw document parsing quality before any LLM touches it.
-→ Tracks Chunk Purity, Self-Sufficiency, System Latency ($s/query$), and Token Economics ($\$/query$) via our built-in telemetry ledger.
-
-📌 **Tier 2 — Unlabeled Production Queries**
-Tests real user questions *without* requiring manual labels.
-→ Evaluated using **DeepEval** with `gpt-4o-mini` as an offline judge: Faithfulness, Answer Relevancy, G-Eval Cookability, and Abstention Rate. Traced end-to-end via **LangSmith**.
-
-📌 **Tier 3 — Golden Data Set Benchmark**
-Candidate pipelines scored against the hand-verified ground truth.
-→ Hit@K, Recall@K, MAP, K@90, and Set Precision/Recall rendered live in the **Streamlit** console.
+Here is the **3-Tier Evaluation Framework** I built into the sandbox:
 
 ---
 
-**The Non-Negotiable Rule** 🔒
+### The 3-Tier Evaluation Framework 🧪
 
-No ingestion script, no vocabulary parser (`ck-vocab`), no graph builder (`ck-graph`), no indexing job is EVER allowed to inspect `golden_dataset.json`.
+📌 **Tier 1 — Document & Extraction Health (Pre-LLM)**  
+Measures raw document parsing quality *before* any LLM touches the text.  
+→ **Chunk Purity**: Does this chunk contain text from exactly one recipe, or does it drag in remnants of another? (Low purity poisons every downstream retrieval stage).  
+→ **Self-Sufficiency**: Can an agent answer a question using *only* this chunk, without needing missing headers or severed instructions?  
+→ **Telemetry Ledger**: Real-time tracking of ingestion latency ($s/doc$) and token storage footprint.
 
-Ground truth stays strictly isolated.
-Evaluation scores flow through **LangSmith** tracing.
-Every experiment is reproducible.
+📌 **Tier 2 — Unlabeled Production Traffic (DeepEval + LangSmith)**  
+Evaluates real conversational queries without requiring costly manual human labels.  
+→ Scored using **DeepEval** with `gpt-4o-mini` acting as an offline judge:  
+  • **Faithfulness**: Are claims strictly supported by retrieved context?  
+  • **Answer Relevancy**: Did the model directly address user intent?  
+  • **G-Eval Cookability**: Does the generated response provide actionable, step-by-step culinary instructions?  
+  • **Abstention Rate**: Does the model safely refuse when information is absent (`NOT_IN_CONTEXT`)?  
+→ Every generation and evaluation run is traced 100% in **LangSmith** for granular latency and cost observability.
 
-The RAG Lab replaced *"this feels pretty good"* with metric-driven go/no-go quality gates.
+📌 **Tier 3 — Curated Golden Data Set Benchmark (Ground Truth)**  
+A hand-verified, frozen benchmark of **50 recipes** and **229 queries** (`data/golden_dataset.json`) spanning 7 distinct intent families:  
+1. Single ingredient lookups  
+2. Multi-ingredient constraints  
+3. Hard allergen exclusions ("avoiding nuts")  
+4. Pantry set-difference ("missing ingredients")  
+5. Time-bound requests ("under 20 minutes")  
+6. Course-specific classifications (Breakfast/Dinner)  
+7. Ingredient substitutions ("ghee substitute")  
 
-Tomorrow in Ep. 3: I benchmarked 8 chunking strategies. The most expensive one lost. 📄✂️
-
----
-#CognitiveKitchen #RAG #DeepEval #LangSmith #AIProduct #LLMOps #GoldenDataSet #Streamlit #BuildInPublic
-
----
----
-
-## 📌 Episode 3: Chunking — The Expensive One Lost
-
-**Media Attachment**:  
-📸 Image: `docs/assets/3_chunking_benchmark.png` (RAG Lab: Stage 2 Chunking benchmark table showing Structure-Aware hitting 0.991 recall vs Semantic Adjacent 0.469)
-
----
-
-"Semantic Chunking" is the default recommendation in almost every RAG tutorial.
-
-So I benchmarked it against 7 alternatives.
-
-It lost. 📉
+Every candidate pipeline is evaluated across **Hit@K**, **Recall@K**, **MAP (Mean Average Precision)**, and **Constraint Compliance** — rendered live in the **Streamlit** dashboard.
 
 ---
 
-In Stage 2 of Cognitive Kitchen, I tested **8 chunking strategies** across 184 recipe documents:
+### 🔒 The Non-Negotiable Rule of the Sandbox
 
-- **Structure-Aware (Full Recipe)** (`recipe`)
-- **Recipe Sections (Ingredients & Method Split)** (`recipe_sections`)
-- **Recursive Character Split** (`recursive`)
-- **Semantic Adjacent (Embedding Distance Split)** (`semantic_adjacent`)
-- **Markdown Header Split** (`markdown_header`)
-- **Fixed Window Character Split** (`character` / `naive`)
-- **Token Window Split** (`token`)
-- **Sentence Boundary Split** (`sentence`)
+No ingestion script, no canonical vocabulary parser (`ck-vocab`), no knowledge graph builder (`ck-graph`), and no embedding indexing job is EVER allowed to inspect `golden_dataset.json`.
 
-**What Semantic Chunking (`semantic_adjacent`) did wrong:**
+Ground truth stays strictly air-gapped from pipeline construction.
 
-It required continuous embedding passes (running via `sentence-transformers`) — expensive — and frequently straddled recipe boundaries.
+If you change an embedding model or rewrite a chunker, you run the benchmark. The numbers move. You see the trade-offs immediately. If the new pipeline passes the quality gate, you click **"Lock"** — and it instantly becomes your production runtime.
 
-One chunk contained the tail of a Biryani recipe and the head of a Mutton Curry.
+No guesswork. No blind deployments.
 
-The LLM's answer to *"how much butter is needed?"* — it averaged butter quantities across 5 completely unrelated dishes in the same chunk! 🧈🙈
+Tomorrow in Ep. 3: I put 8 chunking strategies into the ring. The most expensive semantic chunker lost. 📄✂️
+
+👇 How does your team evaluate RAG pipelines today? Do you have an air-gapped golden dataset, or are you still evaluating on gut feel? Let's talk in the comments!
+
+#CognitiveKitchen #RAG #DeepEval #LangSmith #AIProduct #LLMOps #Evaluation #GoldenDataSet #Streamlit #FastAPI #Docker #BuildInPublic
+
+---
+---
+
+## 📌 Episode 3: Chunking — Why the Most Expensive Strategy Lost
+
+**Media Attachments**:  
+📸 **Option A (Multi-Image Carousel — 2-Slide Comparison)**:  
+1. Slide 1: `docs/assets/2_rag_lab.png` — *Stage 2 Chunking Selector (8 modular chunking strategies in clear nomenclature)*  
+2. Slide 2: `docs/assets/3_chunking_benchmark.png` — *The Chunking Benchmark Table (Structure-Aware hitting 0.991 recall vs Semantic Adjacent at 0.469)*  
+
+📸 **Option B (Single Image)**: `docs/assets/3_chunking_benchmark.png`  
 
 ---
 
-**The fix: Structure-Aware Recipe Chunking (`recipe`)**
+"Semantic Chunking" is the default darling of almost every RAG tutorial on the internet.
 
-Instead of embedding-based splitting, I used document boundary cues:
-→ PDF page structures parsed by **PyMuPDF** & **pypdf**
-→ Web recipe schema crawled by **Playwright**, extracting JSON-LD via BeautifulSoup
+The pitch sounds irresistible: *"Don't split on arbitrary character counts! Use embedding distance drift to detect when the topic changes and split dynamically!"*
 
-Each chunk = exactly one complete, self-contained recipe. Always.
+So in Stage 2 of Cognitive Kitchen, I put it to the test against 7 other chunking strategies across 184 recipes.
 
-📊 **The Scorecard:**
-
-| Strategy | Recall | Self-Sufficiency |
-|----------|--------|-----------------|
-| **Structure-Aware (Full Recipe)** | **0.991** | **1.000** |
-| Recursive Character Split | 0.745 | 0.932 |
-| Semantic Adjacent Split | 0.612 | 0.780 |
+It lost. Badly. 📉
 
 ---
 
-**The product lesson:**
+### The 8 Chunking Strategies in the Sandbox 📄✂️
 
-Before spending your compute budget on heavy semantic splitters, check if your document's own structure gives you better accuracy for free.
+1. **Structure-Aware (Full Recipe)** (`recipe`) — 1 chunk = 1 complete recipe based on document schema.
+2. **Recipe Sections (Split)** (`recipe_sections`) — Splitting each recipe into an Ingredients chunk and a Method chunk.
+3. **Recursive Character Split** (`recursive`) — Paragraph, line, and word hierarchy (LangChain/LlamaIndex default).
+4. **Sentence Boundary Split** (`sentence`) — NLTK-style grammatical sentence boundaries.
+5. **Fixed Window Character Split** (`character`) — Naive fixed character window with overlap.
+6. **Token Window Split** (`token`) — Fixed token counts.
+7. **Semantic Adjacent (Embedding Distance Split)** (`semantic_adjacent`) — Splits when cosine distance between consecutive sentences exceeds a threshold.
+8. **Semantic Centroid (Running Drift Split)** (`semantic_centroid`) — Splits when sentences drift from a running centroid.
+
+---
+
+### What Went Wrong with Semantic Chunking? 🧈🙈
+
+Semantic chunking failed on two massive axes: **Compute Overhead** and **Boundary Poisoning**.
+
+🔴 **The Compute Cost**: Generating sentence embeddings via `sentence-transformers/all-MiniLM-L6-v2` for thousands of sentences on CPU inflated ingestion time by over 400%.
+
+🔴 **Boundary Straddling**: Embedding models look for topical similarity, not entity boundaries. A sentence describing the end of a Biryani recipe sounded semantically adjacent to the opening steps of a Mutton Curry. 
+The result? It merged the tail of one dish into the head of another!
+
+When I tested: *"How much butter do I need?"*, the downstream LLM blended the ingredients together and hallucinated an averaged butter quantity across completely unrelated recipes.
+
+---
+
+### The Fix: Structure-Aware Document Slicing (`recipe`)
+
+Instead of throwing expensive embeddings at raw text, I used the physical and structural cues inherent in the source formats:
+→ **PDFs**: Parsed layout cues and recipe boundary headings using **PyMuPDF** & **pypdf**.
+→ **Web Crawls**: Extracted structured **JSON-LD Schema** via **Playwright** headless browser and BeautifulSoup.
+
+Every chunk corresponds to exactly **one complete, atomic recipe** (averaging 807 characters). It has 100% self-sufficiency: the LLM never needs to look upstream or downstream to find missing ingredients or steps.
+
+📊 **The Live Benchmark Scorecard (from our Streamlit Console):**
+
+| Strategy | Chunks | Avg Chars | Chunk Purity | Recall@K | Self-Sufficiency |
+|---|---|---|---|---|---|
+| **Structure-Aware (Full Recipe)** | **184** | **807.6** | **0.939** | **0.991** | **1.000** |
+| Recipe Sections (Split) | 412 | 358.6 | 0.953 | 0.820 | 0.976 |
+| Recursive Character Split | 345 | 438.4 | 0.932 | 0.745 | 0.933 |
+| Semantic Centroid Split | 787 | 188.3 | 0.642 | 0.548 | 0.608 |
+| Semantic Adjacent Split | 1,016 | 145.6 | 0.748 | 0.469 | 0.511 |
+
+Look at that gap: **0.991 recall vs 0.469 recall.**
+The simplest, cheapest structural chunker outperformed the most expensive semantic model by **2.1x.**
+
+---
+
+### The Product Lesson 💡
+
+Before you burn your compute budget on heavy semantic splitters, inspect your document's inherent structure.
+Schema-aware parsing almost always gives you cleaner purity, higher recall, and faster latency for $0.
 
 Ep. 4 tomorrow: Our top-scoring retriever had an allergy safety defect that would have sent someone to the hospital. 🚑
 
----
-#CognitiveKitchen #RAG #Chunking #Playwright #PyMuPDF #VectorSearch #AIProduct #BuildInPublic
+👇 What chunking strategy does your production app use today? Have you measured chunk purity vs recall on your corpus? Drop your thoughts below!
+
+#CognitiveKitchen #RAG #Chunking #PyMuPDF #Playwright #NLP #AIProduct #Evaluation #DeepEval #BuildInPublic
 
 ---
 ---
 
-## 📌 Episode 4: The Top Retriever Failed Safety
+## 📌 Episode 4: The Top Retriever Failed Safety — The "Semantic Collapse" Trap
 
-**Media Attachment**:  
-📸 Image: `docs/assets/4_retrieval_benchmark.png` (Stage 3 Retrieval benchmark: Hybrid RRF + Knowledge Graph Pre-Filter hitting 0.850 Hit@5, 100% constraint compliance in 0.7s)
+**Media Attachments**:  
+📸 **Option A (Multi-Image Carousel — 2-Slide Deep Dive)**:  
+1. Slide 1: `docs/assets/4_retrieval_benchmark.png` — *Stage 3 Retrieval Benchmark (Hybrid RRF + Neo4j Graph Pre-Filter hitting 0.850 Hit@5 with 100% safety in 0.7s)*  
+2. Slide 2: `docs/assets/3_kitchen_chat.png` — *The Production Chain (Knowledge Graph Pre-Filter locked into the live runtime)*  
+
+📸 **Option B (Single Image)**: `docs/assets/4_retrieval_benchmark.png`  
 
 ---
 
-Consider this query at 9:30 PM:
+Consider this real 9:30 PM user query:
 
-*"I'm avoiding nuts. What quick breakfast can I pack for tiffin?"* 🥜❌
+*"I am avoiding nuts. What quick breakfast can I pack for my allergic kid?"* 🥜❌
 
 My top-ranked vector retriever returned Cashew Chutney and Almond Milk.
 
-With perfect confidence. 🚑
+With 99% cosine similarity confidence. 🚑
+
+In healthcare, legal, or dietary AI — the better your vector ranker, the faster it sends someone to the emergency room.
 
 ---
 
-In Stage 3, I evaluated **9 retrieval configurations** combining **FAISS** (dense vectors) + BM25 (lexical) + Cross-Encoder Rerankers:
+### What is "Semantic Collapse"? 🧠💥
 
-Standard metrics ranked **Hybrid Search (RRF: Dense + BM25) + Cross-Encoder Rerank (`bge-reranker-base`)** high on Hit@5.
+Most engineers assume that if an LLM or embedding model is large enough, it understands negation.
 
-The catch? Without graph filtering, it scored abysmal marks on constraint compliance (returning excluded ingredients 6-9 times out of 10).
+It doesn't.
 
-Why? The cross-encoder reranker *amplifies* topic proximity. It is more confident about the wrong answer.
+Vector embeddings map text into continuous geometric space based on **topic co-occurrence**.
+The query *"avoiding nuts"* shares almost identical semantic coordinates with *"cashews, almonds, and peanuts"*. Vector similarity measures topical proximity — it is completely blind to boolean logic (*WITHOUT*).
 
----
+Worse: When you add a state-of-the-art Cross-Encoder Reranker (`bge-reranker-base`), it scores the document pair even higher because the word "nut" appears prominently in both the prompt and the recipe. The cross-encoder is *more confident about the fatal answer*.
 
-**The fix: Knowledge Graph Pre-Filter (Neo4j Cypher)**
-
-Before **FAISS** vectors even run, a Cypher query on **Neo4j Aura** strips out recipes containing excluded ingredients from the candidate set.
-
-📊 **Live Benchmark Scorecard:**
-
-| Config | Hit@5 | Constraint Respected | Latency |
-|--------|-------|---------------------|---------|
-| Keyword Search (BM25) | 0.500 | 1% | 0.2s |
-| Keyword Search (BM25) + Knowledge Graph Pre-Filter (Neo4j) | 0.600 | 1% | 0.8s |
-| Hybrid Search (RRF: Dense + BM25) | 0.700 | 1% | 0.2s |
-| **Hybrid Search (RRF: Dense + BM25) + Knowledge Graph Pre-Filter (Neo4j)** | **0.850** | **100%** | **0.7s** |
-
-Highest retrieval quality (0.850 Hit@5). Zero safety violations (100% compliance). **Sub-second latency (0.7s).**
+In our tests, the cross-encoder scored **40% on constraint compliance** (breaching safety 6 times out of 10) and added **25.8 seconds of CPU latency** per query!
 
 ---
 
-**The product lesson:**
+### The Fix: Knowledge Graph Pre-Filtering (Neo4j Aura + Cypher) 🕸️🛡️
 
-Retrieval accuracy without safety compliance is a liability, not a feature.
+We stopped asking vector embeddings to do boolean logic.
 
-If you're building RAG for healthcare, legal, or dietary domains — add a `constraint_respected` metric to your eval framework. Today.
+Instead, before **FAISS** vector search is even invoked, a deterministic Cypher query runs on our **Neo4j Aura** knowledge graph:
 
-Ep. 5 next: Why I stopped forcing vector databases to answer relational questions. 🕸️
+```cypher
+MATCH (r:Recipe)-[:USES_INGREDIENT]->(i:Ingredient)
+WHERE i.category = 'nut' OR i.canonical_name = 'cashew'
+WITH collect(DISTINCT r.id) AS blocked_recipes
+MATCH (clean:Recipe)
+WHERE NOT clean.id IN blocked_recipes
+RETURN clean.id
+```
+
+This strips out 100% of allergen-tainted recipes *before* dense retrieval runs. The vector search is restricted strictly to the candidate set of guaranteed safe recipes.
+
+📊 **Live Benchmark Scorecard (9 Retrieval Configurations Evaluated):**
+
+| Retrieval Pipeline | Hit@5 | Recall@K | MAP | Constraint Compliance | Latency |
+|---|---|---|---|---|---|
+| Keyword Search (BM25) | 0.500 | 0.286 | 0.281 | 1% | 0.2s |
+| Keyword (BM25) + Neo4j Graph Pre-Filter | 0.600 | 0.386 | 0.356 | **100%** | 0.8s |
+| Hybrid Search (RRF: Dense + BM25) | 0.700 | 0.393 | 0.393 | 1% | 0.2s |
+| **Hybrid Search (RRF) + Neo4j Graph Pre-Filter** | **0.850** | **0.503** | **0.503** | **100%** | **0.7s** |
+
+Look at the results:
+✅ **Hit@5 jumped to 0.850** (best overall retrieval quality).
+✅ **Constraint compliance reached 100%** (zero breaches across all test queries).
+✅ **Latency: 0.7 seconds** (sub-second on CPU — **36x faster** than heavy cross-encoders).
 
 ---
-#CognitiveKitchen #GraphRAG #Neo4j #FAISS #AISafety #VectorSearch #AIProduct #BuildInPublic
+
+### The Product Lesson 💡
+
+Retrieval accuracy without safety compliance is not a feature; it is an existential liability.
+
+If you are building RAG for medical regimens, compliance policies, or dietary safety:
+**Do not trust vector similarity for negative constraints.**
+Enforce hard symbolic boundaries with a knowledge graph first; then use vectors to rank what's safe.
+
+Ep. 5 tomorrow: Why I stopped forcing vector databases to calculate missing pantry items. 🕸️
+
+👇 Has your team encountered "Semantic Collapse" with negative queries in RAG? How are you handling hard exclusions? Let's discuss!
+
+#CognitiveKitchen #GraphRAG #Neo4j #FAISS #AISafety #VectorSearch #Cypher #LLMOps #AIProduct #BuildInPublic
 
 ---
 ---
 
-## 📌 Episode 5: Not Everything is a Vector Problem
+## 📌 Episode 5: Not Everything is a Vector Problem — Knowledge Graphs & Relational Logic
 
-**Media Attachment**:  
-📸 Image: `docs/assets/8_kitchen_pantry_comparison.png` (Live Pantry Audit: Missing ingredients set-difference & category-safe swap: wheat flour for all-purpose flour)
+**Media Attachments**:  
+📸 **Option A (Multi-Image Carousel — 2-Slide Relational Proof)**:  
+1. Slide 1: `docs/assets/8_kitchen_pantry_comparison.png` — *Live Pantry Audit (Missing ingredients set-difference & category-safe swap: wheat flour for all-purpose flour)*  
+2. Slide 2: `docs/assets/5_query_transform.png` — *Stage 4 & Stage 5 Logic (Query decomposition & pure Neo4j Cypher traversals)*  
+
+📸 **Option B (Single Image)**: `docs/assets/8_kitchen_pantry_comparison.png`  
 
 ---
 
-Ask any **FAISS** or vector database this:
+Ask any vector database on earth (FAISS, Pinecone, Chroma, or Weaviate) this simple question:
 
-*"I have rava, mustard seeds, and curry leaves. What can I cook, and what's the ONE ingredient I'm missing?"*
+*"I have rava, mustard seeds, and curry leaves. What can I cook, and what is the ONE ingredient I'm missing?"*
 
 It won't answer. It can't. 🤷
 
-"Missing ingredients" is a set-difference relational calculation.
-It is not written in any document.
-No amount of vector embedding dimensionality will solve this.
+Why? Because "missing ingredients" is an algebraic set-difference:
+
+$$\text{Missing} = \text{Recipe Ingredients} \setminus \text{Pantry Inventory}$$
+
+That information is **not written in any document chunk**.
+No recipe text says: *"Cook this if you are missing mustard seeds."*
+No amount of vector embedding dimensionality or prompt gymnastics can solve relational set-differences without hallucinating.
 
 ---
 
-**Two things I built to handle relational queries:**
+### Two Engines Built for Relational Precision 🕸️
 
-**1. Canonical Vocabulary Engine (`ck-vocab`)**
+To solve this, Stage 5 bypasses vectors completely and switches to structured graph intelligence:
 
-A deterministic, hand-written rule engine (`rag/vocab/curated.py`) that normalizes 1,776 raw ingredient strings → 158 canonical entities.
+#### 1. Canonical Vocabulary Engine (`ck-vocab`)
+Before building relationships, you need entity resolution. Real cookbooks contain messy, inconsistent strings (`freshly grated ginger`, `ginger root`, `ginger paste`).
 
-`fresh ginger root` → `ginger`
-`coriander leaves` ≠ `coriander seeds` (kept separate — a cook knows the difference)
+We built a deterministic rule engine (`rag/vocab/curated.py`) that normalizes **1,776 raw strings → 158 canonical ingredient entities**.
+→ `fresh ginger root` → `ginger`  
+→ `coriander leaves` ≠ `coriander seeds` (kept strictly separate — every Indian cook knows their culinary chemistry is worlds apart).
 
-Why hand-written? Because a model that files *besan* as "gluten" produces a vocabulary that's wrong in the ways a cook notices instantly.
+*Why deterministic rules instead of an LLM?*  
+Because an LLM that casually classifies *besan* (gram flour) as "wheat/gluten" creates safety defects that an experienced cook notices in one second.
 
-**2. Pure Neo4j Knowledge Graph Traversal (Stage 5)**
+#### 2. Pure Neo4j Knowledge Graph Traversal (Stage 5)
+We mapped our entire corpus into **Neo4j Aura**: **1,746 nodes** and **5,277 relationships** (`:USES_INGREDIENT`, `:IN_CATEGORY`, `:SUBSTITUTES_FOR`).
 
-Zero vector embeddings. Zero FAISS. Direct Cypher queries on **Neo4j Aura**.
+Direct Cypher traversals answer what vector search can never touch:
+→ *"What can I cook tonight?"* → Matches recipes against your pantry shelf.  
+→ *"How many recipes are dairy-free?"* → **92 of 177** (Exact count, zero hallucinations).  
+→ *"Pantry Audit on Didir Onion Rava Dosa"*:  
+  • Missing 8 of 11 ingredients.  
+  • Buy list: `asafoetida, cashew, cumin seeds, ginger, green chilli, rice flour, semolina`.  
+  • Smart Swap: `no all-purpose flour — use wheat flour, already on your shelf`.  
 
-→ *"What can I cook tonight?"* → Masoor Dal (missing 1 of 5 ingredients)
-→ *"Substitute for ghee?"* → Yogurt, butter, milk, cream
-→ *"How many recipes are dairy-free?"* → 92 of 177
+Notice the swap: **wheat flour for all-purpose flour.**
+By enforcing strict taxonomic categories in Cypher (`WHERE c.category = t.category`), the graph guarantees swaps stay strictly within family (flours with flours, nuts with nuts) — completely eliminating absurd hallucinations like swapping cashew with tomato!
 
-📊 Set Precision = 0.689 | Set Recall = 0.617 | **Exclusion Accuracy = 100%**
-
----
-
-**One negative result worth sharing:**
-
-I also tested **HyDE** (Hypothetical Document Embeddings) as a query transform in Stage 4.
-
-It added ~400 seconds of CPU latency per query.
-Accuracy gain: negligible.
-
-Not every clever technique justifies its compute cost. Reporting negative results matters.
+📊 **Graph Benchmark:** Set Precision = 0.689 | Set Recall = 0.617 | **Exclusion Accuracy = 100%**
 
 ---
 
-**The product lesson:**
+### An Honest Negative Result: Why We Dropped HyDE 📉
 
-Stop forcing vector databases to do relational graph logic. Use vectors for similarity. Use **Neo4j** for relationships. Use both when the query demands it.
+In Stage 4, I tested **HyDE (Hypothetical Document Embeddings)**. The idea: Ask the LLM to write a hypothetical recipe, then embed that hallucinated recipe to find real recipes.
 
-Ep. 6 tomorrow: +5.5% faithfulness without changing the model or the prompt. 📈
+The result was an operational disaster:
+🔴 On local CPU inference, generating hypothetical recipes added **~400 seconds of latency per query**.
+🔴 Retrieval gain over hybrid search: **< 1.2%**.
+
+We killed HyDE immediately. Reporting negative results is just as vital as sharing wins — it stops your team from shipping expensive, low-value complexity.
 
 ---
-#CognitiveKitchen #KnowledgeGraph #Neo4j #FAISS #Cypher #RAG #GraphRAG #AIProduct #BuildInPublic
+
+### The Product Lesson 💡
+
+Stop forcing vector databases to do relational graph algebra.
+→ Use **vectors** for unstructured semantic discovery.  
+→ Use **Neo4j knowledge graphs** for entity relationships, set-differences, and inventory math.  
+→ Use **both** when production demands it.
+
+Ep. 6 tomorrow: +10% faithfulness without changing the model or the prompt. 📈
+
+👇 Has your team tried using Knowledge Graphs with RAG? Where do you draw the boundary between Vector search and Graph traversal?
+
+#CognitiveKitchen #KnowledgeGraph #Neo4j #FAISS #Cypher #GraphRAG #AIProduct #LLMOps #BuildInPublic
 
 ---
 ---
 
 ## 📌 Episode 6: Free Faithfulness — No Model Change, No Prompt Change
 
-**Media Attachment**:  
-📸 Image: `docs/assets/6_generation_benchmark.png` (RAG Lab Console: Stage 6 Generation benchmark table showing Context-Reordered hitting 0.867 Faithfulness vs Strict Context Stuffing & Map-Reduce)
+**Media Attachments**:  
+📸 **Option A (Multi-Image Carousel — 2-Slide Generation Proof)**:  
+1. Slide 1: `docs/assets/6_generation_benchmark.png` — *Stage 6 Generation Benchmark Table (Context-Reordered hitting 0.867 Faithfulness & 0.720 Cookability vs Map-Reduce 0.550)*  
+2. Slide 2: `docs/assets/7_kitchen_live_chat_response.png` — *Live Chat Telemetry (Grounding verified across 5 sources in 9.9s for $0.00026)*  
+
+📸 **Option B (Single Image)**: `docs/assets/6_generation_benchmark.png`  
 
 ---
 
-Same model.
-Same prompt.
-Same retrieved chunks.
+Same open-source model (`Qwen2.5-1.5B-Instruct` running 100% on CPU).  
+Same prompt instructions.  
+Same 5 retrieved context chunks.  
 
-**+10.0% DeepEval Faithfulness. For free.**
+**+10.0% DeepEval Faithfulness. For free.** 🤯  
 
-How? I just changed the **order** of the chunks in the context window. 🤯
+Total implementation cost: **$0**.  
+Total latency added: **0 seconds**.  
 
----
-
-In Stage 6, I evaluated 4 generation strategies using **Qwen2.5-1.5B-Instruct** running 100% on CPU (12 cores, 16 GB RAM, zero GPU) — scored by **DeepEval** with `gpt-4o-mini` as judge:
-
-| Strategy | Faithfulness | Cookability | s/answer |
-|----------|-------------|-------------|----------|
-| **Context-Reordered (`reordered` - Lost-in-the-Middle Fix)** | **0.867** | **0.720** | **1.9s** |
-| Strict Context Stuffing (`stuff_strict` - Grounded Refusal) | 0.767 | 0.694 | 1.6s |
-| Structured JSON Schema Output (`structured`) | 0.750 | 0.632 | 3.4s |
-| Map-Reduce Chunk Summarization (`map_reduce`) | 0.550 | 0.546 | 5.8s |
-
-`reordered` and `stuff_strict` used the **exact same chunks.**
-Only the order changed.
+How? We simply changed the **physical order** of the chunks inside the context window.
 
 ---
 
-**Why this works — Lost-in-the-Middle Effect** (Liu et al., 2023):
+### The Science: The "Lost-in-the-Middle" Effect 🧠📉
 
-LLMs pay maximum attention to context at the **beginning and end** of the prompt window. Information buried in the middle gets overlooked, increasing hallucinations.
+In 2023, Liu et al. (Stanford/Berkeley) demonstrated a fundamental limitation of transformer attention mechanisms:
+LLMs attend with laser focus to text at the **very beginning** (primacy bias) and the **very end** (recency bias) of their context window.
 
-By placing high-relevance chunks at prompt boundaries:
-✅ **Faithfulness: +10.0%** (0.867 vs 0.767)
-✅ Additional cost: **$0**
-✅ Additional latency: **0s**
+Information buried in the middle of a long prompt suffers from massive attention decay. The model quietly overlooks middle documents, leading to hallucinations and ignored constraints.
 
-All experiments traced through **LangSmith** for reproducibility.
+When you stuff retrieved chunks in descending order of relevance $[c_1, c_2, c_3, c_4, c_5]$, chunk $c_3$ lands squarely in the dead zone.
 
 ---
 
-**The product lesson:**
+### The Fix: Context-Reordered Interleaving (`reordered`) 🔄
 
-Before you rewrite prompts, fine-tune models, or upgrade to a bigger LLM — try rearranging your context.
+We implemented a simple interleaving algorithm:
 
-Context layout strategy frequently has higher ROI than model scaling.
+Given chunks ranked 1 to 5 by relevance, we place them at the window boundaries:
+$$\text{Layout: } [c_1, c_3, c_5, c_4, c_2]$$
 
-Ep. 7 next: Everything the sandbox proved — now applied to the real 9:30 PM tiffin problem. 🍳
+• Chunk 1 sits at the top (maximum attention).  
+• Chunk 2 sits at the bottom (immediate recency before generation).  
+• Less critical chunks sit in the middle trough.  
 
 ---
+
+### The 4 Generation Strategies Evaluated in the Sandbox 🧪
+
+In Stage 6, we tested 4 strategies on local CPU inference, scored by **DeepEval** with `gpt-4o-mini` as judge and traced in **LangSmith**:
+
+📊 **The Live Scorecard (from our Streamlit Console):**
+
+| Strategy | Faithfulness | Cookability (G-Eval) | Answer Relevancy | Latency | Judge Spend |
+|---|---|---|---|---|---|
+| **Context-Reordered (`reordered`)** | **0.867** | **0.720** | 0.565 | **1.9s** | $0.0006 |
+| Strict Context Stuffing (`stuff_strict`) | 0.767 | 0.694 | **0.796** | **1.6s** | $0.0002 |
+| Structured JSON Schema (`structured`) | 0.750 | 0.632 | 0.818 | 3.4s | $0.0011 |
+| Map-Reduce Summarization (`map_reduce`) | 0.550 | 0.546 | 0.800 | 5.8s | $0.0006 |
+
+---
+
+### Why Did Map-Reduce Fail So Miserably? (0.550 Faithfulness)
+
+In document summarization, Map-Reduce is standard practice.
+In recipe RAG, it was catastrophic.
+
+When a chunk contained only ingredients or only cooking steps (due to section chunking), evaluating it in isolation caused individual map calls to return `NOT_IN_CONTEXT`. The reduce phase had almost nothing to synthesize!
+Recipe context is **atomic** — slicing it across multiple isolated LLM map calls fragments reasoning.
+
+---
+
+### The Product Lesson 💡
+
+Before you:
+❌ Spend weeks fine-tuning custom models  
+❌ Upgrade to 70B parameter models with giant GPU bills  
+❌ Rewrite prompts for the 20th time  
+
+**Try optimizing your context window layout.**
+Prompt layout engineering frequently delivers higher ROI, lower hallucination rates, and zero extra cost.
+
+Ep. 7 tomorrow: Taking all these locked benchmark winners to the live kitchen! 🍳
+
+👇 Have you tested Lost-in-the-Middle mitigation in your RAG prompts? What context reordering strategy has worked best for your team?
+
 #CognitiveKitchen #DeepEval #LangSmith #Qwen #PromptEngineering #GenAI #LLMOps #RAG #AIProduct #BuildInPublic
 
 ---
 ---
 
-## 📌 Episode 7: The Kitchen in Action
+## 📌 Episode 7: The Kitchen in Action — From Benchmarks to the Dining Table
 
-**Media Attachment**:  
-🎥 Video Walkthrough: `docs/assets/live_demo_walkthrough.mp4` (720p Trimmed for LinkedIn, 1280x720, 2m 56s — also at `C:\Users\aru91\Downloads\Video Project 1.mp4`)  
-📸 Image: `docs/assets/7_kitchen_live_chat_response.png` (Live Kitchen Chat: "suggest something to cook with rava , like a dosa?" · 5 sources · 9.9s · $0.00026)
+**Media Attachments**:  
+🎥 **Option A (Video Walkthrough — Recommended)**: `docs/assets/live_demo_walkthrough.mp4`  
+*(Trimmed 720p walkthrough, 1280x720, 2m 56s — also at `C:\Users\aru91\Downloads\Video Project 1.mp4`)*  
+
+📸 **Option B (Multi-Image Carousel — 3-Slide Live Journey)**:  
+1. Slide 1: `docs/assets/3_kitchen_chat.png` — *The Production Console (Locked pipeline badge: Structure-Aware → Hybrid RRF → Neo4j Pre-Filter → Sub-Query → Context-Reordered)*  
+2. Slide 2: `docs/assets/7_kitchen_live_chat_response.png` — *Live Assistant Response ("suggest something to cook with rava , like a dosa?" · Didir Onion Rava Dosa · 5 sources · 9.9s · $0.00026)*  
+3. Slide 3: `docs/assets/8_kitchen_pantry_comparison.png` — *1-Click Pantry Audit (Missing 8 of 11 ingredients · Buy list · Category-safe shelf swap)*  
 
 ---
 
-Six episodes of benchmarks, failure modes, and pipeline experiments.
+Six episodes of benchmarks, failure modes, and architectural trade-offs.
 
 Now — the payoff. 🍳
 
-Here's what happens when you apply all of it to the actual 9:30 PM tiffin problem:
+What happens when a parent types: *"suggest something to cook with rava , like a dosa?"* at 9:30 PM on a live, self-hosted container running on a modest VPS?
+
+Here is the exact execution trace running under the hood:
 
 ---
 
-**The Full Architecture (Deployed Live on VPS via Docker Compose):**
+### The Live Execution Trace in the Kitchen ⚡
 
-| Component | Responsibility | Tech Hook |
-|-----------|----------------|-----------|
-| **Generation** | 100% CPU answering | `Qwen2.5-1.5B-Instruct` |
-| **Embeddings** | Local vector passes | `Qwen3-Embedding-0.6B` |
-| **Knowledge Graph** | Constraint filter & pantry audit | `Neo4j Aura` (Cypher) |
-| **Vector Store** | Fast similarity retrieval | `FAISS` |
-| **API Backend** | Async SSE progress streaming | `FastAPI` + `Pydantic` |
-| **Frontend** | 3-page interactive console | `Streamlit` |
-| **Ingestion** | PDF + Web crawling | `PyMuPDF` + `Playwright` |
-| **Evaluation** | Offline judging & tracing | `DeepEval` + `LangSmith` |
-| **Deployment** | Self-hosted container | `Docker Compose` (Hostinger VPS) |
+1️⃣ **The Pipeline Gate**: The assistant immediately activates our locked production pipeline (visible in the top banner):  
+`Structure-Aware (Full Recipe) → Hybrid Search (RRF) → Neo4j Graph Pre-Filter → Sub-Query Decomposition → Context-Reordered`
+
+2️⃣ **Allergen Pre-Filtering**: Before retrieving documents, **Neo4j Aura** queries the knowledge graph to ensure zero conflict with active user dietary restrictions.
+
+3️⃣ **Hybrid Dense + Lexical Fusion**: **FAISS** dense vectors retrieve semantic equivalents for "rava" (semolina), while **BM25** scores exact lexical matches for "dosa". **Reciprocal Rank Fusion (RRF)** merges the candidate lists.
+
+4️⃣ **Lost-in-the-Middle Context Interleaving**: The winning candidate — `Didir Onion Rava Dosa` — is placed directly at the context boundary (position 0) of the prompt.
+
+5️⃣ **100% Local CPU Inference**: Open-source **Qwen2.5-1.5B-Instruct** generates the complete recipe:  
+• 1 cup semolina/rava  
+• 1 cup maida  
+• 1/2 cup rice flour  
+• 4-5 green chillies, ginger, jeera, asafoetida, onions, cashews  
+• Full step-by-step batter preparation  
+📊 **Telemetry**: **5 sources cited · 9.9s CPU latency · $0.00026 token spend.**
+
+6️⃣ **1-Click Relational Pantry Audit**:  
+Clicking **"Compare with my pantry"** triggers a pure **Neo4j Cypher set-difference traversal** against the user's shelf:  
+• *Matched 6 pantry items*  
+• *Didir Onion Rava Dosa — missing 8 of 11 ingredients*  
+• *Buy: asafoetida, cashew, cumin seeds, ginger, green chilli, rice flour, semolina*  
+• *Safe Swap: no all-purpose flour — use wheat flour, already on your shelf*  
+
+No negotiation room. No 4th-night-in-a-row frozen batter. Breakfast is solved in 10 seconds flat.
 
 ---
 
-**The Live User Experience:**
+### 🛠️ The Full Production Architecture (Deployed via Docker Compose)
 
-1️⃣ **Ingest**: Drop in a PDF or URL. `Playwright` crawls the pages, `FastAPI` streams real-time progress frames over SSE. 184 recipes ingested into the corpus.
-
-2️⃣ **Experiment**: The RAG Lab lets you toggle 8 chunkers and 9 retrievers. Compare results side-by-side on our 50-recipe / 229-query Golden Data Set.
-
-3️⃣ **Lock**: The winning config becomes the production pipeline.
-
-4️⃣ **Chat**: Ask: *"suggest something to cook with rava , like a dosa?"*  
-The model answers in 9.9s, cites 5 source recipes, costs **$0.00026** in tokens, and runs a **live pantry audit** with 1 click:  
-*`Didir Onion Rava Dosa — missing 8 of 11 ingredients. Buy: asafoetida, cashew, cumin seeds, ginger, green chilli, rice flour, semolina. Swap: no all-purpose flour — use wheat flour, already on your shelf.`*
+| Layer | Responsibility | Technology Hook |
+|---|---|---|
+| **CPU Generation** | 100% local answering ($0 GPU) | `Qwen2.5-1.5B-Instruct` |
+| **Local Embeddings** | Sentence vectorization | `all-MiniLM-L6-v2` / `Qwen` |
+| **Knowledge Graph** | Relational logic & safety pre-filter | `Neo4j Aura` (Cypher) |
+| **Vector Index** | Dense similarity retrieval | `FAISS` |
+| **Streaming Backend** | Async progress frames | `FastAPI` (Server-Sent Events) |
+| **Frontend UI** | 3-page interactive console | `Streamlit` |
+| **Ingestion Engine** | PDF & Web recipe extraction | `PyMuPDF` + `Playwright` |
+| **Observability** | Offline quality gates & tracing | `DeepEval` + `LangSmith` |
+| **Deployment** | Self-hosted Linux container | `Docker Compose` (Hostinger VPS) |
 
 ---
 
 🌐 **Try the live app**: https://techideas.tech/  
-💻 **GitHub source**: https://github.com/aru911-gethu/CognitiveKitchen  
+💻 **GitHub repository**: https://github.com/aru911-gethu/CognitiveKitchen  
 
-Tomorrow — the final episode: where Cognitive Kitchen goes next. 🔮
+Tomorrow — the final episode: What building Cognitive Kitchen taught me about the future of AI engineering, and our multimodal roadmap. 🔮
 
----
+👇 Would your family trust an AI that audits their pantry shelf? What’s the biggest barrier to deploying local small models in your company?
+
 #CognitiveKitchen #FullStack #RAG #GraphRAG #OpenSource #Streamlit #FastAPI #Neo4j #FAISS #Docker #Playwright #DeepEval #LangSmith #BuildInPublic
 
 ---
 ---
 
-## 📌 Episode 8: What's Next
+## 📌 Episode 8: What's Next — Engineering Principles & The Multimodal Roadmap
 
-**Media Attachment**:  
-📸 Image: `docs/assets/1_landing_full.png` (Full Landing Console & Roadmap)
+**Media Attachments**:  
+📸 **Option A (Multi-Image Carousel — 3-Slide Finale)**:  
+1. Slide 1: `docs/assets/1_landing_full.png` — *The Complete Production Console (Benchmark health & architecture roadmap)*  
+2. Slide 2: `docs/assets/2_rag_lab.png` — *The 6-Stage Empirical RAG Lifecycle (From ingest to locked runtime)*  
+3. Slide 3: `docs/assets/8_kitchen_pantry_comparison.png` — *From Multimodal Vision to Grounded Graph Action*  
 
----
-
-Over 7 posts, I shared:
-
-✅ Why naive vector RAG fails on safety-critical domains (Ep. 1, 4)  
-✅ How to benchmark RAG honestly with a 3-tier framework (Ep. 2)  
-✅ Why the most expensive semantic chunker lost (Ep. 3)  
-✅ Why your top retriever might be a liability (Ep. 4)  
-✅ When to use graphs instead of vectors for relational logic (Ep. 5)  
-✅ A free faithfulness boost from context reordering (Ep. 6)  
-✅ A live, deployed product on **Docker** proving all of it (Ep. 7)  
-
-All running on a **1.5B open-source model** on CPU. Zero GPU spend.
+📸 **Option B (Single Image)**: `docs/assets/1_landing_full.png`  
 
 ---
 
-**What's next for Cognitive Kitchen:**
+Over 7 posts, I opened the hood on **Cognitive Kitchen**:
+• 184 recipe documents ingested  
+• 1,746 knowledge graph nodes & 5,277 relationships mapped  
+• 158 canonical ingredients curated  
+• 50 golden recipes & 229 verified benchmark queries air-gapped  
+• 100% running on a 1.5B open-source model on CPU — with **$0 GPU spend**.
 
-🔮 **Vision-Driven Pantry Audit**  
-Snap a photo of your fridge shelf. A multimodal vision model extracts ingredients → normalizes via `ck-vocab` → auto-populates the **Neo4j** pantry graph. Zero typing.
+The real breakthrough was never just a cooking app.
+It was proving that **empirical benchmarking before production locking** beats guesswork every single time.
 
-🎙️ **Hands-Free Voice UX**  
-Real-time step-by-step cooking guidance via audio streaming. No touching the screen with messy hands.
-
-📚 **Domain Expansion**  
-The RAG Lab Sandbox is domain-agnostic by design. Recipes were first. Legal contracts, medical policies, technical manuals — same **Streamlit** + **FastAPI** + **DeepEval** framework, different corpus.
-
----
-
-**What building this taught me:**
-
-→ Small models + right architecture > large models + wrong architecture.  
-→ Safety compliance is not a quality score. It's a non-negotiable gate.  
-→ Negative results (HyDE, Semantic Chunking) are as valuable as positive ones.  
-→ Ship it, measure it, share the data. Not just the wins.  
+Here are the 4 non-negotiable principles this build taught me:
 
 ---
 
-💻 https://github.com/aru911-gethu/CognitiveKitchen  
-🌐 https://techideas.tech/  
+### 4 Core Engineering Principles from the Sandbox 📐
 
-Thank you to everyone who followed this series.
+1️⃣ **Small Models + Right Architecture > Giant LLMs + Default Tutorials**  
+A 1.5B model on CPU — paired with a Neo4j knowledge graph and context reordering — outperformed proprietary models on safety, speed, and deterministic inventory logic. Architecture always beats parameter bloat.
 
-👇 What RAG challenges are you navigating right now? What domain would you test the sandbox on? Drop your thoughts below!
+2️⃣ **Safety & Constraint Compliance is a Gate, Not a Quality Score**  
+If a user is allergic to nuts, a retriever that returns cashew milk 1 time out of 10 is not "90% accurate". It is dangerous. Enforce hard symbolic constraints with a knowledge graph *before* probabilistic neural ranking.
+
+3️⃣ **Publish Your Negative Results**  
+We tested HyDE: it added 400s of CPU latency for zero gain. We tested Semantic Chunking: it straddled recipe boundaries and blended butter quantities. We tested Map-Reduce: it fragmented recipes into `NOT_IN_CONTEXT` errors. Sharing failures saves your team hundreds of engineering hours.
+
+4️⃣ **Empirical Benchmarks Before Production Locks**  
+If your chunker, retriever, or vocabulary has ever seen your test queries, your AI is cheating. An air-gapped 3-tier evaluation framework transforms RAG from *"this feels good"* into quantifiable engineering.
 
 ---
-#CognitiveKitchen #BuildInPublic #OpenSource #RAG #GraphRAG #AIProduct #VisionAI #MultiModal #GenAI #Qwen #Neo4j #FAISS #Docker #Streamlit #FastAPI #DeepEval #LangSmith
+
+### 🔮 The Roadmap: Where Cognitive Kitchen Goes Next
+
+1. 📸 **Vision-Driven Multimodal Pantry Audit**  
+Snap a photo of your fridge shelf. A multimodal vision model extracts bounding boxes → normalizes strings through `ck-vocab` → auto-populates your Neo4j pantry graph. Zero typing.
+
+2. 🎙️ **Hands-Free Bidirectional Voice UX**  
+Real-time step-by-step culinary guidance via streaming WebSockets. Ask questions and get timing alerts without touching screens with messy, floured hands.
+
+3. 📚 **Domain Expansion (Beyond Cooking)**  
+The RAG Lab Sandbox is domain-agnostic by design. The same 6-stage Streamlit + FastAPI + DeepEval framework can benchmark:  
+• **Healthcare**: Clinical protocol extraction with strict pharmacological contraindication pre-filtering.  
+• **Legal & Contracts**: Clause extraction with regulatory compliance gates.  
+• **Enterprise Manuals**: SOP compliance with set-difference tooling audits.
+
+---
+
+💻 **GitHub source**: https://github.com/aru911-gethu/CognitiveKitchen  
+🌐 **Live app running on VPS**: https://techideas.tech/  
+
+Thank you to everyone who followed this 8-part journey!
+
+👇 What RAG challenges is your engineering team currently navigating? What domain would you test the RAG Lab Sandbox on next? Let's connect and discuss below!
+
+#CognitiveKitchen #BuildInPublic #OpenSource #RAG #GraphRAG #AIProduct #VisionAI #MultiModal #GenAI #Qwen #Neo4j #FAISS #Docker #Streamlit #FastAPI #DeepEval #LangSmith #LLMOps
